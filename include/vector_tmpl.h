@@ -27,7 +27,7 @@
  *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
- 
+
 #ifdef T
 
 #include <stdbool.h>
@@ -385,20 +385,20 @@ void vpushbptr(T)(vector(T) *v, T *valaddr);
 void vpopb(T)(vector(T) *v);
 
 /**< vector(T): modifiers - insertion */
-iterator *vinsert(T)(vector(T) *v, iterator pos, T val);
-iterator *vinsertptr(T)(vector(T) *v, iterator pos, T *val);
-iterator *vinsertfill(T)(vector(T) *v, iterator pos, size_t n, T val);
-iterator *vinsertfillptr(T)(vector(T) *v, iterator pos, size_t n, T *valaddr);
-iterator *vinsertrnge(T)(vector(T) *v, iterator pos, iterator first,
+iterator vinsert(T)(vector(T) *v, iterator pos, T val);
+iterator vinsertptr(T)(vector(T) *v, iterator pos, T *val);
+iterator vinsertfill(T)(vector(T) *v, iterator pos, size_t n, T val);
+iterator vinsertfillptr(T)(vector(T) *v, iterator pos, size_t n, T *valaddr);
+iterator vinsertrnge(T)(vector(T) *v, iterator pos, iterator first,
                          iterator last);
-iterator *vinsertmove(T)(vector(T) *v, iterator *pos, T *valaddr);
+iterator vinsertmove(T)(vector(T) *v, iterator pos, T *valaddr);
 
 /**< vector(T): modifiers - erasure */
-iterator *verase(T)(vector(T) *v, iterator *pos);
-iterator *verasernge(T)(vector(T) *v, iterator *pos, iterator *last);
+iterator verase(T)(vector(T) *v, iterator pos);
+iterator verasernge(T)(vector(T) *v, iterator pos, iterator last);
 
 /**< vector(T): modifiers - container swappage */
-void vswap(T)(vector(T) * *v, vector(T) * *other);
+void vswap(T)(vector(T) **v, vector(T) **other);
 
 /**< vector(T): modifiers - clear container */
 void vclear(T)(vector(T) *v);
@@ -458,35 +458,5 @@ struct typetable *vgetttbl(T)(vector(T) *v);
 /**< ptrs to vtables */
 struct typetable *vector_typetable_ptr_id(T);
 struct iterator_table *vector_iterator_table_ptr_id(T);
-
-/**
- * TODO:
- *  vassignrnge
- *
- *  vassignfill
- *  vassignfillptr
- *
- *  vassignfill_dcp
- *  vassignfillptr_dcp
- *
- *  vinsert
- *  vinsert_dcp
- *
- *  vinsertptr
- *  vinsertptr_dcp
- *
- *  vinsertfill
- *  vinsertfillptr
- *
- *  vinsertrnge
- *  vinsertrnge_dcp
- *
- *  vinsertmove
- *
- *  verase
- *  verasernge
- *
- *  vmerge
- */
 
 #endif /* T */
