@@ -1,0 +1,9 @@
+color,director_name,movie_title,duration
+Color,James Cameron,Avatar,178
+Black and White,Alfred Hitchcock,Psycho,290
+Color,Francis Ford Coppola,The Godfather,208
+Black and White,"George Clooney","Good Night, and Good Luck.",351
+regularcell,"this is a
+multiline cell
+with a ""str""
+inside it.",regularcell,regularcell
