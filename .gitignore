@@ -3,3 +3,9 @@
 *.DS_Store
 build/*.o
 gcslib
+_debug/.DS_Store
+_debug/.DS_Store
+gcslib.dSYM/Contents/Info.plist
+gcslib.dSYM/Contents/Resources/DWARF/gcslib
+src/.DS_Store
+include/.DS_Store
