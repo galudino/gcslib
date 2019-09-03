@@ -1,11 +1,7 @@
 gcslib by Gemuele Aludino
 --------------------------------------------------------------------------------
 09/03/2019
-vector (void * type) is ready to go.
-next up is templated version of vector, vector(T).
-
-
-
+vector (void *) and vector(T) are ready to use.
 
 --------------------------------------------------------------------------------
 Author's note:
