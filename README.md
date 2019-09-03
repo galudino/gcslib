@@ -1,7 +1,48 @@
-gcslib by Gemuele Aludino
+gcslib by Gemuele Aludino - a container library for C (C99)
 --------------------------------------------------------------------------------
+
+gcslib will be actively tested on:
+    macOS
+    CentOS Linux
+ 
+TO USE GCSLIB:
+Clone this repository (download it to your machine)
+
+The provided Makefile will recognize files in the include and src directories,
+and the object files will reside in the build directory.
+
+A test client is provided for your convenience (and for my testing purposes),
+the test client is named gcslib.c and is located in the client directory.
+You can run the test client by running the gcslib in the root of the repo directory.
+
+Consult the Makefile to review the required compile flags if you wish to
+extract certain containers out of gcslib for use in your projects.
+
+All gcslib containers depend on the following files:
+utils.h
+utils.c
+iterator.h
+iterator.c
+
+Sequential containers will also depend on
+mergesort.h
+mergesort.c
+
+Templated sequential containers will depend on
+mergesort_template.h
+mergesort_template.c
+
+You can review the dependencies for each container by consulting gcslib.h.
+gcslib.h is a catch-all header for the entire library, if you wish to use
+everything at once. Otherwise, you can omit what you don't need for your project,
+so as long as a container's dependency requirements are met.
+
+--------------------------------------------------------------------------------
+CHANGELOG
+
 09/03/2019
 vector (void *) and vector(T) are ready to use.
+gcslib repository online.
 
 --------------------------------------------------------------------------------
 Author's note:
