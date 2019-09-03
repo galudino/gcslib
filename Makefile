@@ -3,7 +3,7 @@
 ##	@brief		Makefile for gcslib
 ##
 ##	@author		Gemuele Aludino
-##	@date       	18 Jul 2019
+##	@date      	18 Jul 2019
 ##	@copyright 	Copyright © 2019 Gemuele Aludino. All rights reserved.
 ##
 
