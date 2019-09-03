@@ -1,7 +1,6 @@
 *.o
 *.out
 *.DS_Store
-build/*.o
 gcslib
 _debug/.DS_Store
 _debug/.DS_Store
