@@ -1,2 +1,5 @@
-
-_debug/.DS_Store
+*.o
+*.out
+*.DS_Store
+build/*.o
+gcslib

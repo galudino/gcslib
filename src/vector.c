@@ -2241,8 +2241,8 @@ void v_fputsf(vector *v, FILE *dest,
         for (size_t i = 0, curr = 1; i < size; i++, curr++) {
             print(target, dest);
 
-            // display address for debugging
-            fprintf(dest, "\t\t%p", target);
+            // address - disable for release
+            fprintf(dest, "\t\t(%s%p%s)", KCYN, target, KNRM);
 
             if (i < size - 1) {
                 fprintf(dest, "%s", postelem ? postelem : "");

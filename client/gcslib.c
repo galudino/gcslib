@@ -67,7 +67,8 @@ int main(int argc, const char *argv[]) {
 void test_int() {
     vector *v = v_new(_int_);
     for (int i = 0; i < 25; i++) {
-        v_pushb(v, &i);
+        int r = rand() % 100;
+        v_pushb(v, &r);
     }
 
     v_shrink_to_fit(v);
@@ -82,15 +83,16 @@ void test_int() {
     // make it addressable - store it in a variable first.
     iterator it = v_begin(v);
     foreach(int, i, it) {
-        printf("%d\n", *i);
+        LOG(__FILE__, "iterator: %d", *i);
     }
+
+    v_delete(&v);
 }
 
 /**
  *  @brief  Space to test container functionality for (char *) types
  */
 void test_str() {
-
     const char arr[][64] = { "alpha", "beta", "charlie", "delta",
     "echo", "foxtrot", "golf", "hottub", "icecream", "jerseygirl" };
 
@@ -109,11 +111,44 @@ void test_str() {
     v_newrnge(it_next_n(v_begin(v1), 2), it_next_n(v_begin(v1), 6));
 
     v_puts(v2);
+
+    v_delete(&v2);
+    v_delete(&v1);
 }
 
 /**
  *  @brief  Space to test container functionality for "object" types
  */
 void test_vec2D() {
+    // If you intend to use your user-defined composite type (struct)
+    // as the struct itself, or a pointer-to-struct,
+    // note that each will require their own typetable, as demonstrated below.
+    // usage with the containers remains the same.
 
+    vector *v1 = v_new(_vec2D_);
+
+    for (int i = 0; i < 8; i++) {
+        double r1 = rand() % 90;
+        double r2 = rand() % 90;
+
+        vec2D vect;
+        vec2D_init(&vect, r1, r2);
+        v_pushb(v1, &vect);
+    }
+
+    v_puts(v1);
+    v_delete(&v1);
+
+    vector *v2 = v_new(_vec2D_ptr_);
+
+    for (int i = 0; i < 8; i++) {
+        double r1 = rand() % 90;
+        double r2 = rand() % 90;
+
+        vec2D *vect = vec2D_ptr_new(r1, r2);
+        v_pushb(v2, &vect);
+    }
+
+    v_puts(v2);
+    v_delete(&v2);
 }
