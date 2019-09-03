@@ -41,9 +41,12 @@
 #include <string.h>
 #include <unistd.h>
 
-void test_int(void);
-void test_str(void);
-void test_vec2D(void);
+void test_int_vp(void);
+void test_str_vp(void);
+void test_vec2D_vp(void);
+
+void test_int_tmpl(void);
+void test_str_tmpl(void);
 
 /**
  *  @brief  Program execution begins here
@@ -54,9 +57,12 @@ void test_vec2D(void);
  *  @return     exit status
  */
 int main(int argc, const char *argv[]) {
-    test_int();
-    test_str();
-    test_vec2D();
+    //test_int_vp();
+    //test_str_vp();
+    //test_vec2D_vp();
+
+    test_int_tmpl();
+    test_str_tmpl();
 
     return EXIT_SUCCESS;
 }
@@ -64,7 +70,7 @@ int main(int argc, const char *argv[]) {
 /**
  *  @brief  Space to test container functionality for integral types
  */
-void test_int() {
+void test_int_vp() {
     vector *v = v_new(_int_);           // starts at size 16
     for (int i = 0; i < 25; i++) {
         int r = rand() % 100;
@@ -92,8 +98,8 @@ void test_int() {
 /**
  *  @brief  Space to test container functionality for (char *) types
  */
-void test_str() {
-    const char arr[][64] = { "alpha", "beta", "charlie", "delta",
+void test_str_vp() {
+    const char arr[][16] = { "alpha", "beta", "charlie", "delta",
     "echo", "foxtrot", "golf", "hottub", "icecream", "jerseygirl" };
 
     vector *v1 = v_new(_cstr_);
@@ -119,7 +125,7 @@ void test_str() {
 /**
  *  @brief  Space to test container functionality for "object" types
  */
-void test_vec2D() {
+void test_vec2D_vp() {
     // If you intend to use your user-defined composite type (struct)
     // as the struct itself, or a pointer-to-struct,
     // note that each will require their own typetable, as demonstrated below.
@@ -151,4 +157,12 @@ void test_vec2D() {
 
     v_puts(v2);
     v_delete(&v2);
+}
+
+void test_int_tmpl() {
+
+}
+
+void test_str_tmpl() {
+
 }
