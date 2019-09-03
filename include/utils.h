@@ -130,17 +130,17 @@ typedef void (*print_fn)(const void *, FILE *);
 /**
  *  @struct     typetable
  *  @brief      a virtual function table that determines the behavior of
- *              a container ADT
+ *              a container ADT when acting with or upon its elements
  */
 struct typetable {
-    size_t width;
+    size_t width;                               /**< sizeof(T) */
 
-    void *(*copy)(void *, const void *);
-    void (*dtor)(void *);
-    void (*swap)(void *, void *);
+    void *(*copy)(void *, const void *);        /**< intended for deep copies */
+    void (*dtor)(void *);    /**< for release of dynamically allocated memory */
+    void (*swap)(void *, void *);/**< for moving dynamically allocated memory */
 
-    int (*compare)(const void *, const void *);
-    void (*print)(const void *, FILE *dest);
+    int (*compare)(const void *, const void *); /**< sorting/searching */
+    void (*print)(const void *, FILE *dest);    /**< output to stream */
 };
 
 /**< Use these pointer variables to instantiate an ADT container (i.e. vector)
@@ -221,26 +221,26 @@ extern struct typetable *_pthread_t_;
  *  If at least one of the function pointers will be NULL,
  *  your struct typetable instance should be defined manually.
  */
-#define TYPETABLE_DEFINE_PTR(TYPENAME)\
-struct typetable ttbl_##TYPENAME = {\
-    sizeof(TYPENAME),\
-    TYPENAME##_copy,\
-    TYPENAME##_dtor,\
-    TYPENAME##_swap,\
-    TYPENAME##_compare,\
-    TYPENAME##_print\
-};\
-\
+#define TYPETABLE_DEFINE_PTR(TYPENAME)                                         \
+struct typetable ttbl_##TYPENAME = {                                           \
+    sizeof(TYPENAME),                                                          \
+    TYPENAME##_copy,                                                           \
+    TYPENAME##_dtor,                                                           \
+    TYPENAME##_swap,                                                           \
+    TYPENAME##_compare,                                                        \
+    TYPENAME##_print                                                           \
+};                                                                             \
+                                                                               \
 struct typetable *_##TYPENAME##_ = &ttbl_##TYPENAME;\
 
 
-#define TYPETABLE_DEFINE_PTR(TYPENAME)\
-struct typetable ttbl_##TYPENAME = {\
-    sizeof(TYPENAME), TYPENAME##_copy, TYPENAME##_dtor,\
-    TYPENAME##_swap, TYPENAME##_compare, TYPENAME##_print\
-};\
-\
-struct typetable *_##TYPENAME##_ = &ttbl_##TYPENAME;\
+#define TYPETABLE_DEFINE_PTR(TYPENAME)                                         \
+struct typetable ttbl_##TYPENAME = {                                           \
+    sizeof(TYPENAME), TYPENAME##_copy, TYPENAME##_dtor,                        \
+    TYPENAME##_swap, TYPENAME##_compare, TYPENAME##_print                      \
+};                                                                             \
+                                                                               \
+struct typetable *_##TYPENAME##_ = &ttbl_##TYPENAME;                           \
 
 /**
  *  Stack allocated instances and heap allocated instances will need to be

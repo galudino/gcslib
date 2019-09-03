@@ -65,7 +65,7 @@ int main(int argc, const char *argv[]) {
  *  @brief  Space to test container functionality for integral types
  */
 void test_int() {
-    vector *v = v_new(_int_);
+    vector *v = v_new(_int_);           // starts at size 16
     for (int i = 0; i < 25; i++) {
         int r = rand() % 100;
         v_pushb(v, &r);
