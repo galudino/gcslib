@@ -33,7 +33,7 @@ CC 				= gcc
 CSTD 				= -std=gnu99
 DEBUG 				= -g
 PTHREAD				= -pthread
-MATH 				= #-lm      ## disable for macOS/clang
+MATH 				= -lm      ## disable for macOS/clang
 
 SANTIIZED 			= #-fsanitize=address
 W_ALL 				= #-Wall
