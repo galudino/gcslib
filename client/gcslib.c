@@ -55,8 +55,8 @@ void test_vec2D(void);
  */
 int main(int argc, const char *argv[]) {
     test_int();
-    //test_str();
-    //test_vec2D();
+    test_str();
+    test_vec2D();
 
     return EXIT_SUCCESS;
 }
@@ -65,7 +65,25 @@ int main(int argc, const char *argv[]) {
  *  @brief  Space to test container functionality for integral types
  */
 void test_int() {
+    vector *v = v_new(_int_);
+    for (int i = 0; i < 25; i++) {
+        v_pushb(v, &i);
+    }
 
+    v_shrink_to_fit(v);
+
+    // EXPERMENTAL MACRO: for-each macro
+    // for each int i in iterator it, print it.
+    // Just supply the target type,
+    // an identifier (name) you'll give
+    // to identify an element of the target type,
+    // and the iterator that you will traverse.
+    // note: rvalue iterators will not work.
+    // make it addressable - store it in a variable first.
+    iterator it = v_begin(v);
+    foreach(int, i, it) {
+        printf("%d\n", *i);
+    }
 }
 
 /**
@@ -73,6 +91,24 @@ void test_int() {
  */
 void test_str() {
 
+    const char arr[][64] = { "alpha", "beta", "charlie", "delta",
+    "echo", "foxtrot", "golf", "hottub", "icecream", "jerseygirl" };
+
+    vector *v1 = v_new(_cstr_);
+    for (int i = 0; i < 10; i++) {
+        const char *cstr = arr[i];
+        v_pushb(v1, &cstr);
+    }
+
+    v_erase_at(v1, 3);
+    v_puts(v1);
+
+    // using iterators to generate a range from within v1 at indices [2, 6),
+    // and using that range to create a new vector
+    vector *v2 =
+    v_newrnge(it_next_n(v_begin(v1), 2), it_next_n(v_begin(v1), 6));
+
+    v_puts(v2);
 }
 
 /**
