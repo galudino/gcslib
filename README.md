@@ -47,7 +47,7 @@ has access to that container variable on their end.
 
 To the client, there is only one iterator type,
 but the behavior of the iterator is dictated by the vtable
-(virtual function table) it is initialized with when calling a
+(virtual function table) -- it is initialized with when calling a
 "_begin" or "_end" function for a particular container.
 
 The iterator, just as in C++, becomes the common interface between
@@ -80,13 +80,16 @@ Eventually, gcslib will have the following containers:
 
 Each of these containers will use a (void *) to store their data.
 
-There will also be a second category of containers that
-are essentially a "poor-man's" template.
+There will also be a second category of containers, just like the ones above,
+but "templated".
 
 These "templates" use preprocessor token-pasting to generate
-type-safe containers. This will be a better option for integral data types,
-like int8_t (char) or int32_t (int), and will have a friendlier API that
-(in my opinion) is easier to use.
+type-safe containers. Not all of the code is generated using macros --
+just the portions of the code that contain type information are macros.
+
+I believe the templated containers will be a better option
+for integral data types, like int8_t (char) or int32_t (int),
+and will have a friendlier API that (in my opinion) is easier to use.
 
 Template "instantiations" of
     int types (char, short, int, long long, both signed/unsigned)
