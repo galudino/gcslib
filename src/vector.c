@@ -186,13 +186,15 @@ vector *v_newfill(struct typetable *ttbl, size_t n, void *valaddr) {
     void *sentinel = (char *)(v->impl.start) + (n * v->ttbl->width);
 
     if (v->ttbl->copy) {
-        // if copy function defined in ttbl, instances of valaddr are deep copied
+        // if copy function defined in ttbl,
+        // instances of valaddr are deep copied
         while (v->impl.finish != sentinel) {
             v->ttbl->copy(v->impl.finish, valaddr);
             v->impl.finish = (char *)(v->impl.finish) + (v->ttbl->width);
         }
     } else {
-        // if no copy function defined in ttbl, instance of valaddr are shallow copied
+        // if no copy function defined in ttbl,
+        // instances of valaddr are shallow copied
         while (v->impl.finish != sentinel) {
             memcpy(v->impl.finish, valaddr, v->ttbl->width);
             v->impl.finish = (char *)(v->impl.finish) + (v->ttbl->width);
@@ -489,7 +491,6 @@ void v_resizefill(vector *v, size_t n, const void *valaddr) {
     void *sentinel = (char *)(v->impl.start) + (n * v->ttbl->width);
 
     if (n > old_capacity) {
-        LOG(__FILE__, "greater");
         // if n is greater than the old size, multiple instances of valaddr are
         // appended to the rear of the vector following a resize.
         v_resize(v, n);
@@ -563,7 +564,7 @@ void v_resizefill(vector *v, size_t n, const void *valaddr) {
  *
  *  @param[in]  v   pointer to vector
  *
- *  @return         Capacity of v
+ *  @return         capacity of v
  */
 size_t v_capacity(vector *v) {
     assert(v);
@@ -657,7 +658,7 @@ void *v_at(vector *v, size_t n) {
         // if n is (size - 1), the back index, effectively (v->impl.finish - 1)
         target = (char *)(v->impl.finish) - (v->ttbl->width);
     } else {
-        // if n is anywhere within [0, size), effectively (v->impl.start + n)
+        // if n is anywhere within (0, size - 1), effectively (v->impl.start + n)
         target = (char *)(v->impl.start) + (n * v->ttbl->width);
     }
 
@@ -1492,6 +1493,24 @@ iterator v_erase(vector *v, iterator pos) {
     return it_next_n(v_begin(v), ipos);
 }
 
+/**
+ *  @brief  Removes elements from v ranging from [pos, last)
+ *
+ *  @param[in]  v       pointer to vector
+ *  @param[in]  pos     refers to element from within vector
+ *  @param[in]  last    refers to element from within vector
+ *
+ *  @return     iterator representing an element that has replaced the
+ *              erased element at pos
+ *
+ *  If a dtor function is defined in v's ttbl,
+ *  the element at position pos will be destroyed using the dtor function
+ *  from within ttbl.
+ *
+ *  Memory management of dynamically allocated elements/elements with
+ *  dynamically allocated fields become the client's responsibility
+ *  if a dtor function is NOT defined within v's ttbl.
+ */
 iterator v_erasernge(vector *v, iterator pos, iterator last) {
     assert(v);
 
@@ -1616,13 +1635,13 @@ void v_clear(vector *v) {
         }
 
         v->ttbl->dtor(v->impl.finish);
-        memset(v->impl.start, 0, v_capacity(v) * v->ttbl->width);
+        memset(v->impl.start, 0, v_size(v) * v->ttbl->width);
         // v->impl.finish is already at v->impl.start.
     } else {
         // if elements were shallow copied,
         // (no dtor function specified in ttbl) --
         // we just memset and reset the finish pointer.
-        memset(v->impl.start, 0, v_capacity(v) * v->ttbl->width);
+        memset(v->impl.start, 0, v_size(v) * v->ttbl->width);
         v->impl.finish = v->impl.start;
     }
 }
@@ -2136,7 +2155,7 @@ void v_sort(vector *v) {
     = v->ttbl->compare ? v->ttbl->compare : void_ptr_compare;
 
     // cstdlib qsort (best performance)
-    //qsort(v->base, size, v->ttbl->width, comparator);
+    //qsort(v->impl.start, size, v->ttbl->width, comparator);
 
     // cstdlib mergesort
     //mergesort(v->impl.start, size, v->ttbl->width, comparator);
@@ -2372,6 +2391,17 @@ void vector_print(const void *arg, FILE *dest) {
 
     vector *v = *(vector **)(arg);
     v_fputs(v, dest);
+}
+
+/**
+ *  @brief  Reassign ttbl to v
+ *
+ *  @param[in]  v       pointer to vector
+ *  @param[in]  ttbl    pointer to typetable
+ */
+void v_set_ttbl(vector *v, struct typetable *ttbl) {
+    assert(v);
+    v->ttbl = ttbl ? ttbl : _void_ptr_;
 }
 
 /**

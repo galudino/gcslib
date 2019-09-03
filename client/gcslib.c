@@ -160,7 +160,24 @@ void test_vec2D_vp() {
 }
 
 void test_int_tmpl() {
+    vector(int) *v = vnew(int)();
 
+    for (int i = 0; i < 32; i++) {
+        vpushb(int)(v, i);
+    }
+
+    vputs(int)(v);
+
+    vector(char) *cv = vnew(char)();
+
+    vpushb(char)(cv, 'h');
+    vpushb(char)(cv, 'e');
+    vpushb(char)(cv, 'y');
+    vpushb(char)(cv, '\0');
+
+    char *data = *vdata(char)(cv);
+    vpopb(char)(cv);
+    vputs(char)(cv);
 }
 
 void test_str_tmpl() {
