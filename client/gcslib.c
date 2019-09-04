@@ -120,6 +120,7 @@ void test_str_vp() {
 
     v_delete(&v2);
     v_delete(&v1);
+    
 }
 
 /**
