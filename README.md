@@ -1,4 +1,4 @@
-gcslib by Gemuele Aludino - a container library for C (C99)
+gcslib by Gemuele Aludino - a container library for C
 --------------------------------------------------------------------------------
 
 gcslib will be actively tested on:
@@ -41,13 +41,15 @@ so as long as a container's dependency requirements are met.
 CHANGELOG
 
 09/03/2019
+Will rewrite to conform to ANSI-C as opposed to C99.
+
 vector (void *) and vector(T) are ready to use.
 gcslib repository online.
 
 --------------------------------------------------------------------------------
 Author's note:
 gcslib stands for "Gem's Computer Science library",
-and it is a container library for C (specifically, C99).
+and it is a container library for C.
 
 It is loosely modeled off of the C++ standard library containers.
 
