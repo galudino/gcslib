@@ -17,6 +17,7 @@
         "map": "cpp",
         "set": "cpp",
         "unordered_map": "cpp",
-        "hashtable": "cpp"
+        "hashtable": "cpp",
+        "complex": "cpp"
     }
 }

@@ -57,9 +57,11 @@ struct typetable ttbl_long_int;
 struct typetable ttbl_signed_long_int;
 struct typetable ttbl_unsigned_long_int;
 
+#if __STD_VERSION__ >= 199901L
 struct typetable ttbl_long_long_int;
 struct typetable ttbl_signed_long_long_int;
 struct typetable ttbl_unsigned_long_long_int;
+#endif
 
 struct typetable ttbl_float;
 struct typetable ttbl_double;
@@ -84,12 +86,18 @@ struct typetable ttbl_void_ptr;
 struct typetable ttbl_int8;
 struct typetable ttbl_int16;
 struct typetable ttbl_int32;
+
+#if __STD_VERSION__ >= 199901L
 struct typetable ttbl_int64;
+#endif
 
 struct typetable ttbl_uint8;
 struct typetable ttbl_uint16;
 struct typetable ttbl_uint32;
+
+#if __STD_VERSION__ >= 199901L
 struct typetable ttbl_uint64;
+#endif
 
 void *str_copy(void *arg, const void *other) {
     char **target = (char **)(arg);
@@ -212,6 +220,7 @@ int unsigned_long_int_compare(const void *c1, const void *c2) {
     return (int)(*((unsigned long int *)c1) - *((unsigned long int *)c2));
 }
 
+#if __STD_VERSION__ >= 199901L
 int long_long_int_compare(const void *c1, const void *c2) {
     return (int)(*((long long int *)c1) - *((long long int *)c2));
 }
@@ -223,6 +232,7 @@ int signed_long_long_int_compare(const void *c1, const void *c2) {
 int unsigned_long_long_int_compare(const void *c1, const void *c2) {
     return (int)(*((unsigned long long int *)c1) - *((unsigned long long int *)c2));
 }
+#endif
 
 int float_compare(const void *c1, const void *c2) {
     float result = -99999.9;
@@ -302,11 +312,20 @@ int char_ptr_compare(const void *c1, const void *c2) {
 }
 
 int str_compare(const void *c1, const void *c2) {
+    int result = -1;
+
     char *first = *((char **)(c1));
     char *second = *((char **)(c2));
 
+    #if __STD_VERSION__ >= 199901L
     char cfirst[strlen(first) + 1];
     char csecond[strlen(second) + 1];
+    #else
+    char *cfirst = malloc(strlen(first) + 1);
+    char *csecond = malloc(strlen(second) + 1);
+    assert(cfirst);
+    assert(csecond);
+    #endif
 
     strcpy(cfirst, first);
     strcpy(csecond, second);
@@ -314,23 +333,40 @@ int str_compare(const void *c1, const void *c2) {
     str_trim(cfirst, NULL);
     str_trim(csecond, NULL);
 
-    return strcmp(cfirst, csecond);
+    result = strcmp(cfirst, csecond);
+
+    #if __STD_VERSION__ >= 199901L
+    free(cfirst);
+    cfirst = NULL;
+
+    free(csecond);
+    csecond = NULL;
+    #endif
+
+    return result;
 }
 
 int str_compare_ignore_case(const void *c1, const void *c2) {
     char *first = *((char **)(c1));
     char *second = *((char **)(c2));
 
+    int i = 0;
+
+    #if __STD_VERSION__ >= 199901L
     char cfirst[strlen(first) + 1];
     char csecond[strlen(second) + 1];
+    #else
+    char *cfirst = malloc(strlen(first) + 1);
+    char *csecond = malloc(strlen(second) + 1);
+    assert(cfirst);
+    assert(csecond);
+    #endif
 
     strcpy(cfirst, first);
     strcpy(csecond, second);
 
     str_trim(cfirst, NULL);
     str_trim(csecond, NULL);
-
-    int i = 0;
 
     while (true) {
         i = toupper(*first) - toupper(*second);
@@ -342,6 +378,14 @@ int str_compare_ignore_case(const void *c1, const void *c2) {
             ++second;
         }
     }
+
+    #if __STD_VERSION__ >= 199901L
+    free(cfirst);
+    cfirst = NULL;
+    
+    free(csecond);
+    csecond = NULL;
+    #endif
 
     return i;
 }
@@ -378,9 +422,11 @@ int int32_compare(const void *c1, const void *c2) {
     return int_compare(c1, c2);
 }
 
+#if __STD_VERSION__ >= 199901L
 int int64_compare(const void *c1, const void *c2) {
     return long_long_int_compare(c1, c2);
 }
+#endif
 
 int uint8_compare(const void *c1, const void *c2) {
     return unsigned_char_compare(c1, c2);
@@ -394,9 +440,11 @@ int uint32_compare(const void *c1, const void *c2) {
     return unsigned_int_compare(c1, c2);
 }
 
+#if __STD_VERSION__ >= 199901L
 int uint64_compare(const void *c1, const void *c2) {
     return unsigned_long_long_int_compare(c1, c2);
 }
+#endif
 
 void char_print(const void *arg, FILE *dest) {
     fprintf(dest, "%c", *(char *)arg);
@@ -446,6 +494,7 @@ void unsigned_long_int_print(const void *arg, FILE *dest) {
     fprintf(dest, "%lu", *(unsigned long int *)arg);
 }
 
+#if __STD_VERSION__ >= 199901L
 void long_long_int_print(const void *arg, FILE *dest) {
     fprintf(dest, "%lli", *(long long int *)arg);
 }
@@ -457,6 +506,7 @@ void signed_long_long_int_print(const void *arg, FILE *dest) {
 void unsigned_long_long_int_print(const void *arg, FILE *dest) {
     fprintf(dest, "%llu", *(unsigned long long int *)arg);
 }
+#endif
 
 void float_print(const void *arg, FILE *dest) {
     fprintf(dest, "%f", *(float *)arg);
@@ -502,9 +552,11 @@ void int32_print(const void *arg, FILE *dest) {
     int_print(arg, dest);
 }
 
+#if __STD_VERSION__ >= 199901L
 void int64_print(const void *arg, FILE *dest) {
     long_long_int_print(arg, dest);
 }
+#endif
 
 void uint8_print(const void *arg, FILE *dest) {
     unsigned_char_print(arg, dest);
@@ -518,19 +570,22 @@ void uint32_print(const void *arg, FILE *dest) {
     unsigned_int_print(arg, dest);
 }
 
+#if __STD_VERSION__ >= 199901L
 void uint64_print(const void *arg, FILE *dest) {
     unsigned_long_long_int_print(arg, dest);
 }
+#endif
 
 char *char_parse(const void *arg) {
     const char value = *(char *)arg;
     const char *format = "%c";
+    char *parsed = NULL;
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value);
 
-    char *parsed = strdup(buffer);
+    parsed = strdup(buffer);
     assert(parsed);
     return parsed;
 }
@@ -538,12 +593,13 @@ char *char_parse(const void *arg) {
 char *signed_char_parse(const void *arg) {
     const char value = *(char *)arg;
     const char *format = "%c";
+    char *parsed = NULL;
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value);
 
-    char *parsed = strdup(buffer);
+    parsed = strdup(buffer);
     assert(parsed);
     return parsed;
 }
@@ -551,12 +607,13 @@ char *signed_char_parse(const void *arg) {
 char *unsigned_char_parse(const void *arg) {
     const unsigned char value = *(unsigned char *)arg;
     const char *format = "%c";
+    char *parsed = NULL;
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value);
 
-    char *parsed = strdup(buffer);
+    parsed = strdup(buffer);
     assert(parsed);
     return parsed;
 }
@@ -564,12 +621,13 @@ char *unsigned_char_parse(const void *arg) {
 char *short_int_parse(const void *arg) {
     const char value = *(short int *)arg;
     const char *format = "%hi";
+    char *parsed = NULL;
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value);
 
-    char *parsed = strdup(buffer);
+    parsed = strdup(buffer);
     assert(parsed);
     return parsed;
 }
@@ -581,12 +639,13 @@ char *signed_short_int_parse(const void *arg) {
 char *unsigned_short_int_parse(const void *arg) {
     const char value = *(unsigned short int *)arg;
     const char *format = "%hu";
+    char *parsed = NULL;
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value);
 
-    char *parsed = strdup(buffer);
+    parsed = strdup(buffer);
     assert(parsed);
     return parsed;
 }
@@ -594,12 +653,13 @@ char *unsigned_short_int_parse(const void *arg) {
 char *int_parse(const void *arg) {
     const char value = *(int *)arg;
     const char *format = "%d";
+    char *parsed = NULL;
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value);
 
-    char *parsed = strdup(buffer);
+    parsed = strdup(buffer);
     assert(parsed);
     return parsed;
 }
@@ -611,12 +671,13 @@ char *signed_int_parse(const void *arg) {
 char *unsigned_int_parse(const void *arg) {
     const char value = *(unsigned int *)arg;
     const char *format = "%u";
+    char *parsed = NULL;
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value);
 
-    char *parsed = strdup(buffer);
+    parsed = strdup(buffer);
     assert(parsed);
     return parsed;
 }
@@ -624,12 +685,13 @@ char *unsigned_int_parse(const void *arg) {
 char *long_int_parse(const void *arg) {
     const char value = *(long int *)arg;
     const char *format = "%li";
+    char *parsed = NULL;
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value);
 
-    char *parsed = strdup(buffer);
+    parsed = strdup(buffer);
     assert(parsed);
     return parsed;
 }
@@ -641,16 +703,18 @@ char *signed_long_int_parse(const void *arg) {
 char *unsigned_long_int_parse(const void *arg) {
     const char value = *(unsigned long int *)arg;
     const char *format = "%u";
+    char *parsed = NULL;
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value);
 
-    char *parsed = strdup(buffer);
+    parsed = strdup(buffer);
     assert(parsed);
     return parsed;
 }
 
+#if __STD_VERSION__ >= 199901L
 char *long_long_int_parse(const void *arg) {
     const char value = *(long long int *)arg;
     const char *format = "%lld";
@@ -680,16 +744,18 @@ char *unsigned_long_long_int_parse(const void *arg) {
     assert(parsed);
     return parsed;
 }
+#endif
 
 char *float_parse(const void *arg) {
     const char value = *(float *)arg;
     const char *format = "%f";
+    char *parsed = NULL;
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value);
 
-    char *parsed = strdup(buffer);
+    parsed = strdup(buffer);
     assert(parsed);
     return parsed;
 }
@@ -697,12 +763,13 @@ char *float_parse(const void *arg) {
 char *double_parse(const void *arg) {
     const char value = *(double *)arg;
     const char *format = "%lf";
+    char *parsed = NULL;
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value);
 
-    char *parsed = strdup(buffer);
+    parsed = strdup(buffer);
     assert(parsed);
     return parsed;
 }
@@ -710,12 +777,13 @@ char *double_parse(const void *arg) {
 char *long_double_parse(const void *arg) {
     const char value = *(long double *)arg;
     const char *format = "%Lf";
+    char *parsed = NULL;
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value);
 
-    char *parsed = strdup(buffer);
+    parsed = strdup(buffer);
     assert(parsed);
     return parsed;
 }
@@ -723,12 +791,13 @@ char *long_double_parse(const void *arg) {
 char *bool_parse(const void *arg) {
     const bool value = *(bool *)arg;
     const char *format = "%s";
+    char *parsed = NULL;
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value ? "true" : "false");
 
-    char *parsed = strdup(buffer);
+    parsed = strdup(buffer);
     assert(parsed);
     return parsed;
 }
@@ -740,12 +809,13 @@ char *char_ptr_parse(const void *arg) {
 char *str_parse(const void *arg) {
     const char *value = *(char **)arg;
     const char *format = "%s";
+    char *parsed = NULL;
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value);
 
-    char *parsed = strdup(buffer);
+    parsed = strdup(buffer);
     assert(parsed);
     return parsed;
 }
@@ -756,12 +826,13 @@ char *cstr_parse(const void *arg) {
 
 char *void_ptr_parse(const void *arg) {
     const char *format = "%p";
+    char *parsed = NULL;
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, arg);
 
-    char *parsed = strdup(buffer);
+    parsed = strdup(buffer);
     assert(parsed);
     return parsed;
 }
@@ -778,9 +849,11 @@ char *int32_parse(const void *arg) {
     return int_parse(arg);
 }
 
+#if __STD_VERSION__ >= 199901L
 char *int64_parse(const void *arg) {
     return long_long_int_parse(arg);
 }
+#endif
 
 char *uint8_parse(const void *arg) {
     return unsigned_char_parse(arg);
@@ -794,19 +867,21 @@ char *uint32_parse(const void *arg) {
     return unsigned_int_parse(arg);
 }
 
+#if __STD_VERSION__ >= 199901L
 char *uint64_parse(const void *arg) {
     return unsigned_long_long_int_parse(arg);
 }
+#endif
 
 char *str_trim_left(char *to_trim, const char *charset) {
+    size_t trim_length = 0;
+
     if (strcmp(to_trim, "") == 0) {
         return to_trim;
     }
 
-    size_t trim_length;
-
     if (charset == NULL) {
-        charset = ESC_CHARS; // "\t\n\v\f\r\"
+        charset = ESC_CHARS; /**< "\t\n\v\f\r\" */
     }
 
     trim_length = strspn(to_trim, charset);
@@ -826,15 +901,17 @@ char *str_trim_left(char *to_trim, const char *charset) {
 }
 
 char *str_trim_right(char *to_trim, const char *charset) {
+    size_t i = 0;
+
     if (strcmp(to_trim, "") == 0) {
         return to_trim;
     }
 
     if (charset == NULL) {
-        charset = ESC_CHARS; // "\t\n\v\f\r\"
+        charset = ESC_CHARS; /**< "\t\n\v\f\r\" */
     }
 
-    size_t i = strlen(to_trim) - 1;
+    i = strlen(to_trim) - 1;
 
     while (strchr(charset, to_trim[i]) != NULL) {
         to_trim[i] = NULL_TERMINATOR;
@@ -967,6 +1044,7 @@ struct typetable ttbl_unsigned_long_int = {
     unsigned_long_int_print
 };
 
+#if __STD_VERSION__ >= 199901L
 struct typetable ttbl_long_long_int = {
     sizeof(long long int),
     NULL,
@@ -993,6 +1071,7 @@ struct typetable ttbl_unsigned_long_long_int = {
     unsigned_long_long_int_compare,
     unsigned_long_long_int_print
 };
+#endif
 
 struct typetable ttbl_float = {
     sizeof(float),
@@ -1129,6 +1208,7 @@ struct typetable ttbl_int32 = {
     int_print
 };
 
+#if __STD_VERSION__ >= 199901L
 struct typetable ttbl_int64 = {
     sizeof(long long int),
     NULL,
@@ -1137,6 +1217,7 @@ struct typetable ttbl_int64 = {
     long_long_int_compare,
     long_long_int_print
 };
+#endif
 
 struct typetable ttbl_uint8 = {
     sizeof(unsigned char),
@@ -1165,6 +1246,7 @@ struct typetable ttbl_uint32 = {
     unsigned_int_print
 };
 
+#if __STD_VERSION__ >= 199901L
 struct typetable ttbl_uint64 = {
     sizeof(unsigned long long int),
     NULL,
@@ -1173,6 +1255,7 @@ struct typetable ttbl_uint64 = {
     unsigned_long_long_int_compare,
     unsigned_long_long_int_print
 };
+#endif
 
 struct typetable *_char_                   = &ttbl_char;
 struct typetable *_signed_char_            = &ttbl_signed_char;
@@ -1190,9 +1273,11 @@ struct typetable *_long_int_               = &ttbl_long_int;
 struct typetable *_signed_long_int_        = &ttbl_signed_long_int;
 struct typetable *_unsigned_long_int_      = &ttbl_unsigned_long_int;
 
+#if __STD_VERSION__ >= 199901L
 struct typetable *_long_long_int_          = &ttbl_long_long_int;
 struct typetable *_signed_long_long_int_   = &ttbl_signed_long_long_int;
 struct typetable *_unsigned_long_long_int_ = &ttbl_unsigned_long_long_int;
+#endif
 
 struct typetable *_float_                  = &ttbl_float;
 struct typetable *_double_                 = &ttbl_double;
@@ -1218,8 +1303,11 @@ struct typetable *_int16_                  = &ttbl_int16;
 struct typetable *_int16_t_                = &ttbl_int16;
 struct typetable *_int32_                  = &ttbl_int32;
 struct typetable *_int32_t_                = &ttbl_int32;
+
+#if __STD_VERSION__ >= 199901L
 struct typetable *_int64_                  = &ttbl_int64;
 struct typetable *_int64_t_                = &ttbl_int64;
+#endif
 
 struct typetable *_uint8_                  = &ttbl_uint8;
 struct typetable *_uint8_t_                = &ttbl_uint8;
@@ -1227,8 +1315,11 @@ struct typetable *_uint16_                 = &ttbl_uint16;
 struct typetable *_uint16_t_               = &ttbl_uint16;
 struct typetable *_uint32_                 = &ttbl_uint32;
 struct typetable *_uint32_t_               = &ttbl_uint32;
+
+#if __STD_VERSION__ >= 199901L
 struct typetable *_uint64_                 = &ttbl_uint64;
 struct typetable *_uint64_t_               = &ttbl_uint64;
+#endif
 
 struct typetable *_pthread_t_ = NULL;
 
@@ -1254,6 +1345,18 @@ int ulog(FILE *dest,
          long double line,
          const char *fmt, ...) {
 
+    char buffer[MAXIMUM_STACK_BUFFER_SIZE];
+    char temp[256];
+
+    const char *color = KNRM;
+    const char *blink = "";
+
+    bool found = false;
+    bool is_integer = false;
+    bool is_currency = *file == '$';
+    
+    int j = 0;
+
     if (ulog_disable[ALL] || (ulog_attrs_disable[DATE]
                               && ulog_attrs_disable[TIME]
                               && ulog_attrs_disable[LEVEL]
@@ -1265,13 +1368,6 @@ int ulog(FILE *dest,
         || line == -666 || fmt == NULL) {
         return 0;
     }
-
-    char buffer[MAXIMUM_STACK_BUFFER_SIZE];
-
-    const char *color = KNRM;
-    const char *blink = "";
-
-    bool found = false;
 
     if (streql(level, "[BUG]")) {
         if (ulog_disable[BUG]) {
@@ -1316,17 +1412,17 @@ int ulog(FILE *dest,
         }
     }
 
-    char temp[256];
     sprintf(temp, "%Lf", line);
 
-    //char *digit = strchr(temp, '.');
+    /* char digit = strchr(temp, '.'); */
 
-    bool is_currency = *file == '$';
-    bool is_integer = line / (long long int)(line) == 1.000000 || line == 0.00000;
+    #if __STD_VERSION__ >= 199901L
+    is_integer = line / (long long int)(line) == 1.000000 || line == 0.00000;
+    #else
+    is_integer = line / (long int)(line) == 1.000000 || line == 0.00000;
+    #endif
 
     is_integer = is_currency ? false : is_integer;
-
-    int j = 0;
 
     if (ulog_attrs_disable[DATE] == false) {
         char date[1024];
@@ -1360,7 +1456,11 @@ int ulog(FILE *dest,
         char linenumber[1024];
 
         if (is_integer) {
+            #if __STD_VERSION__ >= 199901L
             sprintf(linenumber, "[%lli] ", (long long int)(line));
+            #else
+            sprintf(linenumber, "[%li] ", (long int)(line));
+            #endif
         } else {
             if (is_currency) {
                 sprintf(linenumber, "[%0.2Lf] ", line);
@@ -1375,7 +1475,11 @@ int ulog(FILE *dest,
         char fileline[1024];
 
         if (is_integer) {
+            #if __STD_VERSION__ >= 199901L
             sprintf(fileline, "[%s:%lli] ", file, (long long int)(line));
+            #else
+            sprintf(fileline, "[%s:%li] ", file, (long int)(line));
+            #endif
         } else {
             if (is_currency) {
                 sprintf(fileline, "[%s%0.2Lf] ", file, line);

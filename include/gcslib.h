@@ -47,15 +47,15 @@
  *      utils
  */
 #include "iterator.h"
-//#include "pair.h"
-//#include "pair_int_str.h"
+/* #include "pair.h" */
+/* #include "pair_int_str.h" */
 
 /**
  *  Dependencies:
  *      utils
  *      algorithm
  */
-//#include "algorithm.h"
+/* #include "algorithm.h" */
 
 /**
  *  Dependencies:
@@ -72,9 +72,9 @@
  *      vector_tmpl
  *      mergesort_tmpl
  */
-#include "vector_float.h"
-#include "vector_int.h"
-#include "vector_str.h"
+/* #include "vector_float.h" */
+/* #include "vector_int.h" */
+/* #include "vector_str.h" */
 
 /**
  *  Dependencies:
@@ -82,7 +82,7 @@
  *      iterator
  *      mergesort
  */
-//#include "list.h"
+/* #include "list.h" */
 
 /**
  *  Dependencies:
@@ -91,9 +91,9 @@
  *      mergesort_tmpl
  *      list_tmpl
  */
-//#include "list_float.h"
-//#include "list_int.h"
-//#include "list_str.h"
+/* #include "list_float.h" */
+/* #include "list_int.h" */
+/* #include "list_str.h" */
 
 /**
  *  Dependencies:
@@ -101,7 +101,7 @@
  *      iterator
  *      mergesort
  */
-//#include "slist.h"
+/* #include "slist.h" */
 
 /**
  *  Dependencies:
@@ -110,9 +110,9 @@
  *      mergesort_tmpl
  *      slist_tmpl
  */
-//#include "slist_float.h"
-//#include "slist_int.h"
-//#include "slist_str.h"
+/* #include "slist_float.h" */
+/* #include "slist_int.h" */
+/* #include "slist_str.h" */
 
 /**
  *  Dependencies:
@@ -120,7 +120,7 @@
  *      iterator
  *      mergesort
  */
-//#include "deque.h"
+/* #include "deque.h" */
 
 /**
  *  Dependencies:
@@ -129,9 +129,9 @@
  *      mergesort_tmpl
  *      deque_tmpl
  */
-//#include "deque_float.h"
-//#include "deque_int.h"
-//#include "deque_str.h"
+/* #include "deque_float.h" */
+/* #include "deque_int.h" */
+/* #include "deque_str.h" */
 
 /**
  *  Dependencies:
@@ -139,7 +139,7 @@
  *      iterator
  *      deque
  */
-//#include "stack.h"
+/* #include "stack.h" */
 
 /**
  *  Dependencies:
@@ -147,9 +147,9 @@
  *      iterator
  *      deque_tmpl
  */
-//#include "stack_float.h"
-//#include "stack_int.h"
-//#include "stack_str.h"
+/* #include "stack_float.h" */
+/* #include "stack_int.h" */
+/* #include "stack_str.h" */
 
 /**
  *  Dependencies:
@@ -157,7 +157,7 @@
  *      iterator
  *      deque
  */
-//#include "queue.h"
+/* #include "queue.h" */
 
 /**
  *  Dependencies:
@@ -165,9 +165,9 @@
  *      iterator
  *      deque_tmpl
  */
-//#include "queue_float.h"
-//#include "queue_int.h"
-//#include "queue_str.h"
+/* #include "queue_float.h" */
+/* #include "queue_int.h" */
+/* #include "queue_str.h" */
 
 /**
  *  Dependencies:
@@ -175,7 +175,7 @@
  *      iterator
  *      vector
  */
-//#include "rbtree.h"
+/* #include "rbtree.h" */
 
 /**
  *  Dependencies:
@@ -183,9 +183,9 @@
  *      iterator
  *      vector
  */
-//#include "rbtree_float.h"
-//#include "rbtree_int.h"
-//#include "rbtree_str.h"
+/* #include "rbtree_float.h" */
+/* #include "rbtree_int.h" */
+/* #include "rbtree_str.h" */
 
 /**
  *  Dependencies:
@@ -194,7 +194,7 @@
  *      vector
  *      pair_int_str
  */
-//#include "rbtree_pair_int_str.h"
+/* #include "rbtree_pair_int_str.h" */
 
 /**
  *  Dependencies:
@@ -202,7 +202,7 @@
  *      iterator
  *      rbtree
  */
-//#include "set.h"
+/* #include "set.h" */
 
 /**
  *  Dependencies:
@@ -210,9 +210,9 @@
  *      iterator
  *      rbtree
  */
-//#include "set_float.h"
-//#include "set_int.h"
-//#include "set_str.h"
+/* #include "set_float.h" */
+/* #include "set_int.h" */
+/* #include "set_str.h" */
 
 /**
  *  Dependencies:
@@ -221,7 +221,7 @@
  *      pair
  *      rbtree
  */
-//#include "map.h"
+/* #include "map.h" */
 
 /**
  *  Dependencies:
@@ -230,7 +230,7 @@
  *      pair_int_str
  *      rbtree_pair_int_str
  */
-//#include "map_int_str.h"
+/* #include "map_int_str.h" */
 
 /**
  *  Dependencies:
@@ -240,6 +240,6 @@
  *      vector_str
  *      list_str
  */
-//#include "csv.h"
+/* #include "csv.h" */
 
 #endif /* GCSLIB_H */

@@ -28,17 +28,6 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/**
- *  @file       iterator.h
- *  @brief      Required for iterator (struct iterator) and related functions
- */
-#include "iterator.h"
-
-/**
- *  @file       utils.h
- *  @brief      Required for (struct typetable) and related functions
- */
-#include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -46,6 +35,12 @@
 #include <stdarg.h>
 #include <string.h>
 #include <assert.h>
+
+#if __STD_VERSION__ >= 199901L
+/* content */
+#else
+/* default */
+#endif
 
 /**
  *  @brief  Program execution begins here
@@ -56,7 +51,10 @@
  *  @return     exit status
  */
 int main(int argc, const char * argv[]) {
-
-
+    void *ptr = calloc(16, sizeof(int));
+    void *get = (char *)(ptr) + (2 * sizeof(int));
+    int *num = (int *)(get);
+    *num = 22;
+    printf("%d\n", *num);
     return EXIT_SUCCESS;
 }

@@ -30,17 +30,18 @@ CC 				= gcc
 ## FLAGS ######################################################################
 
 ## Flag types - right-hand side can be modified or commented out to disable ##
-CSTD 				= -std=gnu99
+CSTD 				= -std=c89
 DEBUG 				= -g
 PTHREAD				= -pthread
-MATH 				= -lm      ## disable for macOS/clang
+MATH 				= -lm
+PEDANTIC			= -pedantic-errors
 
 SANTIIZED 			= #-fsanitize=address
-W_ALL 				= #-Wall
-W_ERR 				= #-Werror
+W_ALL 				= -Wall
+W_ERR 				= -Werror
 
 ## Add new flag categories here ##############################################
-CFLAGS 				= $(DEBUG) $(CSTD) $(W_ALL) $(W_ERR) $(SANITIZED)
+CFLAGS 				= $(DEBUG) $(CSTD) $(PEDANTIC) $(W_ALL) $(W_ERR) $(SANITIZED)
 LIB 				= $(PTHREAD) $(MATH)
 INC 				= -I $(DIR_INC)
 ###############################################################################

@@ -45,15 +45,20 @@ static void vec2D_update(vec2D *v);
 static double calculate_hypotenuse(double a, double b);
 
 vec2D *vec2D_ptr_new(double vx, double vy) {
-    vec2D *v = vec2D_allocate();
+    vec2D *v = NULL;
+
+    v = vec2D_allocate();
     vec2D_init(v, vx, vy);
+
     return v;
 }
 
 void vec2D_ptr_delete(void *arg) {
+    vec2D **v = NULL;
+
     assert(arg);
 
-    vec2D **v = (vec2D **)(arg);
+    v = (vec2D **)(arg);
     vec2D_deinit((*v));
 
     free(*v);
@@ -61,10 +66,10 @@ void vec2D_ptr_delete(void *arg) {
 }
 
 void vec2D_init(vec2D *v, double vx, double vy) {
+    double *attrs = NULL;
+
     assert(v);
 
-    // Heap allocation
-    double *attrs = NULL;
     attrs = calloc(VEC2D_ATTRIBUTE_COUNT, sizeof((*attrs)));
     assert(attrs);
 
@@ -79,7 +84,6 @@ void vec2D_init(vec2D *v, double vx, double vy) {
 void vec2D_deinit(vec2D *v) {
     assert(v);
 
-    // Heap allocation
     free(v->attrs);
     v->attrs = NULL;
 }
@@ -137,10 +141,14 @@ void vec2D_invertdir(vec2D *v) {
 }
 
 vec2D *vec2D_add(vec2D *v1, vec2D *v2) {
-    vec2D *resultant = vec2D_allocate();
+    vec2D *resultant = NULL;
+    double rx = 0.0;
+    double ry = 0.0;
 
-    double rx = v1->attrs[X] + v2->attrs[X];
-    double ry = v1->attrs[Y] + v2->attrs[Y];
+    resultant = vec2D_allocate();
+
+    rx = v1->attrs[X] + v2->attrs[X];
+    ry = v1->attrs[Y] + v2->attrs[Y];
 
     vec2D_init(resultant, rx, ry);
     return resultant;
@@ -148,14 +156,17 @@ vec2D *vec2D_add(vec2D *v1, vec2D *v2) {
 
 vec2D *vec2D_subtract(vec2D *v1, vec2D *v2) {
     vec2D_invertdir(v2);
-    return vec2D_add(v1, v2); // v1 - v2 == v1 + (-v2)
+    return vec2D_add(v1, v2); /* v1 - v2 == v1 + (-v2) */
 }
 
 void *vec2D_copy(void *arg, const void *other) {
+    vec2D *dest = NULL;
+    vec2D *source = NULL;
+
     assert(other);
 
-    vec2D *dest = (vec2D *)(arg);
-    vec2D *source = (vec2D *)(other);
+    dest = (vec2D *)(arg);
+    source = (vec2D *)(other);
 
     vec2D_init(dest, source->attrs[X], source->attrs[Y]);
 
@@ -163,8 +174,10 @@ void *vec2D_copy(void *arg, const void *other) {
 }
 
 void vec2D_dtor(void *arg) {
+    vec2D *v = NULL;
     assert(arg);
-    vec2D *v = (vec2D *)(arg);
+    
+    v = (vec2D *)(arg);
     vec2D_deinit(v);
 }
 
@@ -178,33 +191,42 @@ void vec2D_swap(void *c1, void *c2) {
 
         dest->attrs = source->attrs;
         source->attrs = temp.attrs;
-    } else {
+    } else { 
         dest->attrs = source->attrs;
         source->attrs = NULL;
     }
 }
 
 int vec2D_compare(const void *c1, const void *c2) {
+    vec2D *v1 = NULL;
+    vec2D *v2 = NULL;
+
+    int compare_magnitude = 0;
+
     assert(c1);
     assert(c2);
 
-    vec2D *v1 = (vec2D *)(c1);
-    vec2D *v2 = (vec2D *)(c2);
+    v1 = (vec2D *)(c1);
+    v2 = (vec2D *)(c2);
 
-    int compare_magnitude =
+    compare_magnitude =
     double_compare(&v1->attrs[MAGNITUDE], &v2->attrs[MAGNITUDE]);
 
-    // directions are compared iff magnitudes are equal
-    // otherwise, magnitudes determine comparison outcome
+    /**
+     *  Directions are compared iff magnitudes are equal
+     *  Otherwise, magnitudes determine comparison outcome
+     */
     return compare_magnitude ? compare_magnitude :
     double_compare(&v1->attrs[THETA], &v2->attrs[THETA]);
 }
 
 void vec2D_print(const void *arg, FILE *dest) {
+    vec2D *v = NULL;
+
     assert(arg);
     assert(dest);
 
-    vec2D *v = (vec2D *)(arg);
+    v = (vec2D *)(arg);
 
     fprintf(dest,
             "%s\n  v    = (%0.2fi, %0.2fj)\n||v||  =  %0.2f\n  %s    =  "
@@ -216,15 +238,15 @@ void vec2D_print(const void *arg, FILE *dest) {
 
 void vec2D_print_override_simple(const void *arg, FILE *dest) {
     vec2D *v = (vec2D *)(arg);
-    //fprintf(dest, "(%lfi, %lfj)", vec2D_x(v), vec2D_y(v));
+    /* fprintf(dest, "(%lfi, %lfj)", vec2D_x(v), vec2D_y(v)); */
     fprintf(dest, "%0.3lf at %0.3lf%s", v->attrs[MAGNITUDE], v->attrs[THETA], DEGREE_SYMBOL);
 }
 
 void *vec2D_ptr_copy(void *arg, const void *other) {
-    assert(other);
-
     vec2D **dest = (vec2D **)(arg);
     vec2D **vec = (vec2D **)(other);
+
+    assert(other);
 
     (*dest) = vec2D_ptr_new((*vec)->attrs[X], (*vec)->attrs[Y]);
     return (*dest);
@@ -251,26 +273,30 @@ void vec2D_ptr_swap(void *c1, void *c2) {
 }
 
 int vec2D_ptr_compare(const void *c1, const void *c2) {
-    assert(c1);
-    assert(c2);
-
     vec2D *v1 = *(vec2D **)(c1);
     vec2D *v2 = *(vec2D **)(c2);
 
-    int compare_magnitude =
+    int compare_magnitude = 0;
+
+    assert(c1);
+    assert(c2);
+
+    compare_magnitude =
     double_compare(&v1->attrs[MAGNITUDE], &v2->attrs[MAGNITUDE]);
 
-    // directions are compared iff magnitudes are equal
-    // otherwise, magnitudes determine comparison outcome
+    /**
+     *  Directions are compared iff magnitudes are equal
+     *  Otherwise, magnitudes determine comparison outcome
+     */
     return compare_magnitude ? compare_magnitude :
     double_compare(&v1->attrs[THETA], &v2->attrs[THETA]);
 }
 
 void vec2D_ptr_print(const void *arg, FILE *dest) {
+    vec2D *v = *(vec2D **)(arg);
+
     assert(arg);
     assert(dest);
-
-    vec2D *v = *(vec2D **)(arg);
 
     fprintf(dest,
             "%s\n  v    = (%0.2fi, %0.2fj)\n||v||  =  %0.2f\n  %s    =  "
@@ -282,7 +308,7 @@ void vec2D_ptr_print(const void *arg, FILE *dest) {
 
 void vec2D_ptr_print_override_simple(const void *arg, FILE *dest) {
     vec2D *v = *(vec2D **)(arg);
-    //fprintf(dest, "(%lfi, %lfj)", vec2D_x(v), vec2D_y(v));
+    /* fprintf(dest, "(%lfi, %lfj)", vec2D_x(v), vec2D_y(v)); */
     fprintf(dest, "%0.3lf at %0.3lf%s", v->attrs[MAGNITUDE], v->attrs[THETA], DEGREE_SYMBOL);
 }
 
@@ -294,18 +320,21 @@ static vec2D *vec2D_allocate() {
 }
 
 static void vec2D_update(vec2D *v) {
+    double radians = 0.0;
+    double degrees = 0.0;
+
     assert(v);
 
     v->attrs[MAGNITUDE] = calculate_hypotenuse(v->attrs[X], v->attrs[Y]);
 
-    double radians = atan(v->attrs[Y] / v->attrs[X]);
-    double degrees = radians * (180.0 / M_PI);
+    radians = atan(v->attrs[Y] / v->attrs[X]);
+    degrees = radians * (180.0 / M_PI);
 
     v->attrs[THETA] = degrees;
 }
 
 static double calculate_hypotenuse(double a, double b) {
-    // c = sqrt(a^2 + b^2)
+    /* c = sqrt(a^2 + b^2) */
     return sqrt(pow(a, 2.0) + pow(b, 2.0));
 }
 

@@ -70,7 +70,7 @@
  *  function prototypes for your user-defined type,
  *  use the following macro inside your header file within a global scope:
  *
- *      // in something like foobar.h, after your declared function prototypes:
+ *      in something like foobar.h, after your declared function prototypes:
  *      TYPETABLE_DECLARE_PTR(foobar);
  *
  *  foobar will be prepended to each function prototype identifier,
@@ -84,7 +84,7 @@
  *  After the respective functions are defined,
  *  use the following macro inside your source file within a global scope:
  *
- *      // in something like foobar.c, after your defined functions:
+ *      in something like foobar.c, after your defined functions:
  *      TYPETABLE_DEFINE_PTR(foobar);
  *
  *  The handle (pointer), _foobar_ is a (struct typetable *)
@@ -107,7 +107,7 @@
  *  See this header file, and utils.c for examples.
  */
 
-// optional typedefs for pointers-to-functions
+/**< optional typedefs for pointers-to-functions */
 typedef bool (*unary_predicate_fn)(const void *);
 typedef bool (*binary_predicate_fn)(const void *, const void *);
 typedef void (*consumer_fn)(const void *);
@@ -162,9 +162,11 @@ extern struct typetable *_long_int_;
 extern struct typetable *_signed_long_int_;
 extern struct typetable *_unsigned_long_int_;
 
+#if __STD_VERSION__ >= 199901L
 extern struct typetable *_long_long_int_;
 extern struct typetable *_signed_long_long_int_;
 extern struct typetable *_unsigned_long_long_int_;
+#endif
 
 extern struct typetable *_float_;
 extern struct typetable *_double_;
@@ -199,8 +201,11 @@ extern struct typetable *_uint16_;
 extern struct typetable *_uint16_t_;
 extern struct typetable *_uint32_;
 extern struct typetable *_uint32_t_;
+
+#if __STD_VERSION__ >= 199901L
 extern struct typetable *_uint64_;
 extern struct typetable *_uint64_t_;
+#endif
 
 extern struct typetable *_pthread_t_;
 
@@ -210,7 +215,7 @@ extern struct typetable *_pthread_t_;
  *              creates a handle for a struct typetable to be used for
  *              container instantiations
  */
-#define TYPETABLE_DECLARE_PTR(TYPENAME) extern struct typetable *_##TYPENAME##_;
+#define TYPETABLE_DECLARE_PTR(TYPENAME) extern struct typetable *_##TYPENAME##_
 
 /**
  *  @def        TYPETABLE_DEFINE_PTR
@@ -231,7 +236,7 @@ struct typetable ttbl_##TYPENAME = {                                           \
     TYPENAME##_print                                                           \
 };                                                                             \
                                                                                \
-struct typetable *_##TYPENAME##_ = &ttbl_##TYPENAME;\
+struct typetable *_##TYPENAME##_ = &ttbl_##TYPENAME                            \
 
 
 #define TYPETABLE_DEFINE_PTR(TYPENAME)                                         \
@@ -240,7 +245,7 @@ struct typetable ttbl_##TYPENAME = {                                           \
     TYPENAME##_swap, TYPENAME##_compare, TYPENAME##_print                      \
 };                                                                             \
                                                                                \
-struct typetable *_##TYPENAME##_ = &ttbl_##TYPENAME;                           \
+struct typetable *_##TYPENAME##_ = &ttbl_##TYPENAME                            \
 
 /**
  *  Stack allocated instances and heap allocated instances will need to be
@@ -279,7 +284,7 @@ void *void_ptr_copy(void *arg, const void *other);
 /**< Destructor functions - casts arg to TYPE and frees the pointee */
 void str_dtor(void *arg);
 void cstr_dtor(void *arg);
-void void_ptr_dtor(void *arg); // empty body
+void void_ptr_dtor(void *arg); /*<< empty body */
 
 /**< Swap functions */
 void str_swap(void *arg, void *other);
@@ -302,9 +307,11 @@ int long_int_compare(const void *c1, const void *c2);
 int signed_long_int_compare(const void *c1, const void *c2);
 int unsigned_long_int_compare(const void *c1, const void *c2);
 
+#if __STDC_VERSION__ >= 199901L
 int long_long_int_compare(const void *c1, const void *c2);
 int signed_long_long_int_compare(const void *c1, const void *c2);
 int unsigned_long_long_int_compare(const void *c1, const void *c2);
+#endif
 
 int float_compare(const void *c1, const void *c2);
 int double_compare(const void *c1, const void *c2);
@@ -326,12 +333,18 @@ int void_ptr_compare(const void *c1, const void *c2);
 int int8_compare(const void *c1, const void *c2);
 int int16_compare(const void *c1, const void *c2);
 int int32_compare(const void *c1, const void *c2);
+
+#if __STD_VERSION__ >= 199901L
 int int64_compare(const void *c1, const void *c2);
+#endif
 
 int uint8_compare(const void *c1, const void *c2);
 int uint16_compare(const void *c1, const void *c2);
 int uint32_compare(const void *c1, const void *c2);
+
+#if __STD_VERSION__ >= 199901L
 int uint64_compare(const void *c1, const void *c2);
+#endif
 
 /**< Print functions - casts arg to TYPE and prints output to dest */
 void char_print(const void *arg, FILE *dest);
@@ -350,9 +363,11 @@ void long_int_print(const void *arg, FILE *dest);
 void signed_long_int_print(const void *arg, FILE *dest);
 void unsigned_long_int_print(const void *arg, FILE *dest);
 
+#if __STD_VERSION__ >= 199901L
 void long_long_int_print(const void *arg, FILE *dest);
 void signed_long_long_int_print(const void *arg, FILE *dest);
 void unsigned_long_long_int_print(const void *arg, FILE *dest);
+#endif
 
 void float_print(const void *arg, FILE *dest);
 void double_print(const void *arg, FILE *dest);
@@ -371,12 +386,18 @@ void void_ptr_print(const void *arg, FILE *dest);
 void int8_print(const void *arg, FILE *dest);
 void int16_print(const void *arg, FILE *dest);
 void int32_print(const void *arg, FILE *dest);
+
+#if __STD_VERSION__ >= 199901L
 void int64_print(const void *arg, FILE *dest);
+#endif
 
 void uint8_print(const void *arg, FILE *dest);
 void uint16_print(const void *arg, FILE *dest);
 void uint32_print(const void *arg, FILE *dest);
+
+#if __STD_VERSION__ >= 199901L
 void uint64_print(const void *arg, FILE *dest);
+#endif
 
 /**< Parse functions - casts arg to TYPE and returns a (char *)  */
 char *char_parse(const void *arg);
@@ -395,9 +416,11 @@ char *long_int_parse(const void *arg);
 char *signed_long_int_parse(const void *arg);
 char *unsigned_long_int_parse(const void *arg);
 
+#if __STDC_VERSION__ >= 199901L
 char *long_long_int_parse(const void *arg);
 char *signed_long_long_int_parse(const void *arg);
 char *unsigned_long_long_int_parse(const void *arg);
+#endif
 
 char *float_parse(const void *arg);
 char *double_parse(const void *arg);
@@ -416,12 +439,18 @@ char *void_ptr_parse(const void *arg);
 char *int8_parse(const void *arg);
 char *int16_parse(const void *arg);
 char *int32_parse(const void *arg);
+
+#if __STD_VERSION__ >= 199901L
 char *int64_parse(const void *arg);
+#endif
 
 char *uint8_parse(const void *arg);
 char *uint16_parse(const void *arg);
 char *uint32_parse(const void *arg);
+
+#if __STD_VERSION__ >= 199901L
 char *uint64_parse(const void *arg);
+#endif
 
 /**< C-String trim functions */
 char *str_trim_left(char *to_trim, const char *charset);
@@ -472,17 +501,18 @@ void void_ptr_swap(void **n1, void **n2);
 #define BUFFER_SIZE_4K 4096
 #define MAXIMUM_STACK_BUFFER_SIZE 16384
 
-// Redefine a macro of interest by using a preprocessor directive
-// before the inclusion of "utils.h".
-//      For example, to redefine CSTR_ARR_DEFAULT_SIZE (for cstr_arr)
-//
-//      #ifdef CSTR_ARR_DEFAULT_SIZE
-//      #undef CSTR_ARR_DEFAULT_SIZE
-//      #endif /* CSTR_ARR_DEFAULT_SIZE */
-//      #define CSTR_ARR_DEFAULT_SIZE   <a positive integer>
-//
-//      #include "utils.h"
-//
+/**
+ *  Redefine a macro of interest by using a preprocessor directive
+ *  before the inclusion of "utils.h"
+ *      For example, to redefine CSTR_ARR_DEFAULT_SIZE (for cstr_arr)
+ *      
+ *      #ifdef CSTR_ARR_DEFAULT_SIZE
+ *      #undef CSTR_ARR_DEFAULT_SIZE
+ *      #endif
+ *      #define CSTR_ARR_DEFAULT_SIZE   <nonzero integer of positive magnitude>
+ * 
+ *      #include "utils.h"
+ */
 #ifndef CSTR_ARR_DEFAULT_SIZE
 #define CSTR_ARR_DEFAULT_SIZE 256
 #endif /* CSTR_ARR_DEFAULT_SIZE */
@@ -597,33 +627,34 @@ typedef cchar_tptr cstr_dptr;
  */
 typedef cchar_ptr_arr cstr_arr;
 
-// use char_arr
-//      for statically allocated char. arr (may or may not be null-terminated)
-//      char_arr have mutable characters.
-
-// use char_ptr or str
-//      for dynamically allocated strings or string literals
-//      char_ptr/str have mutable addresses, but immutable characters.
-//      (compiler does not protect against character mutations of stack
-//       allocated string literals)
-
-// use cchar_ptr or cstr
-//      for dynamically allocated strings or string literals
-//      cchar_ptr/cstr have mutable addresses, but immutable characters.
-//      (compiler protects against character mutations of stack allocated
-//       string literals)
-
-// use char_dptr or str_ptr
-//      for dynamically allocated arrays of (char_ptr), aka (str)
-
-// use cchar_dptr or cstr_ptr
-//      for dynamically allocated arrays of (ccstr_ptr), aka (cstr)
-
-// use char_ptr_arr or str_arr
-//      for statically allocated arrays of (char_ptr), aka (str)
-
-// use cchar_ptr_arr or cstr_arr
-//      for statically allocated arrays of (cchar_ptr), aka (cstr)
+/**
+ *  use char_arr
+ *      for statically allocated array of char (null-terminated, or not)
+ *      char_arr (statically allocated array of char) have mutable characters.
+ * 
+ *  use char_ptr or str
+ *      for dynamically allocated strings or string literals
+ *      char_ptr/str have mutable addresses, but immutable characters.
+ *      (compiler will not protect against character mutations of stack
+ *       allocated string literals)
+ *      
+ *      note: the pointer-to-typetable, '_str_', include a copy function
+ *      for creating dynamically allocated string duplicates, as well as a dtor
+ *      function for releasing memory allocated by the copy function.
+ *      the '_char_ptr_' pointer-to-typetable does not define a copy or dtor.
+ * 
+ *  use char_dptr or str_ptr
+ *      for dynamically allocated arrays of (char_ptr), aka (str)
+ * 
+ *  use cchar_dptr or cstr_ptr
+ *      for dynamically allocated arrays of (ccstr_ptr), aka (cstr)
+ * 
+ *  use char_ptr_arr or str_arr
+ *      for statically allocated arrays of (char_ptr), aka (str)
+ * 
+ *  use cchar_ptr_arr or cstr_arr
+ *      for statically allocated arrays of (cchar_ptr), aka (cstr)
+ */
 
 typedef signed char *signed_char_ptr;
 typedef signed char **signed_char_dptr;
@@ -651,6 +682,7 @@ typedef signed long int **signed_long_int_dptr;
 typedef unsigned long int *unsigned_long_int_ptr;
 typedef unsigned long int **unsigned_long_int_dptr;
 
+#if __STDC_VERSION__ >= 199901L
 typedef long long int *long_long_int_ptr;
 typedef long long int **long_long_int_dptr;
 
@@ -658,6 +690,7 @@ typedef signed long long int *signed_long_long_int_ptr;
 typedef signed long long int **signed_long_long_int_dptr;
 typedef unsigned long long int *unsigned_long_long_int_ptr;
 typedef unsigned long long int **unsigned_long_long_int_dptr;
+#endif
 
 typedef float *float_ptr;
 typedef float **float_dptr;
@@ -681,8 +714,10 @@ typedef short int **int16_dptr;
 typedef int *int32_ptr;
 typedef int **int32_dptr;
 
+#if __STD_VERSION__ >= 199901L
 typedef long long int *int64_ptr;
 typedef long long int **int64_dptr;
+#endif
 
 typedef unsigned char *uint8_ptr;
 typedef unsigned char **uint8_dptr;
@@ -693,8 +728,10 @@ typedef unsigned short int **uint16_dptr;
 typedef unsigned int *uint32_ptr;
 typedef unsigned int **uint32_dptr;
 
+#if __STD_VERSION__ >= 199901L
 typedef unsigned long long int *uint64_ptr;
 typedef unsigned long long int **uint64_dptr;
+#endif
 
 typedef float float32_t;
 typedef double float64_t;
@@ -702,11 +739,11 @@ typedef long double long_double;
 
 /**< utils: debugging */
 int ulog(FILE *dest,
-         const char *level,     // meant for "BUG", "LOG", "ERROR", or "WARNING"
-         const char *file,      // meant for use with the __FILE__ macro
-         const char *func,      // meant for use with the __func__ macro
-         long double line,      // meant for use with the __LINE__ macro
-         const char *fmt, ...); // user's custom message
+         const char *level,     /**< meant for "BUG", "LOG", "ERROR", or "WARNING" */
+         const char *file,      /**< meant for use with the __FILE__ macro */
+         const char *func,      /**< meant for use with the __func__ macro */
+         long double line,      /**< meant for use with the __LINE__ macro */
+         const char *fmt, ...); /**< user's custom message */
 
 /**
  *  Unless you would like to create a customized
@@ -732,72 +769,60 @@ int ulog(FILE *dest,
 #define ULOG_STREAM_WARNING stderr
 
 /**
- *  If you would like to change any of these on the fly
- *  (without modifying this file, of course)
- *  copy and paste the following directives into your program:
- *
- *  (uncomment the directives corresponding to the ulog(s)
- *  you would like to reroute, and in place of [stream],
- *  provide the name of your stream, without [ ]).
- *
- *  Note: [stream] is a (FILE *) stream
- */
-
-/**< Reroute BUG */
-//#ifdef ULOG_STREAM_BUG
-//#undef ULOG_STREAM_BUG
-//#endif /* ULOG_STREAM_BUG */
-//#define ULOG_STREAM_BUG             [stream]      // default stderr
-
-/**< Reroute LOG */
-//#ifdef ULOG_STREAM_LOG
-//#undef ULOG_STREAM_LOG
-//#endif /* ULOG_STREAM_LOG */
-//#define ULOG_STREAM_LOG             [stream]      // default stdout
-
-/**< Reroute ERROR */
-//#ifdef ULOG_STREAM_ERROR
-//#undef ULOG_STREAM_ERROR
-//#endif /* ULOG_STREAM_ERROR */
-//#define ULOG_STREAM_ERROR           [stream]      // default stderr
-
-/**< Reroute WARNING */
-//#ifdef ULOG_STREAM_WARNING
-//#undef ULOG_STREAM_WARNING
-//#endif /* ULOG_STREAM_WARNING */
-//#define ULOG_STREAM_WARNING         [stream]      // default stderr
-
-/**
  *  @def        BUG
  *  @brief      Shorthand macro for ulog to note bugs in a program
  */
+#if __STDC_VERSION__ >= 199901L
 #define BUG(FILEMACRO, ...)                                                    \
     ulog(ULOG_STREAM_BUG, "[BUG]", FILEMACRO, __func__,                        \
-         (long long int)__LINE__, __VA_ARGS__)
+         (long int)__LINE__, __VA_ARGS__)
+#else
+#define BUG(FILEMACRO, MSG)                                                    \
+    ulog(ULOG_STREAM_BUG, "[BUG]", FILEMACRO, __func__,                        \
+         (long int)__LINE__, MSG)
+#endif
 
 /**
  *  @def        LOG
  *  @brief      Shorthand macro for ulog to create messages for a program
  */
+#if __STDC_VERSION__ >= 199901L
 #define LOG(FILEMACRO, ...)                                                    \
     ulog(ULOG_STREAM_LOG, "[LOG]", FILEMACRO, __func__,                        \
-         (long long int)__LINE__, __VA_ARGS__)
+         (long int)__LINE__, __VA_ARGS__)
+#else
+#define LOG(FILEMACRO, MSG)                                                    \
+    ulog(ULOG_STREAM_LOG, "[LOG]", FILEMACRO, __func__,                        \
+         (long int)__LINE__, MSG)
+#endif
 
 /**
  *  @def        ERROR
  *  @brief      Shorthand macro for ulog to display errors for a program
  */
+#if __STDC_VERSION__ >= 199901L
 #define ERROR(FILEMACRO, ...)                                                  \
     ulog(ULOG_STREAM_ERROR, "[ERROR]", FILEMACRO, __func__,                    \
-         (long long int)__LINE__, __VA_ARGS__)
+         (long int)__LINE__, __VA_ARGS__)
+#else
+#define ERROR(FILEMACRO, MSG)                                                  \
+    ulog(ULOG_STREAM_ERROR, "[ERROR]", FILEMACRO, __func__,                    \
+         (long int)__LINE__, MSG)
+#endif
 
 /**
  *  @def        WARNING
  *  @brief      Shorthand macro for ulog to display warning for a program
  */
+#if __STDC_VERSION__ >= 199901L
 #define WARNING(FILEMACRO, ...)                                                \
     ulog(ULOG_STREAM_WARNING, "[WARNING]", FILEMACRO, __func__,                \
-         (long long int)__LINE__, __VA_ARGS__)
+         (long int)__LINE__, __VA_ARGS__)
+#else
+#define WARNING(FILEMACRO, MSG)                                                \
+    ulog(ULOG_STREAM_WARNING, "[WARNING]", FILEMACRO, __func__,                \
+         (long int)__LINE__, MSG)
+#endif
 
 #define UTILS_LOG_COUNT 5
 extern bool ulog_disable[UTILS_LOG_COUNT];
@@ -831,23 +856,26 @@ extern bool ulog_attrs_disable[UTILS_LOG_ATTRS_COUNT];
  *  Invoking the directive again will undo the previous action.
  */
 
-// ULOG_TOGGLE_TYPE(ALL);
-// ULOG_TOGGLE_TYPE(BUG);
-// ULOG_TOGGLE_TYPE(LOG);
-// ULOG_TOGGLE_TYPE(ERROR);
-// ULOG_TOGGLE_TYPE(WARNING);
+/**
+ULOG_TOGGLE_TYPE(ALL);
+ULOG_TOGGLE_TYPE(BUG);
+ULOG_TOGGLE_TYPE(LOG);
+ULOG_TOGGLE_TYPE(ERROR);
+ULOG_TOGGLE_TYPE(WARNING);
 
-// ULOG_TOGGLE_ATTR(DATE);
-// ULOG_TOGGLE_ATTR(TIME);
-// ULOG_TOGGLE_ATTR(LEVEL);
-// ULOG_TOGGLE_ATTR(FILENAME);
-// ULOG_TOGGLE_ATTR(LINE);
-// ULOG_TOGGLE_ATTR(FUNCTION);
-// ULOG_TOGGLE_ATTR(MESSAGE);
+ULOG_TOGGLE_ATTR(DATE);
+ULOG_TOGGLE_ATTR(TIME);
+ULOG_TOGGLE_ATTR(LEVEL);
+ULOG_TOGGLE_ATTR(FILENAME);
+ULOG_TOGGLE_ATTR(LINE);
+ULOG_TOGGLE_ATTR(FUNCTION);
+ULOG_TOGGLE_ATTR(MESSAGE);
+*/
 
 /**
- *  Token-pasting utilities for "tmpls"
+ *  Token-pasting utilities for "templates" (tmpl)
  */
+
 #define CAT(X, Y) X##_##Y
 #define tmpl(ARG, TYPE) CAT(ARG, TYPE)
 
@@ -856,6 +884,9 @@ extern bool ulog_attrs_disable[UTILS_LOG_ATTRS_COUNT];
 
 #define TCAT(X, Y, Z, ZZ) X##_##Y##_##Z_##ZZ
 #define tmpl3t(ARG, TYPE1, TYPE2, TYPE3) TCAT(ARG, TYPE1, TYPE2, TYPE3)
+
+#define QCAT(W, X, Y, Z, ZZ) WW##_##X##_##Y##_##Z##_##ZZ
+#define tmpl4t(ARG, TYPE1, TYPE2, TYPE3, TYPE4) QCAT(ARG, TYPE1, TYPE2, TYPE3, TYPE4)
 
 #define table_id(TBL_TYPE, T) tmpl(TBL_TYPE, T)
 #define table_ptr_id(TYPE, T) _##TYPE##_##T##_

@@ -30,8 +30,10 @@
 
 #include "mergesort.h"
 #include "vector.h"
-//#include "slist.h"
-//#include "list.h"
+
+/**< slist and list in the works */
+/* #include "slist.h" */
+/* #include "list.h" */
 
 #include <assert.h>
 #include <stdio.h>
@@ -45,12 +47,14 @@ static void v_mergesort_iterative_merge(void *arr,
                                         size_t width,
                                         int (*compare)(const void *, const void *));
 
+/* slist and list in the works
 //static dlnode *dn_mergesort_recursive_merge(dlnode *a, dlnode *b, int (*compare)(const void *, const void *));
 //static void dn_mergesort_recursive_split(dlnode *head, dlnode **tail, dlnode **a, dlnode **b);
 
 //static void sn_mergesort_iterative_swap(void *a, void *b);
 //static int sn_mergesort_iterative_length(slnode *curr);
 //static void sn_mergesort_iterative_merge(slnode **start1, slnode **end1, slnode **start2, slnode **end2, int (*compare)(const void *, const void *));
+*/
 
 static int v_mergesort_min(int x, int y) {
     return (x < y) ? x : y;
@@ -66,10 +70,25 @@ static void v_mergesort_iterative_merge(void *arr, int l, int m, int r,
     int n1 = m - l + 1;
     int n2 = r - m;
 
+    #if __STD_VERSION__ >= 199901L
     void **L[n1];
     void **R[n2];
+    #else
+    void *L = NULL;
+    void *R = NULL;
+
+    L = calloc(n1, width);
+    assert(L);
+
+    R = calloc(n2, width);
+    assert(R);
+    #endif
 
     for (i = 0; i < n1; i++) {
+        /**
+         *  ADDR_AT(pointer, index, width) expands to:
+         *  (((char *)(pointer)) + ((index) * (width)))
+         */
         void *L_i = ADDR_AT(L, i, width);
         void *arr_l_plus_i = ADDR_AT(arr, l + i, width);
 
