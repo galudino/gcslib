@@ -57,11 +57,10 @@ void test_str_tmpl(void);
  *  @return     exit status
  */
 int main(int argc, const char *argv[]) {
-    /*
     test_int_vp();
     test_str_vp();
     test_vec2D_vp();
-    */
+
 
     test_int_tmpl();
     test_str_tmpl();
