@@ -61,7 +61,6 @@ int main(int argc, const char *argv[]) {
     test_str_vp();
     test_vec2D_vp();
 
-
     test_int_tmpl();
     test_str_tmpl();
 
@@ -72,7 +71,16 @@ int main(int argc, const char *argv[]) {
  *  @brief  Space to test container functionality for integral types
  */
 void test_int_vp() {
+    vector *v = v_new(_int_);
+    int i = 0;
+    for (i = 0; i < 100; i++) {
+        int push = rand() % 60;
+        v_pushb(v, &push);
+    }
 
+    v_sort(v);
+    v_puts(v);
+    v_delete(&v);
 }
 
 /**
