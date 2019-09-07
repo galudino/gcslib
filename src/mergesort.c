@@ -74,6 +74,7 @@ static void v_mergesort_iterative_merge(void *arr, int l, int m, int r,
     void **L[n1];
     void **R[n2];
     #else
+    
     void *L = NULL;
     void *R = NULL;
 
@@ -82,7 +83,26 @@ static void v_mergesort_iterative_merge(void *arr, int l, int m, int r,
 
     R = calloc(n2, width);
     assert(R);
+    
+    /*
+    void **L = NULL;
+    void **R = NULL;
+
+    L = calloc(n1, sizeof *L);
+    assert(L);
+    R = calloc(n2, sizeof *R);
+    assert(R);
+    */
     #endif
+
+    /**
+     *  arr is being split down the middle at index m.
+     * 
+     *  n1 will be the logical length 
+     *  and capacity for the left partition.
+     * 
+     *  n2 will be the same for the right partition.
+     */
 
     for (i = 0; i < n1; i++) {
         /**
@@ -93,6 +113,8 @@ static void v_mergesort_iterative_merge(void *arr, int l, int m, int r,
         void *arr_l_plus_i = ADDR_AT(arr, l + i, width);
 
         memcpy(L_i, arr_l_plus_i, width);
+
+        /* L[i] = arr[l + 1]; */
     }
 
     for (j = 0; j < n2; j++) {
@@ -100,6 +122,8 @@ static void v_mergesort_iterative_merge(void *arr, int l, int m, int r,
         void *arr_m_plus_j_plus_one = ADDR_AT(arr, m + j + 1, width);
 
         memcpy(R_j, arr_m_plus_j_plus_one, width);
+
+        /* R[j] = arr[m + j + 1]; */
     }
 
     i = 0;
@@ -115,9 +139,13 @@ static void v_mergesort_iterative_merge(void *arr, int l, int m, int r,
         if (compare(L_i, R_j) <= 0) {
             memcpy(arr_k, L_i, width);
             i++;
+
+            /* arr[k] = L[i++]; */
         } else {
             memcpy(arr_k, R_j, width);
             j++;
+
+            /* arr[k] = R[j++] */
         }
 
         k++;
@@ -128,6 +156,8 @@ static void v_mergesort_iterative_merge(void *arr, int l, int m, int r,
         void *L_i = ADDR_AT(L, i++, width);
 
         memcpy(arr_k, L_i, width);
+
+        /* arr_k[k++] = L[i++]; */
     }
 
     while (j < n2) {
@@ -135,6 +165,8 @@ static void v_mergesort_iterative_merge(void *arr, int l, int m, int r,
         void *R_j = ADDR_AT(R, j++, width);
 
         memcpy(arr_k, R_j, width);
+
+        /* arr[k++] = R[j++] */
     }
 }
 
@@ -142,12 +174,11 @@ void v_mergesort_iterative(void *arr,
                            size_t n, size_t width,
                            int (*compare)(const void *, const void *)) {
     int curr_size = -1;
-
     int left_start = -1;
 
     for (curr_size = 1; curr_size <= (n - 1); curr_size *= 2) {
-
-        for (left_start = 0; left_start < (n - 1);
+        for (left_start = 0; 
+             left_start < (n - 1);
              left_start += (curr_size * 2)) {
 
             int mid =
@@ -157,7 +188,9 @@ void v_mergesort_iterative(void *arr,
             v_mergesort_min(left_start + curr_size * 2 - 1, (int)(n) - 1);
 
             v_mergesort_iterative_merge(arr,
-                                        left_start, mid, right_end,
+                                        left_start, 
+                                        mid, 
+                                        right_end,
                                         width, compare);
         }
     }

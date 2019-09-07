@@ -248,6 +248,7 @@ vector *v_newrnge(iterator first, iterator last) {
          *  Iterators first and last must refer to the same container,
          *  or else the cursor pointer will never meet the sentinel pointer
          *  that will end the copy loop.
+         * 
          *  This also means that iterators first and last cannot refer to
          *  different container types (this is determiend by what itbls
          *  they each point to)
@@ -479,6 +480,8 @@ void v_resize(vector *v, size_t n) {
 
     if (old_capacity == n) {
         return;
+    } else if (n == 0) {
+        WARNING(__FILE__, "v_resize must receive a nonzero value for n.");
     }
 
     /**
@@ -707,7 +710,9 @@ void *v_at(vector *v, size_t n) {
     target = NULL;
 
     if (n >= size) {
-        ERROR(__FILE__, "n is greater than vector's logical length -- index out of bounds.");
+        char str[256];
+        sprintf(str, "Input %lu is greater than vector's logical length, %lu -- index out of bounds.", n, size);
+        ERROR(__FILE__, str);
         return NULL;
     } else if (n == 0) {
         /* if n is 0, it's the front of the vector */
@@ -846,7 +851,9 @@ const void *v_at_const(vector *v, size_t n) {
     assert(v);
 
     if (n >= v_size(v)) {
-        ERROR(__FILE__, "n is greater than vector's logical length -- index out of bounds.");
+        char str[256];
+        sprintf(str, "Input %lu is greater than vector's logical length, %lu -- index out of bounds.", n, v_size(v));
+        ERROR(__FILE__, str);
         return NULL;
     }
 
@@ -926,6 +933,20 @@ void v_assignrnge(vector *v, iterator first, iterator last) {
     size_t old_size = v_size(v);
     size_t old_capacity = v_capacity(v);
 
+    if (first.itbl != last.itbl) {
+        /**
+         *  Iterators first and last must refer to the same container,
+         *  or else the cursor pointer will never meet the sentinel pointer
+         *  that will end the copy loop.
+         * 
+         *  This also means that iterators first and last cannot refer to
+         *  different container types (this is determiend by what itbls
+         *  they each point to)
+         */
+        ERROR(__FILE__, "first and last must matching container types and refer to the same container.");
+        return;
+    }
+
     if (delta >= old_capacity) {
         /**
          *  If range [first, last) exceeds that of old_capacity,
@@ -990,6 +1011,8 @@ void v_assignfill(vector *v, size_t n, const void *valaddr) {
     void *newstart = NULL;
     void *sentinel = NULL;
 
+    assert(valaddr);
+
     if (n >= old_size || n >= old_capacity) {
         /**
          *  elements from [0, size) are completely overwritten and replaced with
@@ -1035,11 +1058,12 @@ void v_assignfill(vector *v, size_t n, const void *valaddr) {
              *  Elements from [0, n) are completely overwritten and replaced with
              *  valaddr. If elements were deep copied, their memory must be released first.
              */
-            v->impl.finish = (char *)(v->impl.finish) - ((n + 1) * v->ttbl->width);
+            sentinel = (char *)(v->impl.start) + ((n + 1) * v->ttbl->width);
+            v->impl.finish = v->impl.start;
 
-            while (v->impl.finish != v->impl.start) {
+            while (v->impl.finish != sentinel) {
                 v->ttbl->dtor(v->impl.finish);
-                v->impl.finish = (char *)(v->impl.finish) - (v->ttbl->width);
+                v->impl.finish = (char *)(v->impl.finish) + (v->ttbl->width);
             }
 
             v->ttbl->dtor(v->impl.start);
@@ -1052,8 +1076,9 @@ void v_assignfill(vector *v, size_t n, const void *valaddr) {
             v->impl.finish = v->impl.start;
         }
 
-        sentinel = (char *)(v->impl.start) + (n * v->ttbl->width);
-
+        v->impl.finish = v->impl.start;
+        sentinel = (char *)(v->impl.start) + ((n + 1) * v->ttbl->width);
+        
         if (v->ttbl->copy) {
             /* deep copy */
             while (v->impl.finish != sentinel) {
@@ -1086,6 +1111,7 @@ void v_assignfill(vector *v, size_t n, const void *valaddr) {
  */
 void v_pushb(vector *v, const void *valaddr) {
     assert(v);
+    assert(valaddr);
 
     /**
      *  A doubling strategy is employed when the finish pointer
@@ -1850,7 +1876,7 @@ void v_insert_at(vector *v, size_t index, const void *valaddr) {
 
     if (index >= size) {
         char str[256];
-        sprintf(str, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
+        sprintf(str, "Index provided [%lu] is out of bounds. Size of vector is %lu.", index, size);
         ERROR(__FILE__, str);
         return;
     }
@@ -1922,7 +1948,7 @@ void v_erase_at(vector *v, size_t index) {
 
     if (index >= size) {
         char str[256];
-        sprintf(str, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
+        sprintf(str, "Index provided [%lu] is out of bounds. Size of vector is %lu.", index, size);
         ERROR(__FILE__, str);
         return;
     }
@@ -1999,7 +2025,7 @@ void v_replace_at(vector *v, size_t index, const void *valaddr) {
 
     if (index >= size) {
         char str[256];
-        sprintf(str, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
+        sprintf(str, "Index provided [%lu] is out of bounds. Size of vector is %lu.", index, size);
         ERROR(__FILE__, str);
         return;
     }
@@ -2065,7 +2091,7 @@ void v_swap_elem(vector *v, size_t n1, size_t n2) {
         temp = NULL;
     } else {
         char str[256];
-        sprintf(str, "indices n1 [%lu] and/or n2 [%lu] are out of bounds.", n1, n2);
+        sprintf(str, "Indices n1 [%lu] and/or n2 [%lu] are out of bounds.", n1, n2);
         ERROR(__FILE__, str);
         return;
     }
@@ -2181,6 +2207,10 @@ vector *v_merge(vector *v, vector *other) {
 
     assert(v);
     assert(other);
+
+    if (v->ttbl != other->ttbl) {
+        WARNING(__FILE__, "Merging vectors with different data types may result in undefined behavior.");
+    }
 
     size_other = v_size(v);
     capacity_v = v_capacity(v);
@@ -2777,7 +2807,10 @@ static void v_init(vector *v, struct typetable *ttbl, size_t capacity) {
         v->ttbl->dtor = v->ttbl->dtor ? v->ttbl->dtor : NULL;
     }
 
-    capacity = (capacity <= 0) ? 1 : capacity;
+    if (capacity <= 0) {
+        WARNING(__FILE__, "Provided input capacity was less than or equal to 0. Will default to capacity of 1.");
+        capacity = 1;
+    } 
 
     start = calloc(capacity, v->ttbl->width);
     assert(start);
@@ -2898,7 +2931,11 @@ static iterator vi_next(iterator it) {
     iter.container = v;
     iter.curr = it.curr;
 
-    iter.curr = (char *)(iter.curr) + (v->ttbl->width);
+    if (iter.curr == v->impl.finish) {
+        ERROR(__FILE__, "Cannot advance - iterator already at end.");
+    } else {
+        iter.curr = (char *)(v->impl.finish) + (v->ttbl->width);
+    }
 
     return iter;
 }
@@ -2914,6 +2951,7 @@ static iterator vi_next(iterator it) {
 static iterator vi_next_n(iterator it, int n) {
     vector *v = NULL;
     iterator iter;
+    int pos = 0;
 
     v = (vector *)(it.container);
 
@@ -2921,7 +2959,15 @@ static iterator vi_next_n(iterator it, int n) {
     iter.container = v;
     iter.curr = it.curr;
 
-    iter.curr = (char *)(iter.curr) + (n * v->ttbl->width);
+    pos = ptr_distance(v->impl.start, iter.curr, v->ttbl->width);
+
+    if ((v_size(v) - pos) <= 0) {
+        char str[256];
+        sprintf(str, "Cannot advance %d times from position %d.", n, pos);
+        ERROR(__FILE__, str);
+    } else {
+        iter.curr = (char *)(iter.curr) + (n * v->ttbl->width);
+    }
 
     return iter;
 }
@@ -2944,7 +2990,11 @@ static iterator vi_prev(iterator it) {
     iter.container = v;
     iter.curr = it.curr;
 
-    iter.curr = (char *)(iter.curr) - (v->ttbl->width);
+    if (iter.curr == v->impl.start) {
+        ERROR(__FILE__, "Cannot retract - already at begin.");
+    } else {
+        iter.curr = (char *)(v->impl.finish) - (v->ttbl->width);
+    }
 
     return iter;
 }
@@ -2960,6 +3010,7 @@ static iterator vi_prev(iterator it) {
 static iterator vi_prev_n(iterator it, int n) {
     vector *v = NULL;
     iterator iter;
+    int pos = 0;
 
     v = (vector *)(it.container);
 
@@ -2967,7 +3018,15 @@ static iterator vi_prev_n(iterator it, int n) {
     iter.container = v;
     iter.curr = it.curr;
 
-    iter.curr = (char *)(iter.curr) - (n * v->ttbl->width);
+    pos = ptr_distance(v->impl.start, iter.curr, v->ttbl->width);
+
+    if ((v_size(v) - pos) <= 0) {
+        char str[256];
+        sprintf(str, "Cannot retract %d times from position %d.", n, pos);
+        ERROR(__FILE__, str);
+    } else {
+        iter.curr = (char *)(iter.curr) + (n * v->ttbl->width);
+    }
 
     return iter;
 }
@@ -2996,6 +3055,7 @@ static int vi_distance(iterator *first, iterator *last) {
         v = (vector *)(first->container);
         return (int)(ptr_distance(v->impl.start, first->curr, v->ttbl->width));
     } else if (first == NULL && last == NULL) {
+        ERROR(__FILE__, "Both iterator first and last are NULL.");
         return 0;
     } else {
         v = (vector *)(first->container);
@@ -3013,11 +3073,21 @@ static int vi_distance(iterator *first, iterator *last) {
  */
 static iterator *vi_advance(iterator *it, int n) {
     vector *v = NULL;
+    int pos = 0;
 
     assert(it);
 
-    v = (vector *)(it->container);
-    it->curr = (char *)(it->curr) + (n * v->ttbl->width);
+    pos = ptr_distance(v->impl.start, it->curr, v->ttbl->width);
+
+    if ((v_size(v) - pos) < 0) {
+        char str[256];
+        sprintf(str, "Cannot advance %d times from position %d.", n, pos);
+        ERROR(__FILE__, str);
+    } else {
+        v = (vector *)(it->container);
+        it->curr = (char *)(it->curr) + (n * v->ttbl->width);
+    }
+
     return it;
 }
 
@@ -3036,7 +3106,12 @@ static iterator *vi_incr(iterator *it) {
 
     v = (vector *)(it->container);
 
-    it->curr = (char *)(it->curr) + (v->ttbl->width);
+    if (it->curr == v->impl.finish) {
+        ERROR(__FILE__, "Cannot increment - already at end.");
+    } else {
+        it->curr = (char *)(it->curr) + (v->ttbl->width);
+    }
+
     return it;
 }
 
@@ -3054,7 +3129,12 @@ static iterator *vi_decr(iterator *it) {
 
     v = (vector *)(it->container);
 
-    it->curr = (char *)(it->curr) - (v->ttbl->width);
+    if (it->curr == v->impl.start) {
+        ERROR(__FILE__, "Cannot decrement this iterator, already at begin.");
+    } else {
+        it->curr = (char *)(it->curr) - (v->ttbl->width);
+    }
+
     return it;
 }
 

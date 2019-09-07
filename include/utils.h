@@ -36,8 +36,9 @@
 #if __STD_VERSION__ >= 199901L
 #include <stdbool.h>
 #else
-enum Boolean { false, true };
-typedef enum Boolean bool;
+typedef unsigned char bool;
+# define false '\0'
+# define true '0'
 #endif
 
 #include <stddef.h>

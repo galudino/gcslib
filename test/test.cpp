@@ -31,17 +31,19 @@
 #include <iostream>
 #include <vector>
 #include <list>
+#include <forward_list>
+#include <deque>
 #include <stack>
 #include <queue>
 #include <set>
-#include <multiset>
 #include <map>
-#include <multimap>
 #include <iterator>
 #include <algorithm>
 
 using std::cout;
+using std::cin;
 using std::endl;
+using std::string;
 
 /**
  *  @brief  Program execution begins here
@@ -52,27 +54,7 @@ using std::endl;
  *  @return     exit status
  */
 int main(int argc, const char *argv[]) {
-    std::vector<int> v;
-    for (int i = 0; i < 10; i++) {
-        v.push_back(i);
-    }
-
-    cout << "max size: " << v.max_size() << endl;
-
-    std::vector<int> vec;
-    for (int i = 0; i < 10; i++) {
-        vec.push_back(i);
-    }
-
-    // observation: leads to undefined behavior
-    std::list<int> l(v.begin(), vec.end());
-
-    std::list<int>::iterator it = l.begin();
-    while (it != l.end()) {
-        std::cout << *(it++) << std::endl;
-    }
-
-    vec.insert(vec.begin(), l.begin(), l.end());
+    cout << "sizeof(bool): " << sizeof(bool) << endl;
 
     return EXIT_SUCCESS;
 }

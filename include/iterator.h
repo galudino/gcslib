@@ -122,6 +122,7 @@ bool it_has_prev(iterator it);
 /**< iterator: retrieve typetable */
 struct typetable *it_get_ttbl(iterator it);
 
+/* C99 only */
 #define foreach(TYPE, ID, IT)                                                  \
 for (TYPE *ID = NULL,                                                          \
     (*finish) = it_finish(IT);                                                 \
