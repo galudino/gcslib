@@ -1,9 +1,9 @@
 /**
- *  @file       test.c
- *  @brief      Testbench for C code
+ *  @file       list.c
+ *  @brief      Source file for a doubly-linked list ADT
  *
  *  @author     Gemuele Aludino
- *  @date       2 Sep 2019
+ *  @date       07 Sep 2019
  *  @copyright  Copyright © 2019 Gemuele Aludino
  */
 /**
@@ -28,64 +28,65 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include "list.h"
+#include "iterator.h"
+#include "utils.h"
+
+#include <assert.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdarg.h>
-#include <assert.h>
-
 #include <string.h>
 
-void *str_copy(void *arg, const void *other) {
-    char **target = (char **)(arg);
-    char **source = (char **)(other);
-
-    (*target) = strdup((*source));
-
-    return (*target);
-}
-
-
-typedef struct parent parent;
-struct parent {
-    parent *prev;
-    parent *next;
-};
-
-typedef struct child child;
-struct child {
-    struct parent base;
-    const char *name;
+/**
+ *  @struct     list
+ *  @brief      Represents a doubly-linked list ADT
+ * 
+ *  Note that struct list is opaque -- 
+ *  its fields cannot be accessed directly,
+ *  nor can instances of struct list be created on the stack. 
+ *  This is done to enforce encapsulation.
+ */
+struct list {
+    struct list_node impl;
+    struct typetable *ttbl;
 };
 
 /**
- *  @brief  Program execution begins here
- *
- *  @param[in]  argc    argument count
- *  @param[in]  argv    command line arguments
- *
- *  @return     exit status
+ *  static func prototypes
  */
-int main(int argc, const char * argv[]) {
-    child first = { { NULL, NULL }, "john doe" };
-    child second = { { NULL, NULL }, "jane doe" };
-    child third = { { NULL, NULL }, "jessica doe" };
 
-    first.base.next = (parent *)(&second);
 
-    second.base.prev = (parent *)(&first);
-    second.base.next = (parent *)(&third);
+/**
+ *  ttbl_list and _list_ ttbl pointer
+ */
 
-    third.base.prev = (parent *)(&second);
-    
-    parent *p = (parent *)(&first);
 
-    while (p != NULL) {
-        child c = *(child *)(p);
-        printf("name: %s\n", c.name);
-        p = c.base.next;
-    }
+/**
+ *  static list iterator func prototypes
+ */
 
-    return EXIT_SUCCESS;
-}
+
+/**
+ *  list iterator table and _list_iterator_ pointer
+ */
+
+
+/**
+ *  public list func defs
+ */
+
+
+/**
+ *  public list typetable func defs
+ */
+
+
+/**
+ *  static list func defs
+ */
+
+
+/**
+ *  static list iterator func defs
+ */

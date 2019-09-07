@@ -252,4 +252,5 @@ void test_str_tmpl() {
     vputs(str)(vstr);
 
     vdelete(str)(&vstr);
+    vdelete(str)(&vs);
 }

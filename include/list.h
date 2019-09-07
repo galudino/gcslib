@@ -1,20 +1,35 @@
 /**
  *  @file       list.h
- *  @brief      Header file for a doubly-linked list
+ *  @brief      Header file for a doubly-linked list ADT
  *
  *  @author     Gemuele Aludino
- *  @date       25 Jun 2019
+ *  @date       07 Sep 2019
  *  @copyright  Copyright © 2019 Gemuele Aludino
+ */
+/**
+ *  Copyright © 2019 Gemuele Aludino
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining
+ *  a copy of this software and associated documentation files (the "Software"),
+ *  to deal in the Software without restriction, including without limitation
+ *  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit persons to whom the
+ *  Software is furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included
+ *  in all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ *  OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ *  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
+ *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #ifndef LIST_H
 #define LIST_H
-
-#include <assert.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 /**
  *  @file       utils.h
@@ -28,20 +43,35 @@
  */
 #include "iterator.h"
 
-typedef struct dlnode dlnode;
-typedef struct dlnode *dlnode_ptr;
-typedef struct dlnode **dlnode_dptr;
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-struct dlnode {
-    void *valaddr;
+typedef struct list_node            list_node;
+typedef struct list_node *          list_node_ptr;
+typedef struct list_node **         list_node_dptr;
 
-    dlnode *prev;
-    dlnode *next;
+struct list_node {
+    struct list_node_base link;
+    void *data;
 };
 
-typedef struct list list;
-typedef struct list *list_ptr;
-typedef struct list **list_dptr;
+typedef struct list     list;
+typedef struct list *   list_ptr;
+typedef struct list **  list_dptr;
+
+/**
+ *      By default, elements are deep copied into the containers,
+ *      iff the typetable provided upon instantiation has a copy function
+ *      that performs a deep copy of its argument.
+ *
+ *      If there is no deep copy function provided in the typetable,
+ *      elements are shallow copied.
+ *
+ *      "fill" functions always create deep copies of elements when used.
+ *      (provided a deep copy function is defined in the typetable)
+ */
 
 /**< list: constructors */
 list *l_new(struct typetable *ttbl);
