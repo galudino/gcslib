@@ -32,7 +32,6 @@
 
 #include <assert.h>
 #include <math.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -3607,5 +3606,5 @@ static struct typetable *vigetttbl(T)(void *arg) {
 }
 
 #else
-typedef int __PLACEHOLDER_TYPEDEF_GCSLIB__;
+typedef char __PLACEHOLDER_TYPEDEF_GCSLIB__;
 #endif

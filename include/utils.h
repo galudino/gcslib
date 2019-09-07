@@ -34,9 +34,11 @@
 #include <stdarg.h>
 
 #if __STD_VERSION__ >= 199901L
-#endif
-
 #include <stdbool.h>
+#else
+enum Boolean { false, true };
+typedef enum Boolean bool;
+#endif
 
 #include <stddef.h>
 #include <stdint.h>
