@@ -1,6 +1,6 @@
 /**
- *  @file       vector_int.c
- *  @brief      Source file for vector template instantiations
+ *  @file       vector_float.h
+ *  @brief      Header file for vector template instantiations
  *
  *  @author     Gemuele Aludino
  *  @date       20 Jun 2019
@@ -28,76 +28,36 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-#include "vector_int.h"
+#ifndef VECTOR_FLOAT_H
+#define VECTOR_FLOAT_H
 
-//*
+#include <stdio.h>
+
+/**
+ *  @file       utils.h
+ *  @brief      Required for typetable
+ */
+#include "utils.h"
+
 #ifdef T
 #undef T
 #endif
-#define T char
-#include "vector_tmpl.c"
+#define T float
+#include "vector_tmpl.h"
 #undef T
-//*/
 
-//*
 #ifdef T
 #undef T
 #endif
-#define T int
-#include "vector_tmpl.c"
+#define T double
+#include "vector_tmpl.h"
 #undef T
-//*/
 
-//*
 #ifdef T
 #undef T
 #endif
-#define T int16_t
-#include "vector_tmpl.c"
+#define T long_double
+#include "vector_tmpl.h"
 #undef T
-//*/
 
-//*
-#ifdef T
-#undef T
-#endif
-#define T int64_t
-#include "vector_tmpl.c"
-#undef T
-//*/
-
-//*
-#ifdef T
-#undef T
-#endif
-#define T uint8_t
-#include "vector_tmpl.c"
-#undef T
-//*/
-
-//*
-#ifdef T
-#undef T
-#endif
-#define T uint16_t
-#include "vector_tmpl.c"
-#undef T
-//*/
-
-//*
-#ifdef T
-#undef T
-#endif
-#define T uint32_t
-#include "vector_tmpl.c"
-#undef T
-//*/
-
-//*
-#ifdef T
-#undef T
-#endif
-#define T uint64_t
-#include "vector_tmpl.c"
-#undef T
-//*/
+#endif /* VECTOR_FLOAT_H */

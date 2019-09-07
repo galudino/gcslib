@@ -51,10 +51,7 @@
  *  @return     exit status
  */
 int main(int argc, const char * argv[]) {
-    void *ptr = calloc(16, sizeof(int));
-    void *get = (char *)(ptr) + (2 * sizeof(int));
-    int *num = (int *)(get);
-    *num = 22;
-    printf("%d\n", *num);
+
+
     return EXIT_SUCCESS;
 }

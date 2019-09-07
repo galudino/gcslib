@@ -32,7 +32,12 @@
 #define UTILS_H
 
 #include <stdarg.h>
+
+#if __STD_VERSION__ >= 199901L
+#endif
+
 #include <stdbool.h>
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -133,11 +138,12 @@ typedef void (*print_fn)(const void *, FILE *);
  *              a container ADT when acting with or upon its elements
  */
 struct typetable {
-    size_t width;                               /**< sizeof(T) */
+    size_t width; /**< sizeof(T) */
 
-    void *(*copy)(void *, const void *);        /**< intended for deep copies */
-    void (*dtor)(void *);    /**< for release of dynamically allocated memory */
-    void (*swap)(void *, void *);/**< for moving dynamically allocated memory */
+    void *(*copy)(void *, const void *); /**< intended for deep copies */
+    void (*dtor)(void *); /**< for release of dynamically allocated memory */
+    void (*swap)(void *,
+                 void *); /**< for moving dynamically allocated memory */
 
     int (*compare)(const void *, const void *); /**< sorting/searching */
     void (*print)(const void *, FILE *dest);    /**< output to stream */
@@ -227,25 +233,18 @@ extern struct typetable *_pthread_t_;
  *  your struct typetable instance should be defined manually.
  */
 #define TYPETABLE_DEFINE_PTR(TYPENAME)                                         \
-struct typetable ttbl_##TYPENAME = {                                           \
-    sizeof(TYPENAME),                                                          \
-    TYPENAME##_copy,                                                           \
-    TYPENAME##_dtor,                                                           \
-    TYPENAME##_swap,                                                           \
-    TYPENAME##_compare,                                                        \
-    TYPENAME##_print                                                           \
-};                                                                             \
+    struct typetable ttbl_##TYPENAME = {sizeof(TYPENAME),   TYPENAME##_copy,   \
+                                        TYPENAME##_dtor,    TYPENAME##_swap,   \
+                                        TYPENAME##_compare, TYPENAME##_print}; \
                                                                                \
-struct typetable *_##TYPENAME##_ = &ttbl_##TYPENAME                            \
-
+    struct typetable *_##TYPENAME##_ = &ttbl_##TYPENAME
 
 #define TYPETABLE_DEFINE_PTR(TYPENAME)                                         \
-struct typetable ttbl_##TYPENAME = {                                           \
-    sizeof(TYPENAME), TYPENAME##_copy, TYPENAME##_dtor,                        \
-    TYPENAME##_swap, TYPENAME##_compare, TYPENAME##_print                      \
-};                                                                             \
+    struct typetable ttbl_##TYPENAME = {sizeof(TYPENAME),   TYPENAME##_copy,   \
+                                        TYPENAME##_dtor,    TYPENAME##_swap,   \
+                                        TYPENAME##_compare, TYPENAME##_print}; \
                                                                                \
-struct typetable *_##TYPENAME##_ = &ttbl_##TYPENAME                            \
+    struct typetable *_##TYPENAME##_ = &ttbl_##TYPENAME
 
 /**
  *  Stack allocated instances and heap allocated instances will need to be
@@ -505,12 +504,12 @@ void void_ptr_swap(void **n1, void **n2);
  *  Redefine a macro of interest by using a preprocessor directive
  *  before the inclusion of "utils.h"
  *      For example, to redefine CSTR_ARR_DEFAULT_SIZE (for cstr_arr)
- *      
+ *
  *      #ifdef CSTR_ARR_DEFAULT_SIZE
  *      #undef CSTR_ARR_DEFAULT_SIZE
  *      #endif
  *      #define CSTR_ARR_DEFAULT_SIZE   <nonzero integer of positive magnitude>
- * 
+ *
  *      #include "utils.h"
  */
 #ifndef CSTR_ARR_DEFAULT_SIZE
@@ -631,27 +630,27 @@ typedef cchar_ptr_arr cstr_arr;
  *  use char_arr
  *      for statically allocated array of char (null-terminated, or not)
  *      char_arr (statically allocated array of char) have mutable characters.
- * 
+ *
  *  use char_ptr or str
  *      for dynamically allocated strings or string literals
  *      char_ptr/str have mutable addresses, but immutable characters.
  *      (compiler will not protect against character mutations of stack
  *       allocated string literals)
- *      
+ *
  *      note: the pointer-to-typetable, '_str_', include a copy function
  *      for creating dynamically allocated string duplicates, as well as a dtor
  *      function for releasing memory allocated by the copy function.
  *      the '_char_ptr_' pointer-to-typetable does not define a copy or dtor.
- * 
+ *
  *  use char_dptr or str_ptr
  *      for dynamically allocated arrays of (char_ptr), aka (str)
- * 
+ *
  *  use cchar_dptr or cstr_ptr
  *      for dynamically allocated arrays of (ccstr_ptr), aka (cstr)
- * 
+ *
  *  use char_ptr_arr or str_arr
  *      for statically allocated arrays of (char_ptr), aka (str)
- * 
+ *
  *  use cchar_ptr_arr or cstr_arr
  *      for statically allocated arrays of (cchar_ptr), aka (cstr)
  */
@@ -738,12 +737,13 @@ typedef double float64_t;
 typedef long double long_double;
 
 /**< utils: debugging */
-int ulog(FILE *dest,
-         const char *level,     /**< meant for "BUG", "LOG", "ERROR", or "WARNING" */
-         const char *file,      /**< meant for use with the __FILE__ macro */
-         const char *func,      /**< meant for use with the __func__ macro */
-         long double line,      /**< meant for use with the __LINE__ macro */
-         const char *fmt, ...); /**< user's custom message */
+int ulog(
+    FILE *dest,
+    const char *level,     /**< meant for "BUG", "LOG", "ERROR", or "WARNING" */
+    const char *file,      /**< meant for use with the __FILE__ macro */
+    const char *func,      /**< meant for use with the __func__ macro */
+    long double line,      /**< meant for use with the __LINE__ macro */
+    const char *fmt, ...); /**< user's custom message */
 
 /**
  *  Unless you would like to create a customized
@@ -774,12 +774,11 @@ int ulog(FILE *dest,
  */
 #if __STDC_VERSION__ >= 199901L
 #define BUG(FILEMACRO, ...)                                                    \
-    ulog(ULOG_STREAM_BUG, "[BUG]", FILEMACRO, __func__,                        \
-         (long int)__LINE__, __VA_ARGS__)
+    ulog(ULOG_STREAM_BUG, "[BUG]", FILEMACRO, __func__, (long int)__LINE__,    \
+         __VA_ARGS__)
 #else
 #define BUG(FILEMACRO, MSG)                                                    \
-    ulog(ULOG_STREAM_BUG, "[BUG]", FILEMACRO, __func__,                        \
-         (long int)__LINE__, MSG)
+    ulog(ULOG_STREAM_BUG, "[BUG]", FILEMACRO, __func__, (long int)__LINE__, MSG)
 #endif
 
 /**
@@ -788,12 +787,11 @@ int ulog(FILE *dest,
  */
 #if __STDC_VERSION__ >= 199901L
 #define LOG(FILEMACRO, ...)                                                    \
-    ulog(ULOG_STREAM_LOG, "[LOG]", FILEMACRO, __func__,                        \
-         (long int)__LINE__, __VA_ARGS__)
+    ulog(ULOG_STREAM_LOG, "[LOG]", FILEMACRO, __func__, (long int)__LINE__,    \
+         __VA_ARGS__)
 #else
 #define LOG(FILEMACRO, MSG)                                                    \
-    ulog(ULOG_STREAM_LOG, "[LOG]", FILEMACRO, __func__,                        \
-         (long int)__LINE__, MSG)
+    ulog(ULOG_STREAM_LOG, "[LOG]", FILEMACRO, __func__, (long int)__LINE__, MSG)
 #endif
 
 /**
@@ -886,7 +884,8 @@ ULOG_TOGGLE_ATTR(MESSAGE);
 #define tmpl3t(ARG, TYPE1, TYPE2, TYPE3) TCAT(ARG, TYPE1, TYPE2, TYPE3)
 
 #define QCAT(W, X, Y, Z, ZZ) WW##_##X##_##Y##_##Z##_##ZZ
-#define tmpl4t(ARG, TYPE1, TYPE2, TYPE3, TYPE4) QCAT(ARG, TYPE1, TYPE2, TYPE3, TYPE4)
+#define tmpl4t(ARG, TYPE1, TYPE2, TYPE3, TYPE4)                                \
+    QCAT(ARG, TYPE1, TYPE2, TYPE3, TYPE4)
 
 #define table_id(TBL_TYPE, T) tmpl(TBL_TYPE, T)
 #define table_ptr_id(TYPE, T) _##TYPE##_##T##_

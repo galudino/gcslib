@@ -1,6 +1,6 @@
 /**
- *  @file       vector_str.h
- *  @brief      Header file for vector template instantiations
+ *  @file       vector_int.c
+ *  @brief      Source file for vector template instantiations
  *
  *  @author     Gemuele Aludino
  *  @date       20 Jun 2019
@@ -28,43 +28,66 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-#ifndef VECTOR_STR_H
-#define VECTOR_STR_H
+#include "vector_int.h"
 
-/**
- *  @file       utils.h
- *  @brief      Required for typetable
- */
-#include "utils.h"
-
-//* typedef char * char_ptr, for char[] and char * literals
-// no destructor
 #ifdef T
 #undef T
 #endif
-#define T char_ptr
-#include "vector_tmpl.h"
+#define T char
+#include "vector_tmpl.c"
 #undef T
-//*/
 
-//* typedef char * str, for dynamically allocated char *
-// destructor enabled
 #ifdef T
 #undef T
 #endif
-#define T str
-#include "vector_tmpl.h"
+#define T int
+#include "vector_tmpl.c"
 #undef T
-//*/
 
-//* typedef const char *cstr, for const char * literals
-// no destructor
 #ifdef T
 #undef T
 #endif
-#define T cstr
-#include "vector_tmpl.h"
+#define T int16_t
+#include "vector_tmpl.c"
 #undef T
-//*/
 
-#endif /* VECTOR_STR_H */
+#if __STD_VERSION__ >= 199901L
+#ifdef T
+#undef T
+#endif
+#define T int64_t
+#include "vector_tmpl.c"
+#undef T
+#endif
+
+#ifdef T
+#undef T
+#endif
+#define T uint8_t
+#include "vector_tmpl.c"
+#undef T
+
+#ifdef T
+#undef T
+#endif
+#define T uint16_t
+#include "vector_tmpl.c"
+#undef T
+
+#ifdef T
+#undef T
+#endif
+#define T uint32_t
+#include "vector_tmpl.c"
+#undef T
+
+#if __STD_VERSION__ >= 199901L
+#ifdef T
+#undef T
+#endif
+#define T uint64_t
+#include "vector_tmpl.c"
+#undef T
+#endif
+
+

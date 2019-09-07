@@ -1,5 +1,5 @@
 /**
- *  @file       vector_str.c
+ *  @file       vector_float.h
  *  @brief      Header file for vector template instantiations
  *
  *  @author     Gemuele Aludino
@@ -28,34 +28,25 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-#include "vector_str.h"
+#include "vector_float.h"
 
-//* typedef char * char_ptr, for char[] and char * literals
-// no destructor
 #ifdef T
 #undef T
 #endif
-#define T char_ptr
+#define T float
 #include "vector_tmpl.c"
 #undef T
-//*/
 
-//* typedef char * str, for dynamically allocated char *
-// destructor enabled
 #ifdef T
 #undef T
 #endif
-#define T str
+#define T double
 #include "vector_tmpl.c"
 #undef T
-//*/
 
-//* typedef const char *cstr, for const char * literals
-// no destructor
 #ifdef T
 #undef T
 #endif
-#define T cstr
+#define T long_double
 #include "vector_tmpl.c"
 #undef T
-//*/

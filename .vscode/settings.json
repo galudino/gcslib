@@ -18,6 +18,7 @@
         "set": "cpp",
         "unordered_map": "cpp",
         "hashtable": "cpp",
-        "complex": "cpp"
+        "complex": "cpp",
+        "assert.h": "c"
     }
 }

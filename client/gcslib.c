@@ -99,7 +99,10 @@ void test_vec2D_vp() {
 
 
 void test_int_tmpl() {
+    vector(int) *v = vnew(int)();
 
+    vputs(int)(v);
+    vdelete(int)(&v);
 }
 
 void test_str_tmpl() {

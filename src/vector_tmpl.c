@@ -62,7 +62,7 @@
 #define VECTOR_TMPL_MAXIMUM_STACK_BUFFER_SIZE 16384
 #define VECTOR_DEFAULT_CAPACITY 16
 
-// optional macros for accessing the innards of vector_base
+/* optional macros for accessing the innards of vector_base */
 #define AT(VEC, INDEX)  ((VEC->impl.start) + (INDEX))
 #define FRONT(VEC)      ((VEC->impl.start))
 #define BACK(VEC)       ((VEC->impl.finish) - 1)
@@ -186,9 +186,9 @@ struct iterator_table *vector_iterator_table_ptr_id(T) = &table_id(itbl_vector, 
  *  @return     pointer to vector(T)
  */
 vector(T) *vnew(T)(void) {
-    vector(T) *v = vallocate(T)();          // allocate
-    vinit(T)(v, VECTOR_DEFAULT_CAPACITY);   // construct
-    return v;                               // return
+    vector(T) *v = vallocate(T)();              /* allocate */
+    vinit(T)(v, VECTOR_DEFAULT_CAPACITY);       /* construct */
+    return v;                                   /* return */
 }
 
 /**
@@ -198,9 +198,9 @@ vector(T) *vnew(T)(void) {
  *  @return     pointer to vector(T)
  */
 vector(T) *vnewr(T)(size_t n) {
-    vector(T) *v = vallocate(T)();
-    vinit(T)(v, n);
-    return v;
+    vector(T) *v = vallocate(T)();          /* allocate */
+    vinit(T)(v, n);                         /* construct */
+    return v;                               /* return */
 }
 
 /**
@@ -218,18 +218,25 @@ vector(T) *vnewr(T)(size_t n) {
  *  deep copies. Otherwise, val will be shallow-copied using memcpy.
  */
 vector(T) *vnewfill(T)(size_t n, T val) {
-    vector(T) *v = vnewr(T)(n);
-    T *sentinel = v->impl.start + n;
+    vector(T) *v = NULL;
+    T *sentinel = NULL;
+
+    v = vnewr(T)(n);
+    sentinel = v->impl.start + n;
 
     if (v->ttbl->copy) {
-        // if copy function defined in ttbl,
-        // instances of val are deep copied
+        /**
+         *  If copy function defined in ttbl,
+         *  instances of valaddr are deep copied
+         */
         while (v->impl.finish != sentinel) {
             v->ttbl->copy(v->impl.finish++, &val);
         }
     } else {
-        // if no copy function defined in ttbl,
-        // instances of val are shallow-copied
+        /**
+         *  If no copy function defined in ttbl,
+         *  instances of valaddr are shallow copied
+         */
         while (v->impl.finish != sentinel) {
             memcpy(v->impl.finish++, &val, v->ttbl->width);
         }
@@ -253,18 +260,25 @@ vector(T) *vnewfill(T)(size_t n, T val) {
  *  deep copies. Otherwise, valaddr will be shallow-copied using memcpy.
  */
 vector(T) *vnewfillptr(T)(size_t n, T *valaddr) {
-    vector(T) *v = vnewr(T)(n);
-    T *sentinel = v->impl.start + n;
+    vector(T) *v = NULL;
+    T *sentinel = NULL;
+
+    v = vnewr(T)(n);
+    sentinel = v->impl.start + n;
 
     if (v->ttbl->copy) {
-        // if copy function defined in ttbl,
-        // instances of valaddr are deep copied
+        /**
+         *  If copy function defined in ttbl,
+         *  instances of valaddr are deep copied
+         */
         while (v->impl.finish != sentinel) {
             v->ttbl->copy(v->impl.finish++, valaddr);
         }
     } else {
-        // if no copy function defined in ttbl,
-        // instances of valaddr are shallow-copied
+        /**
+         *  If no copy function defined in ttbl,
+         *  instances of valaddr are shallow copied
+         */
         while (v->impl.finish != sentinel) {
             memcpy(v->impl.finish++, valaddr, v->ttbl->width);
         }
@@ -298,33 +312,42 @@ vector(T) *vnewfillptr(T)(size_t n, T *valaddr) {
  *  Otherwise, [first, last) will be shallow-copied using memcpy.
  */
 vector(T) *vnewrnge(T)(iterator first, iterator last) {
+    int delta = 0;
+
+    struct typetable *ttbl_first = NULL;
+    vector(T) *v = NULL;
+
+    T *sentinel = NULL;
+    T *curr = NULL;
+
     if (first.itbl != last.itbl) {
-        // iterators first and last must refer to the same container,
-        // or else the cursor pointer will never meet the sentinel pointer
-        // that will end the copy loop.
-        // this also means that iterators first and last cannot refer to
-        // different container types (this is determined by what itbls
-        // they each point to)
+        /**
+         *  Iterators first and last must refer to the same container,
+         *  or else the cursor pointer will never meet the sentinel pointer
+         *  that will end the copy loop.
+         *  This also means that iterators first and last cannot refer to
+         *  different container types (this is determiend by what itbls
+         *  they each point to)
+         */
         ERROR(__FILE__, "first and last must matching container types and refer to the same container.");
         return NULL;
     }
 
-    int delta = it_distance(&first, &last);
-    struct typetable *ttbl_first = it_get_ttbl(first);
+    delta = it_distance(&first, &last);
+    ttbl_first = it_get_ttbl(first);
 
-    vector(T) *v = vnewr(T)(delta);
+    v = vnewr(T)(delta);
 
-    T *sentinel = it_curr(last);         // iteration range is [first, last)
-    T *curr = NULL;
+    sentinel = it_curr(last);         /* iteration range is [first, last) */
 
     if (ttbl_first->copy) {
         while ((curr = it_curr(first)) != sentinel)  {
             ttbl_first->copy(v->impl.finish++, curr);
+
             it_incr(&first);
         }
     } else {
         while ((curr = it_curr(first)) != sentinel)  {
-            curr = it_curr(first);
             memcpy(v->impl.finish++, curr, v->ttbl->width);
 
             it_incr(&first);
@@ -348,12 +371,17 @@ vector(T) *vnewrnge(T)(iterator first, iterator last) {
  *  Otherwise, the contents of v will be shallow-copied using memcpy.
  */
 vector(T) *vnewcopy(T)(vector(T) *v) {
+    vector(T) *copy = NULL;
+
+    T *sentinel = NULL;
+    T *curr = NULL;
+
     assert(v);
 
-    vector(T) *copy = vnewr(T)(vcapacity(T)(v));
+    copy = vnewr(T)(vcapacity(T)(v));
 
-    T *sentinel = copy->impl.finish + vsize(T)(v);
-    T *curr = v->impl.start;
+    sentinel = copy->impl.finish + vsize(T)(v);
+    curr = v->impl.start;
 
     if (v->ttbl->copy) {
         while (copy->impl.finish != sentinel) {
@@ -380,16 +408,24 @@ vector(T) *vnewcopy(T)(vector(T) *v) {
  *  v may be deleted by the client, or reused.
  */
 vector(T) *vnewmove(T)(vector(T) **v) {
+    vector(T) *move = NULL;
+
     assert(v);
 
-    vector(T) *move = vallocate(T)();
+    move = vallocate(T)();
 
+    /**
+     *  A new vector, move, is constructed from the contents of an existing vector,
+     *  by a change of ownership between impl pointers.
+     *  The previous vector, v, is initialized to have a size of 1 --
+     *  v may be deleted clientside if preferred.
+     */
     move->impl.start = (*v)->impl.start;
     move->impl.finish = (*v)->impl.finish;
     move->impl.end_of_storage = (*v)->impl.end_of_storage;
     move->ttbl = (*v)->ttbl;
 
-    vinit(T)((*v), VECTOR_DEFAULT_CAPACITY);
+    vinit(T)((*v), 1);
 
     return move;
 }
@@ -413,15 +449,17 @@ vector(T) *vnewmove(T)(vector(T) **v) {
 void vdelete(T)(vector(T) **v) {
     assert((*v));
 
-    // deinitialization involves releasing all dynamically allocated
-    // memory at each field (if dtor function is defined in ttbl,
-    // and is written to release such memory) --
-    // after that step (or if there is no memory to free within the elements),
-    // (*v)->impl.start has its memory freed, and the remainder of (*v)'s fields
-    // are set NULL.
+    /**
+     *  Deinitialization involves releasing all dynamically allocated
+     *  memory at each field (if dtor function is defined in ttbl,
+     *  and is written to release such memory) --
+     *  after that step (or if there is no memory to free within the elements),
+     *  (*v)->impl.start has its memory freed, and the remainder of (*v)'s fields
+     *  are set NULL.
+     */
     vdeinit(T)((*v));
 
-    // finally, the memory (*v) points to will be freed.
+    /* finally, the memory (*v) points to will be freed. */
     free((*v));
     (*v) = NULL;
 }
@@ -470,10 +508,12 @@ size_t vsize(T)(vector(T) *v) {
  *  @return     theoretical maximum logical length of v
  */
 size_t vmaxsize(T)(vector(T) *v) {
+    size_t ptr_sz = 0;
+
     assert(v);
 
-    // ptr_sz is 8 bytes on 64 bit system, 4 bytes on 32 bit system
-    size_t ptr_sz = (sizeof(void *) == 8) ? 8 : 4;
+    /* ptr_sz is 8 bytes on 64 bit system, 4 bytes on 32 bit system */
+    ptr_sz = (sizeof(void *) == 8) ? 8 : 4;
     return ((pow)(2.0, (ptr_sz * 8)) / (v->ttbl->width)) - 1;
 }
 
@@ -488,35 +528,47 @@ size_t vmaxsize(T)(vector(T) *v) {
  *  otherwise, v's capacity will be extended.
  */
 void vresize(T)(vector(T) *v, size_t n) {
-    assert(v);
+    size_t old_size = 0;
+    size_t old_capacity = 0;
+
+    T *target = NULL;
+    T *newstart = NULL;
+
+    int back_index = 0;
+    int i = 0;
+
+    size_t fin = 0;
+    size_t end = 0;
+    
     assert(v);
 
-    size_t old_size = vsize(T)(v);
-    size_t old_capacity = vcapacity(T)(v);
+    old_size = vsize(T)(v);
+    old_capacity = vcapacity(T)(v);
 
     if (old_capacity == n) {
         return;
     }
 
-    // if n is less than the old size, and items were deep copied --
-    // dynamically allocated memory will be released as per the dtor function
-    // prior to truncation
-    // (if dtor is defined in ttbl, copy should be defined as well)
+    /**
+     *  If n is less than the old size, and items were deep copied --
+     *  dynamically allocated memory will be released as per the dtor function
+     *  prior to truncation
+     *  (if dtor is defined in ttbl, copy should be defined as well)
+     */
     if (n < old_size && v->ttbl->dtor) {
-        T *target = v->impl.start + n;
+        target = v->impl.start + n;
 
-        const int back_index = n - 1;
-        for (int i = 0; i < back_index; i++) {
+        back_index = n - 1;
+        for (i = 0; i < back_index; i++) {
             v->ttbl->dtor(target--);
         }
     }
 
-    T *newstart = NULL;
     newstart = realloc(v->impl.start, n * v->ttbl->width);
     assert(newstart);
 
-    size_t fin = n > old_size ? old_size : n;
-    size_t end = n > old_size ? n : fin;
+    fin = n > old_size ? old_size : n;
+    end = n > old_size ? n : fin;
 
     v->impl.start = newstart;
     v->impl.finish = v->impl.start + fin;
@@ -538,19 +590,27 @@ void vresize(T)(vector(T) *v, size_t n) {
  *  initialized, with each block consisting of copies of val.
  */
 void vresizefill(T)(vector(T) *v, size_t n, T val) {
+    size_t old_size = 0;
+    size_t old_capacity = 0;
+
+    T *sentinel = NULL;
+    T *newstart = NULL;
+
     assert(v);
 
-    size_t old_size = vsize(T)(v);
-    size_t old_capacity = vcapacity(T)(v);
+    old_size = vsize(T)(v);
+    old_capacity = vcapacity(T)(v);
 
-    T *sentinel = v->impl.start + n;
+    sentinel = v->impl.start + n;
 
     if (n > old_capacity) {
-        // if n is greater than the old size, multiple instances of valaddr are
-        // appended to the rear of the vector following a resize.
+        /**
+         *  If n is greater than the old size, multiple instances of valaddr are
+         *  appended to the rear of the vector following a resize.
+         */
         vresize(T)(v, n);
 
-        // sentinel must be updated to reflect the resize.
+        /* sentinel must be updated to reflect the resize. */
         sentinel = v->impl.start + n;
 
         if (v->ttbl->copy) {
@@ -563,10 +623,12 @@ void vresizefill(T)(vector(T) *v, size_t n, T val) {
             }
         }
     } else {
-        // if n is less than or equal to the old size,
-        // and dtor is defined in ttbl,
-        // then dynamically allocated memory will be released
-        // at each element, as per the dtor function.
+        /**
+         *  If n is less than or equal to the old size,
+         *  and dtor is defined in ttbl,
+         *  then dynamically allocated memory will be released
+         *  at each element, as per the dtor function.
+         */
         if (v->ttbl->dtor) {
             --v->impl.finish;
 
@@ -577,20 +639,21 @@ void vresizefill(T)(vector(T) *v, size_t n, T val) {
             v->ttbl->dtor(v->impl.finish);
         }
 
-        // memory at the base address of the vector will be released...
+        /* memory at the base address of the vector will be released... */
         free(v->impl.start);
         v->impl.start = NULL;
 
-        // ...and new memory will be allocated of size n to represent
-        // the new base address of the vector.
-        // (alternatively, v->impl.start have also been realloc'ed to size n),
-        // but if n is less than or equal to the old size, the old elements
-        // will be overwritten anyway.
-        T *newstart = NULL;
+        /**
+         *  ...and new memory will be allocated of size n to represent
+         *  the new base address of the vector.
+         *  (alternatively, v->impl.start have also been realloc'ed to size n),
+         *  but if n is less than or equal to the old size, the old elements
+         *  will be overwritten anyway.
+         */
         newstart = calloc(n, v->ttbl->width);
         assert(newstart);
 
-        // pointers at impl are re-established
+        /* pointers at impl are re-established */
         v->impl.start = newstart;
         v->impl.finish = v->impl.start;
         v->impl.end_of_storage = v->impl.start + n;
@@ -624,19 +687,27 @@ void vresizefill(T)(vector(T) *v, size_t n, T val) {
  *  initialized, with each block consisting of copies of valaddr.
  */
 void vresizefillptr(T)(vector(T) *v, size_t n, T *valaddr) {
+    size_t old_size = 0;
+    size_t old_capacity = 0;
+
+    T *sentinel = NULL;
+    T *newstart = NULL;
+
     assert(v);
 
-    size_t old_size = vsize(T)(v);
-    size_t old_capacity = vcapacity(T)(v);
+    old_size = vsize(T)(v);
+    old_capacity = vcapacity(T)(v);
 
-    T *sentinel = v->impl.start + n;
+    sentinel = v->impl.start + n;
 
     if (n > old_capacity) {
-        // if n is greater than the old size, multiple instances of valaddr are
-        // appended to the rear of the vector following a resize.
+        /**
+         *  If n is greater than the old size, multiple instances of valaddr are
+         *  appended to the rear of the vector following a resize.
+         */
         vresize(T)(v, n);
 
-        // sentinel must be updated to reflect the resize.
+        /* sentinel must be updated to reflect the resize. */
         sentinel = v->impl.start + n;
 
         if (v->ttbl->copy) {
@@ -649,10 +720,12 @@ void vresizefillptr(T)(vector(T) *v, size_t n, T *valaddr) {
             }
         }
     } else {
-        // if n is less than or equal to the old size,
-        // and dtor is defined in ttbl,
-        // then dynamically allocated memory will be released
-        // at each element, as per the dtor function.
+        /**
+         *  If n is less than or equal to the old size,
+         *  and dtor is defined in ttbl,
+         *  then dynamically allocated memory will be released
+         *  at each element, as per the dtor function.
+         */
         if (v->ttbl->dtor) {
             --v->impl.finish;
 
@@ -663,20 +736,21 @@ void vresizefillptr(T)(vector(T) *v, size_t n, T *valaddr) {
             v->ttbl->dtor(v->impl.finish);
         }
 
-        // memory at the base address of the vector will be released...
+        /* memory at the base address of the vector will be released... */
         free(v->impl.start);
         v->impl.start = NULL;
 
-        // ...and new memory will be allocated of size n to represent
-        // the new base address of the vector.
-        // (alternatively, v->impl.start have also been realloc'ed to size n),
-        // but if n is less than or equal to the old size, the old elements
-        // will be overwritten anyway.
-        T *newstart = NULL;
+        /**
+         *  ...and new memory will be allocated of size n to represent
+         *  the new base address of the vector.
+         *  (alternatively, v->impl.start have also been realloc'ed to size n),
+         *  but if n is less than or equal to the old size, the old elements
+         *  will be overwritten anyway.
+         */
         newstart = calloc(n, v->ttbl->width);
         assert(newstart);
 
-        // pointers at impl are re-established
+        /* pointers at impl are re-established */
         v->impl.start = newstart;
         v->impl.finish = v->impl.start;
         v->impl.end_of_storage = v->impl.start + n;
@@ -716,21 +790,25 @@ size_t vcapacity(T)(vector(T) *v) {
  */
 bool vempty(T)(vector(T) *v) {
     assert(v);
-    // since v->impl.finish is always one address ahead of vector's back element,
-    // if v->impl.start == v->impl.finish, the vector is empty.
+    /**
+     *  Since v->impl.finish is always one address ahead of vector's back element,
+     *  if v->impl.start == v->impl.finish, the vector is empty.
+     */
     return v->impl.start == v->impl.finish;
 }
 
 void vreserve(T)(vector(T) *v, size_t n) {
     assert(v);
 
-    // reserve is effectively a resize,
-    // but verifies that the value of n meets the requirements for a reservation.
+    /**
+     *  Reserve is effectively a resize,
+     *  but verifies that the value of n meets the requirements for a reservation.
+     */
     if (n > vcapacity(T)(v)) {
         vresize(T)(v, n);
     } else {
-        // no-op
-        ERROR(__FILE__, "n must be greater than vector(T)'s buffer capacity.");
+        /* no-op */
+        ERROR(__FILE__, "n must be greater than vector's buffer capacity.");
         return;
     }
 }
@@ -764,22 +842,25 @@ void vshrinktofit(T)(vector(T) *v) {
  *  A bounds check is performed to ensure that n is a valid index.
  */
 T *vat(T)(vector(T) *v, size_t n) {
-    assert(v);
-
-    size_t size = vsize(T)(v);
+    size_t size = 0;
     T *target = NULL;
 
+    assert(v);
+
+    size = vsize(T)(v);
+    target = NULL;
+
     if (n >= size) {
-        ERROR(__FILE__, "n is greater than vector(T)'s logical length -- index out of bounds.");
+        ERROR(__FILE__, "n is greater than vector's logical length -- index out of bounds.");
         return NULL;
     } else if (n == 0) {
-        // if n is 0, it's the front of the vector
+        /* if n is 0, it's the front of the vector */
         target = v->impl.start;
     } else if (n == (size - 1)) {
-        // if n is (size - 1), the back index, effectively (v->impl.finish - 1)
+        /* if n is (size - 1), the back index, effectively (v->impl.finish - 1) */
         target = v->impl.finish - 1;
     } else {
-        // if n is anywhere within (0, size - 1)
+        /* if n is anywhere within (0, size - 1), effectively (v->impl.start + n) */
         target = v->impl.start + n;
     }
 
@@ -833,25 +914,16 @@ T **vdata(T)(vector(T) *v) {
  *  A bounds check is performed to ensure that n is a valid index.
  */
 const T *vatconst(T)(vector(T) *v, size_t n) {
-    assert(v);
-
-    size_t size = vsize(T)(v);
     T *target = NULL;
 
-    if (n >= size) {
-        ERROR(__FILE__, "n is greater than vector(T)'s logical length -- index out of bounds.");
+    assert(v);
+
+    if (n >= vsize(T)(v)) {
+        ERROR(__FILE__, "n is greater than vector's logical length -- index out of bounds.");
         return NULL;
-    } else if (n == 0) {
-        // if n is 0, it's the front of the vector
-        target = v->impl.start;
-    } else if (n == (size - 1)) {
-        // if n is (size - 1), the back index, effectively (v->impl.finish - 1)
-        target = v->impl.finish - 1;
-    } else {
-        // if n is anywhere within (0, size - 1)
-        target = v->impl.start + n;
     }
 
+    target = v->impl.start + n;
     return target ? target : NULL;
 }
 
@@ -863,7 +935,6 @@ const T *vatconst(T)(vector(T) *v, size_t n) {
  *  @return     address of front element, const qualified
  */
 const T *vfrontconst(T)(vector(T) *v) {
-    assert(v);
     const T *result = (const T *)(v->impl.start);
     return result;
 }
@@ -876,7 +947,6 @@ const T *vfrontconst(T)(vector(T) *v) {
  *  @return     address of rear element, const qualified
  */
 const T *vbackconst(T)(vector(T) *v) {
-    assert(v);
     const T *result = (const T *)(v->impl.finish - 1);
     return result;
 }
@@ -889,7 +959,6 @@ const T *vbackconst(T)(vector(T) *v) {
  *  @return     address of v->impl.start, const qualified
  */
 const T **vdataconst(T)(vector(T) *v) {
-    assert(v);
     const T **result = (const T **)(&v->impl.start);
     return result;
 }
@@ -921,17 +990,21 @@ void vassignrnge(T)(vector(T) *v, iterator first, iterator last) {
     size_t old_capacity = vcapacity(T)(v);
 
     if (delta >= old_capacity) {
-        // if range [first, last) exceeds that of old_capacity,
-        // resize the vector to accomodate the new elements
+        /**
+         *  If range [first, last) exceeds that of old_capacity,
+         *  resize the vector to accomodate the new elements
+         */
         vresize(T)(v, delta);
     }
 
-    // move the finish pointer to the beginning of the vector
+    /* move the finish pointer to the beginning of the vector */
     v->impl.finish = v->impl.start;
 
     if (ttbl_first->copy && ttbl_first->dtor) {
-        // if items were deep copied, existing memory
-        // will be released before copying new data
+        /**
+         *  If items were deep copied, existing memory
+         *  will be released before copying new data
+         */
         while ((curr = it_curr(first)) != sentinel)  {
             ttbl_first->dtor(v->impl.finish);
             ttbl_first->copy(v->impl.finish++, curr);
@@ -939,8 +1012,10 @@ void vassignrnge(T)(vector(T) *v, iterator first, iterator last) {
             it_incr(&first);
         }
     } else {
-        // if items were shallow copied,
-        // blocks will be overwritten immediately
+        /**
+         *  If items were shallow copied,
+         *  blocks will be overwritten immediately
+         */
         while ((curr = it_curr(first)) != sentinel)  {
             memcpy(v->impl.finish++, curr, v->ttbl->width);
 
@@ -948,8 +1023,8 @@ void vassignrnge(T)(vector(T) *v, iterator first, iterator last) {
         };
     }
 
-    // restoring finish pointer to appropriate location
-    v->impl.finish = delta < old_size ? v->impl.start + old_size : v->impl.finish;
+    /* restoring finish pointer to appropriate location */
+    v->impl.finish = (delta < old_size) ? v->impl.start + old_size : v->impl.finish;
 }
 
 /**
@@ -972,11 +1047,14 @@ void vassignfill(T)(vector(T) *v, size_t n, T val) {
     size_t old_size = vsize(T)(v);
     size_t old_capacity = vcapacity(T)(v);
 
-    if (n >= old_size || n >= old_capacity) {
-        // elements from [0, size) are completely overwritten and replaced with
-        // valaddr. if elements were deep copied, their memory
-        // must be released first.
+    T *newstart = NULL;
+    T *sentinel = NULL;
 
+    if (n >= old_size || n >= old_capacity) {
+        /**
+         *  elements from [0, size) are completely overwritten and replaced with
+         *  valaddr. If elements were deep copied, their memory must be released first.
+         */
         if (v->ttbl->dtor) {
             --v->impl.finish;
 
@@ -990,7 +1068,6 @@ void vassignfill(T)(vector(T) *v, size_t n, T val) {
         free(v->impl.start);
         v->impl.start = NULL;
 
-        T *newstart = NULL;
         newstart = calloc(n, v->ttbl->width);
         assert(newstart);
 
@@ -999,20 +1076,22 @@ void vassignfill(T)(vector(T) *v, size_t n, T val) {
         v->impl.end_of_storage = v->impl.start + n;
 
         if (v->ttbl->copy) {
-            // deep copy
+            /* deep copy */
             while (v->impl.finish != v->impl.end_of_storage) {
                 v->ttbl->copy(v->impl.finish++, &val);
             }
         } else {
-            // shallow copy
+            /* shallow copy */
             while (v->impl.finish != v->impl.end_of_storage) {
                 memcpy(v->impl.finish++, &val, v->ttbl->width);
             }
         }
     } else {
         if (v->ttbl->dtor) {
-            // elements from [0, n) are completely overwritten and replaced with
-            // val. if elements were deep copied, their memory must be released first.
+            /**
+             *  Elements from [0, n) are completely overwritten and replaced with
+             *  valaddr. If elements were deep copied, their memory must be released first.
+             */
             v->impl.finish = v->impl.finish - (n + 1);
 
             while (v->impl.finish != v->impl.start) {
@@ -1021,27 +1100,29 @@ void vassignfill(T)(vector(T) *v, size_t n, T val) {
 
             v->ttbl->dtor(v->impl.start);
         } else {
-            // if elements are shallow copied,
-            // we skip memory deallocation and move the finish pointer
-            // to the address of the start pointer
+            /**
+             *  If elements are shallow copied,
+             *  we skip memory deallocation and move the finish pointer
+             *  to the address of the start pointer
+             */
             v->impl.finish = v->impl.start;
         }
 
-        T *sentinel = v->impl.start + n;
+        sentinel = v->impl.start + n;
 
         if (v->ttbl->copy) {
-            // deep copy
+            /* deep copy */
             while (v->impl.finish != sentinel) {
                 v->ttbl->copy(v->impl.finish++, &val);
             }
         } else {
-            // shallow copy
+            /* shallow copy */
             while (v->impl.finish != sentinel) {
                 memcpy(v->impl.finish++, &val, v->ttbl->width);
             }
         }
 
-        // restoring the finish pointer to its former address
+        /* restoring the finish pointer to its former address */
         v->impl.finish = v->impl.start + old_size;
     }
 }
@@ -1066,11 +1147,14 @@ void vassignfillptr(T)(vector(T) *v, size_t n, T *valaddr) {
     size_t old_size = vsize(T)(v);
     size_t old_capacity = vcapacity(T)(v);
 
-    if (n >= old_size || n >= old_capacity) {
-        // elements from [0, size) are completely overwritten and replaced with
-        // valaddr. if elements were deep copied, their memory
-        // must be released first.
+    T *newstart = NULL;
+    T *sentinel = NULL;
 
+    if (n >= old_size || n >= old_capacity) {
+        /**
+         *  elements from [0, size) are completely overwritten and replaced with
+         *  valaddr. If elements were deep copied, their memory must be released first.
+         */
         if (v->ttbl->dtor) {
             --v->impl.finish;
 
@@ -1084,7 +1168,6 @@ void vassignfillptr(T)(vector(T) *v, size_t n, T *valaddr) {
         free(v->impl.start);
         v->impl.start = NULL;
 
-        T *newstart = NULL;
         newstart = calloc(n, v->ttbl->width);
         assert(newstart);
 
@@ -1093,20 +1176,22 @@ void vassignfillptr(T)(vector(T) *v, size_t n, T *valaddr) {
         v->impl.end_of_storage = v->impl.start + n;
 
         if (v->ttbl->copy) {
-            // deep copy
+            /* deep copy */
             while (v->impl.finish != v->impl.end_of_storage) {
                 v->ttbl->copy(v->impl.finish++, valaddr);
             }
         } else {
-            // shallow copy
+            /* shallow copy */
             while (v->impl.finish != v->impl.end_of_storage) {
                 memcpy(v->impl.finish++, valaddr, v->ttbl->width);
             }
         }
     } else {
         if (v->ttbl->dtor) {
-            // elements from [0, n) are completely overwritten and replaced with
-            // val. if elements were deep copied, their memory must be released first.
+            /**
+             *  Elements from [0, n) are completely overwritten and replaced with
+             *  valaddr. If elements were deep copied, their memory must be released first.
+             */
             v->impl.finish = v->impl.finish - (n + 1);
 
             while (v->impl.finish != v->impl.start) {
@@ -1115,27 +1200,29 @@ void vassignfillptr(T)(vector(T) *v, size_t n, T *valaddr) {
 
             v->ttbl->dtor(v->impl.start);
         } else {
-            // if elements are shallow copied,
-            // we skip memory deallocation and move the finish pointer
-            // to the address of the start pointer
+            /**
+             *  If elements are shallow copied,
+             *  we skip memory deallocation and move the finish pointer
+             *  to the address of the start pointer
+             */
             v->impl.finish = v->impl.start;
         }
 
-        T *sentinel = v->impl.start + n;
+        sentinel = v->impl.start + n;
 
         if (v->ttbl->copy) {
-            // deep copy
+            /* deep copy */
             while (v->impl.finish != sentinel) {
                 v->ttbl->copy(v->impl.finish++, valaddr);
             }
         } else {
-            // shallow copy
+            /* shallow copy */
             while (v->impl.finish != sentinel) {
                 memcpy(v->impl.finish++, valaddr, v->ttbl->width);
             }
         }
 
-        // restoring the finish pointer to its former address
+        /* restoring the finish pointer to its former address */
         v->impl.finish = v->impl.start + old_size;
     }
 }
@@ -1152,21 +1239,25 @@ void vassignfillptr(T)(vector(T) *v, size_t n, T *valaddr) {
  *  using memcpy.
  */
 void vpushb(T)(vector(T) *v, T val) {
-    assert(v);
+   assert(v);
 
-    // a doubling strategy is employed when the finish pointer
-    // meets the end_of_storage pointer.
+    /**
+     *  A doubling strategy is employed when the finish pointer
+     *  meets the end_of_storage pointer.
+     */
     if (v->impl.finish == v->impl.end_of_storage) {
         vresize(T)(v, vcapacity(T)(v) * 2);
     }
 
     if (v->ttbl->copy) {
-        // if copy fn defined in ttbl, deep copy
+        /* if copy fn defined in ttbl, deep copy */
         v->ttbl->copy(v->impl.finish++, &val);
     } else {
-        // if no copy defined in ttbl, shallow copy
+        /* if no copy defined in ttbl, shallow copy */
         memcpy(v->impl.finish++, &val, v->ttbl->width);
     }
+
+    /* finish pointer advanced to the next empty block */
 }
 
 /**
@@ -1181,21 +1272,25 @@ void vpushb(T)(vector(T) *v, T val) {
  *  using memcpy.
  */
 void vpushbptr(T)(vector(T) *v, T *valaddr) {
-    assert(v);
+   assert(v);
 
-    // a doubling strategy is employed when the finish pointer
-    // meets the end_of_storage pointer.
+    /**
+     *  A doubling strategy is employed when the finish pointer
+     *  meets the end_of_storage pointer.
+     */
     if (v->impl.finish == v->impl.end_of_storage) {
         vresize(T)(v, vcapacity(T)(v) * 2);
     }
 
     if (v->ttbl->copy) {
-        // if copy fn defined in ttbl, deep copy
+        /* if copy fn defined in ttbl, deep copy */
         v->ttbl->copy(v->impl.finish++, valaddr);
     } else {
-        // if no copy defined in ttbl, shallow copy
+        /* if no copy defined in ttbl, shallow copy */
         memcpy(v->impl.finish++, valaddr, v->ttbl->width);
     }
+
+    /* finish pointer advanced to the next empty block */
 }
 
 /**
@@ -1218,21 +1313,25 @@ void vpopb(T)(vector(T) *v) {
     assert(v);
 
     if (v->impl.finish == v->impl.start) {
-        // v_popb is a no-op if vector is empty
+        /* vpopb is a no-op if vector is empty */
         return;
     }
 
-    // decrement the finish pointer to the address of the "victim" block
+    /* decrement the finish pointer to the address of the "victim" block */
     --v->impl.finish;
 
     if (v->ttbl->dtor) {
-        // if dtor defined in ttbl.
-        // release memory at finish pointer as defined by dtor.
+        /**
+         *  If dtor defined in ttbl,
+         *  release memory at finish pointer as defined by dtor.
+         */
         v->ttbl->dtor(v->impl.finish);
     }
 
-    // if no dtor defined, the next element appendage
-    // will simply be overwritten
+    /**
+     *  If no dtor defined, the next element appendage
+     *  will simply be overwritten
+     */
 }
 
 /**
@@ -1252,43 +1351,52 @@ void vpopb(T)(vector(T) *v) {
  *  using memcpy.
  */
 iterator vinsert(T)(vector(T) *v, iterator pos, T val) {
+    T *curr = NULL;
+    size_t ipos = 0;
+
     assert(v);
 
-    // a doubling strategy is employed when the finish pointer
-    // meets the end_of_storage pointer.
+    /**
+     *  A doubling strategy is employed when the finish pointer
+     *  meets the end_of_storage pointer.
+     */
     if (v->impl.finish == v->impl.end_of_storage) {
         vresize(T)(v, vcapacity(T)(v) * 2);
     }
 
-    // to insert within indices (0, v_size(v)),
-    // begin by appending valaddr to the rear of the vector.
-
+    /**
+     *  To insert within indices (0, vsize(T)(v)),
+     *  begin by appending val to the rear of the vector.
+     */
     if (v->ttbl->copy) {
-        // if copy fn defined in ttbl, deep copy
+        /* if copy fn defined in ttbl, deep copy */
         v->ttbl->copy(v->impl.finish, &val);
     } else {
-        // if no copy defined in ttbl, shallow copy
+        /* if no copy defined in ttbl, shallow copy */
         memcpy(v->impl.finish, &val, v->ttbl->width);
     }
 
-    // all of the above was code for pushb,
-    // but incrementing the finish pointer was omitted.
+    /**
+     *  All of the above was code for pushb,
+     *  but incrementing the finish pointer was omitted.
+     */
 
-    // save pos's index - a new iterator will be returned later
-    size_t ipos = it_distance(NULL, &pos);
+    /* save pos's index - a new iterator will be returned later */
+    ipos = it_distance(NULL, &pos);
 
-    // use iterator pos to swap elements from [pos, v_size(v))
-    // valaddr will reside at the index originally specified by pos
-    T *curr = NULL;
+    /**
+     *  Use iterator pos to swap elements from [pos, vsize(T)(v))
+     *  val will resize at the index originally specified by pos
+     */
     while ((curr = it_curr(pos)) != v->impl.finish) {
         vswapaddr(T)(v, curr, v->impl.finish);
         it_incr(&pos);
     }
 
-    // restore finish pointer to address of rear element
+    /* restore finish pointer to address of rear element */
     ++v->impl.finish;
 
-    // returned is an iterator at refers to valaddr's position in v
+    /* returned is an iterator at refers to val's position in v */
     return it_next_n(vbegin(T)(v), ipos);
 }
 
@@ -1309,43 +1417,53 @@ iterator vinsert(T)(vector(T) *v, iterator pos, T val) {
  *  using memcpy.
  */
 iterator vinsertptr(T)(vector(T) *v, iterator pos, T *valaddr) {
-    assert(v);
+    T *curr = NULL;
+    size_t ipos = 0;
 
-    // a doubling strategy is employed when the finish pointer
-    // meets the end_of_storage pointer.
+    assert(v);
+    assert(valaddr);
+
+    /**
+     *  A doubling strategy is employed when the finish pointer
+     *  meets the end_of_storage pointer.
+     */
     if (v->impl.finish == v->impl.end_of_storage) {
         vresize(T)(v, vcapacity(T)(v) * 2);
     }
 
-    // to insert within indices (0, v_size(v)),
-    // begin by appending valaddr to the rear of the vector.
-
+    /**
+     *  To insert within indices (0, vsize(T)(v)),
+     *  begin by appending valaddr to the rear of the vector.
+     */
     if (v->ttbl->copy) {
-        // if copy fn defined in ttbl, deep copy
+        /* if copy fn defined in ttbl, deep copy */
         v->ttbl->copy(v->impl.finish, valaddr);
     } else {
-        // if no copy defined in ttbl, shallow copy
+        /* if no copy defined in ttbl, shallow copy */
         memcpy(v->impl.finish, valaddr, v->ttbl->width);
     }
 
-    // all of the above was code for pushb,
-    // but incrementing the finish pointer was omitted.
+    /**
+     *  All of the above was code for pushb,
+     *  but incrementing the finish pointer was omitted.
+     */
 
-    // save pos's index - a new iterator will be returned later
-    size_t ipos = it_distance(NULL, &pos);
+    /* save pos's index - a new iterator will be returned later */
+    ipos = it_distance(NULL, &pos);
 
-    // use iterator pos to swap elements from [pos, v_size(v))
-    // valaddr will reside at the index originally specified by pos
-    T *curr = NULL;
+    /**
+     *  Use iterator pos to swap elements from [pos, vsize(T)(v))
+     *  val will resize at the index originally specified by pos
+     */
     while ((curr = it_curr(pos)) != v->impl.finish) {
         vswapaddr(T)(v, curr, v->impl.finish);
         it_incr(&pos);
     }
 
-    // restore finish pointer to address of rear element
+    /* restore finish pointer to address of rear element */
     ++v->impl.finish;
 
-    // returned is an iterator at refers to valaddr's position in v
+    /* returned is an iterator at refers to val's position in v */
     return it_next_n(vbegin(T)(v), ipos);
 }
 
@@ -1367,31 +1485,41 @@ iterator vinsertptr(T)(vector(T) *v, iterator pos, T *valaddr) {
  *  deep copies. Otherwise, val will be shallow-copied using memcpy.
  */
 iterator vinsertfill(T)(vector(T) *v, iterator pos, size_t n, T val) {
+    size_t ipos = 0;
+    size_t old_size = 0;
+    size_t old_capacity = 0;
+
+    T *sentinel = NULL;
+    T *right_adj = NULL;
+    T *finish = NULL;
+
     assert(v);
 
-    size_t ipos = it_distance(NULL, &pos);        // pos's index position
-    size_t old_size = vsize(T)(v);                // v's former size
-    size_t old_capacity = vcapacity(T)(v);        // v's former capacity
+    ipos = it_distance(NULL, &pos);      /**< pos's index position */
+    old_size = vsize(T)(v);                /**< v's former size */
+    old_capacity = vcapacity(T)(v);        /**< v's former capacity */
 
     if ((old_size + n) >= old_capacity) {
-        // if inserting n elements will equal or exceed that of old_capacity,
-        // vector will be resized to accomodate ((old_capacity + n) * 2) elements.
+        /**
+         *  If inserting n elements will equal or exceed that of old_capacity,
+         *  vector will be resized to accomodate ((old_capacity + n) * 2) elements.
+         */
         vresize(T)(v, (old_capacity + n) * 2);
         pos = it_next_n(vbegin(T)(v), ipos);
     }
 
     if (n <= 0) {
-        // no-op
+        /* no-op */
         return pos;
     } else if (n == 1) {
-        // if n is 1, redirect to v_insert and return early
+        /* if n is 1, redirect to vinsert and return early */
         vinsert(T)(v, pos, val);
         return it_next_n(vbegin(T)(v), ipos);
     }
 
     if (ipos == old_size - 1 || ipos == old_size) {
-        // inlined instructions resembling pushb
-        T *sentinel = v->impl.finish + n;
+        /* inlined instructions resembling pushb */
+        sentinel = v->impl.finish + n;
 
         if (v->ttbl->copy) {
             while (v->impl.finish != sentinel) {
@@ -1403,55 +1531,65 @@ iterator vinsertfill(T)(vector(T) *v, iterator pos, size_t n, T val) {
             }
         }
 
-        // since n == back index, return early
+        /* since n == back index, return early */
         return it_next_n(vbegin(T)(v), n);
     } else {
-        // decrement finish pointer so it refers to the rear element
+        /* decrement finish pointer so it refers to the rear element */
         --v->impl.finish;
 
-        // each element in the range [n, v_size(v)) will be moved n blocks over
-        // -- starting with the rear element.
+        /**
+         *  Each element in the range [n, vsize(T)(v)) will be moved n blocks over
+         *  -- starting with the rear element.
+         */
 
-        // sentinel will be set one position behind pos.curr
-        // to account for the new element(s) being inserted
-        T *sentinel = pos.curr - 1;
+        /**
+         *  sentinel will be set one position behind pos.curr
+         *  to account for the new element(s) being inserted
+         */
+        sentinel = (T *)(pos.curr) - 1;
 
-        // new destination address for finish pointer
-        T *right_adj = v->impl.finish + n;
+        /* new destination address for finish pointer */
+        right_adj = v->impl.finish + n;
 
-        // need to save this address for later when restoring impl.finish
-        T *finish = v->impl.finish + (n + 1);
+        /* need to save this address for later when restoring impl.finish */
+        finish = v->impl.finish + (n + 1);
 
-        // elements [n, v_size(v)) are moved over n blocks to the right,
-        // starting with v->impl.finish.
-        // loop stops when finish pointer reaches sentinel
+        /**
+         *  Elements [n, vsize(T)(v)) are moved over n blocks to the right,
+         *  starting with v->impl.finish.
+         *  Loop stops when finish pointer reach sentinel.
+         */
         while (v->impl.finish != sentinel) {
             vswapaddr(T)(v, v->impl.finish--, right_adj--);
         }
 
-        // sentinel is changed to point to the (ipos + n)th block
-        // (one element past the last fill insertion element)
+        /**
+         *  sentinel is changed to point to the (ipos + n)th block
+         *  (one element past the last fill insertion element)
+         */
         sentinel = v->impl.start + (ipos + n);
 
-        // v->impl.finish must be advanced one block forward
-        // (finish was decremented until it was at the address
-        // of the former sentinel value, which was one position behind
-        // pos.curr)
-        ++v->impl.finish;
+        /**
+         *  v->impl.finish must be advanced one block forward
+         *  (finish was decremented until it was at the address
+         *  of the former sentinel value, which was one position behind
+         *  pos.curr)
+         */
+        ++v->impl.finish; 
 
         if (v->ttbl->copy) {
-            // deep copy
+            /* deep copy */
             while (v->impl.finish != sentinel) {
                 v->ttbl->copy(v->impl.finish++, &val);
             }
         } else {
-            // shallow copy
+            /* shallow copy */
             while (v->impl.finish != sentinel) {
                 memcpy(v->impl.finish++, &val, v->ttbl->width);
             }
         }
 
-        // now restoring v->impl.finish to where it should be
+        /* now restoring v->impl.finish to where it should be */
         v->impl.finish = finish;
     }
 
@@ -1464,7 +1602,7 @@ iterator vinsertfill(T)(vector(T) *v, iterator pos, size_t n, T val) {
  *  @param[in]  v       pointer to vector(T)
  *  @param[in]  pos     refers to an element within v
  *  @param[in]  n       quantity of desired copies of valaddr to insert
- *  @param[in]  val     address of the desired element to fill vector with
+ *  @param[in]  valaddr address of the desired element to fill vector with
  *
  *  @return     iterator referring to the first copy of valaddr from within vector
  *
@@ -1476,32 +1614,41 @@ iterator vinsertfill(T)(vector(T) *v, iterator pos, size_t n, T val) {
  *  deep copies. Otherwise, valaddr will be shallow-copied using memcpy.
  */
 iterator vinsertfillptr(T)(vector(T) *v, iterator pos, size_t n, T *valaddr) {
-    assert(v);
-    assert(valaddr);
+    size_t ipos = 0;
+    size_t old_size = 0;
+    size_t old_capacity = 0;
 
-    size_t ipos = it_distance(NULL, &pos);        // pos's index position
-    size_t old_size = vsize(T)(v);                // v's former size
-    size_t old_capacity = vcapacity(T)(v);        // v's former capacity
+    T *sentinel = NULL;
+    T *right_adj = NULL;
+    T *finish = NULL;
+
+    assert(v);
+
+    ipos = it_distance(NULL, &pos);      /**< pos's index position */
+    old_size = vsize(T)(v);                /**< v's former size */
+    old_capacity = vcapacity(T)(v);        /**< v's former capacity */
 
     if ((old_size + n) >= old_capacity) {
-        // if inserting n elements will equal or exceed that of old_capacity,
-        // vector will be resized to accomodate ((old_capacity + n) * 2) elements.
+        /**
+         *  If inserting n elements will equal or exceed that of old_capacity,
+         *  vector will be resized to accomodate ((old_capacity + n) * 2) elements.
+         */
         vresize(T)(v, (old_capacity + n) * 2);
         pos = it_next_n(vbegin(T)(v), ipos);
     }
 
     if (n <= 0) {
-        // no-op
+        /* no-op */
         return pos;
     } else if (n == 1) {
-        // if n is 1, redirect to v_insert and return early
+        /* if n is 1, redirect to vinsert and return early */
         vinsertptr(T)(v, pos, valaddr);
         return it_next_n(vbegin(T)(v), ipos);
     }
 
     if (ipos == old_size - 1 || ipos == old_size) {
-        // inlined instructions resembling pushb
-        T *sentinel = v->impl.finish + n;
+        /* inlined instructions resembling pushb */
+        sentinel = v->impl.finish + n;
 
         if (v->ttbl->copy) {
             while (v->impl.finish != sentinel) {
@@ -1513,55 +1660,65 @@ iterator vinsertfillptr(T)(vector(T) *v, iterator pos, size_t n, T *valaddr) {
             }
         }
 
-        // since n == back index, return early
+        /* since n == back index, return early */
         return it_next_n(vbegin(T)(v), n);
     } else {
-        // decrement finish pointer so it refers to the rear element
+        /* decrement finish pointer so it refers to the rear element */
         --v->impl.finish;
 
-        // each element in the range [n, v_size(v)) will be moved n blocks over
-        // -- starting with the rear element.
+        /**
+         *  Each element in the range [n, vsize(T)(v)) will be moved n blocks over
+         *  -- starting with the rear element.
+         */
 
-        // sentinel will be set one position behind pos.curr
-        // to account for the new element(s) being inserted
-        T *sentinel = pos.curr - 1;
+        /**
+         *  sentinel will be set one position behind pos.curr
+         *  to account for the new element(s) being inserted
+         */
+        sentinel = (T *)(pos.curr) - 1;
 
-        // new destination address for finish pointer
-        T *right_adj = v->impl.finish + n;
+        /* new destination address for finish pointer */
+        right_adj = v->impl.finish + n;
 
-        // need to save this address for later when restoring impl.finish
-        T *finish = v->impl.finish + (n + 1);
+        /* need to save this address for later when restoring impl.finish */
+        finish = v->impl.finish + (n + 1);
 
-        // elements [n, v_size(v)) are moved over n blocks to the right,
-        // starting with v->impl.finish.
-        // loop stops when finish pointer reaches sentinel
+        /**
+         *  Elements [n, vsize(T)(v)) are moved over n blocks to the right,
+         *  starting with v->impl.finish.
+         *  Loop stops when finish pointer reach sentinel.
+         */
         while (v->impl.finish != sentinel) {
             vswapaddr(T)(v, v->impl.finish--, right_adj--);
         }
 
-        // sentinel is changed to point to the (ipos + n)th block
-        // (one element past the last fill insertion element)
+        /**
+         *  sentinel is changed to point to the (ipos + n)th block
+         *  (one element past the last fill insertion element)
+         */
         sentinel = v->impl.start + (ipos + n);
 
-        // v->impl.finish must be advanced one block forward
-        // (finish was decremented until it was at the address
-        // of the former sentinel value, which was one position behind
-        // pos.curr)
-        ++v->impl.finish;
+        /**
+         *  v->impl.finish must be advanced one block forward
+         *  (finish was decremented until it was at the address
+         *  of the former sentinel value, which was one position behind
+         *  pos.curr)
+         */
+        ++v->impl.finish; 
 
         if (v->ttbl->copy) {
-            // deep copy
+            /* deep copy */
             while (v->impl.finish != sentinel) {
                 v->ttbl->copy(v->impl.finish++, valaddr);
             }
         } else {
-            // shallow copy
+            /* shallow copy */
             while (v->impl.finish != sentinel) {
                 memcpy(v->impl.finish++, valaddr, v->ttbl->width);
             }
         }
 
-        // now restoring v->impl.finish to where it should be
+        /* now restoring v->impl.finish to where it should be */
         v->impl.finish = finish;
     }
 
@@ -1601,33 +1758,44 @@ iterator vinsertfillptr(T)(vector(T) *v, iterator pos, size_t n, T *valaddr) {
  */
 iterator vinsertrnge(T)(vector(T) *v, iterator pos,
                         iterator first, iterator last) {
+    size_t ipos = 0;
+    size_t old_size = 0;
+    size_t old_capacity = 0;
+    size_t delta = 0;
+
+    T *sentinel = NULL;
+    T *right_adj = NULL;
+    T *finish = NULL;
+
     assert(v);
 
-    size_t ipos = it_distance(NULL, &pos);        // pos's index position
-    size_t old_size = vsize(T)(v);                // v's former size
-    size_t old_capacity = vcapacity(T)(v);        // v's former capacity
-    size_t delta = it_distance(&first, &last);    // index(last) - index(first)
+    ipos = it_distance(NULL, &pos);        /**< pos's index position */
+    old_size = vsize(T)(v);                /**< v's former size */
+    old_capacity = vcapacity(T)(v);        /**< v's former capacity */
+    delta = it_distance(&first, &last);    /**< index(last) - index(first) */
 
     if ((old_size + delta) >= old_capacity) {
-        // if inserting delta elements will equal or exceed that of
-        // old_capacity, vector will be resized to
-        // accommodate ((old_capacity + delta) * 2) elements.
+        /**
+         *  If inserting delta elements will equal or exceed that of
+         *  old_capacity, vector will be resized to
+         *  accommodate ((old_capacity + delta) * 2) elements.
+         */
         vresize(T)(v, (old_capacity + delta) * 2);
         pos = it_next_n(vbegin(T)(v), ipos);
     }
 
     if (delta <= 0) {
-        // no-op
+        /* no-op */
         return pos;
     } else if (delta == 1) {
-        // if delta is 1, redirect to v_insert and return early
-        vinsertptr(T)(v, pos, (T *)(it_curr(first)));
+        /* if delta is 1, redirect to vinsert and return early */
+        vinsert(T)(v, pos, *(T *)it_curr(first));
         return it_next_n(vbegin(T)(v), ipos);
     }
 
     if (ipos >= old_size - 1) {
-        // inlined instructions resembling pushb
-        T *sentinel = v->impl.finish + delta;
+        /* inlined instructions resembling pushb */
+        sentinel = v->impl.finish + delta;
 
         if (v->ttbl->copy) {
             while (v->impl.finish != sentinel) {
@@ -1641,58 +1809,65 @@ iterator vinsertrnge(T)(vector(T) *v, iterator pos,
             }
         }
 
-        // since n == back index, return early
+        /* since n == back index, return early */
         return it_next_n(vbegin(T)(v), delta);
     } else {
-        // decrement finish pointer so it refers to the rear element
+        /* decrement finish pointer so it refers to the rear element */
         --v->impl.finish;
 
-        // each element in the range [n, vsize(T)(v))
-        // will be moved delta blocks over
-        // -- starting with the rear element.
+        /**
+         *  Each element in the range [n, vsize(T)(v))
+         *  will be moved delta blocks over
+         *  -- starting with the rear element.
+         * 
+         *  sentinel will be set one position behind pos.curr
+         *  to account for the new element(s) being inserted
+         */
+        sentinel = (T *)(pos.curr) - 1;
 
-        // sentinel will be set one position behind pos.curr
-        // to account for the new element(s) being inserted
-        T *sentinel = pos.curr - 1;
+        /* new destination address for finish pointer */
+        right_adj = v->impl.finish + delta;
 
-        // new destination address for finish pointer
-        T *right_adj = v->impl.finish + delta;
+        /* need to save this address for later when restoring impl.finish */
+        finish = v->impl.finish + (delta + 1);
 
-        // need to save this address for later when restoring impl.finish
-        T *finish = v->impl.finish + (delta + 1);
-
-        // elements [n, v_size(v)) are moved over delta blocks to the right,
-        // starting with v->impl.finish.
-        // loop stops when finish pointer reaches sentinel
+        /**
+         *  Elements [n, vsize(T)(v)) are moved over delta blocks to the right,
+         *  starting with v->impl.finish.
+         *  Loop stops when finish pointer reaches sentinel
+         */
         while (v->impl.finish != sentinel) {
             vswapaddr(T)(v, v->impl.finish--, right_adj--);
         }
 
-        // sentinel is changed to point to the (ipos + delta)th block
-        // (one element past the last fill insertion element)
-        sentinel = v->impl.start + (ipos + delta);
+        /**
+         *  sentinel is changed to point to the (ipos + delta)th block
+         *  (one element past the last fill insertion element)
+         */
+        sentinel = (v->impl.start) + (ipos + delta);
 
-        // v->impl.finish must be advanced one block forward
-        // (finish was decremented until it was at the address
-        // of the former sentinel value, which was one position behind
-        // pos.curr)
+        /**
+         *  v->impl.finish must be advanced one block forward
+         *  (finish was decremented until it was at the address of the former
+         *  sentinel value, which one position behind pos.curr)
+         */
         ++v->impl.finish;
 
         if (v->ttbl->copy) {
-            // deep copy
+            /* deep copy */
             while (v->impl.finish != sentinel) {
                 v->ttbl->copy(v->impl.finish++, it_curr(first));
                 it_incr(&first);
             }
         } else {
-            // shallow copy
+            /* shallow copy */
             while (v->impl.finish != sentinel) {
                 memcpy(v->impl.finish++, it_curr(first), v->ttbl->width);
                 it_incr(&first);
             }
         }
 
-        // now restoring v->impl.finish to where it should be
+        /* now restoring v->impl.finish to where it should be */
         v->impl.finish = finish;
     }
 
@@ -1717,31 +1892,32 @@ iterator vinsertrnge(T)(vector(T) *v, iterator pos,
  *  to run this function, otherwise a regular insert is performed.
  */
 iterator vinsertmove(T)(vector(T) *v, iterator pos, T *valaddr) {
+    T *dst = NULL;
+
     assert(v);
     assert(valaddr);
 
-    T *dst = NULL;
-
     if (v->ttbl->swap) {
-        // if a swap function is defined,
-        // the address of dst will be sent to swap,
-        // along with valaddr (which is already the address of some var
-        // sent in by the client)
-        // the contents of valaddr will be used to initialize dst,
-        // and the standard insert function will be called after.
-
-        // if no swap function is defined,
-        // a regular insert occurs.
-
-        // this function can prove useful if a client
-        // has a dynamically allocated type, like a pointer
-        // (or a type with dynamically allocated fields)
-        // and wants vector to have full ownership
-        // of the memory that the param inserted referred to
-
-        // this can help prevent unwanted deep copying of elements,
-        // or shallow copies of elements where there are two pointers
-        // referring to the same memory.
+        /**
+         *  If a swap function is defined,
+         *  the address of dst will be sent to swap,
+         *  along with valaddr (which is already the address of some var
+         *  sent in by the client)
+         * 
+         *  The contents of valaddr will be used to initialize dst,
+         *  and the standard insert function will be called after.
+         * 
+         *  If no swap function is defined,
+         *  a regular insert occurs.
+         *  
+         *  This function can prove useful if a client has a dynamically
+         *  allocated type, like a pointer (or a type with dynamically allocated fields)
+         *  and wants vector to have full ownership of the memory that param inserted
+         *  referred to.
+         * 
+         *  This can help prevent unwanted deep copying of elements, or shallow copies
+         *  of elements where there are two pointers referring to the same memory.
+         */
         v->ttbl->swap(&dst, valaddr);
     }
 
@@ -1766,52 +1942,71 @@ iterator vinsertmove(T)(vector(T) *v, iterator pos, T *valaddr) {
  *  if a dtor function is NOT defined within v's ttbl.
  */
 iterator verase(T)(vector(T) *v, iterator pos) {
+    int ipos = 0;
+    size_t back_index = 0;
+
+    T *curr = NULL;
+    T *sentinel = NULL;
+
     assert(v);
 
-    int ipos = it_distance(NULL, &pos);
-    const size_t back_index = vsize(T)(v) - 1;
+    ipos = it_distance(NULL, &pos);
+    back_index = vsize(T)(v) - 1;
 
     if ((ipos < 0) || (ipos >= back_index + 1)) {
-        // if ipos is negative or ipos is greater than or equal to v_size(v),
-        // no-op
+        /**
+         *  If ipos is negative or ipos greater than or equal to v_size(v),
+         *  no-op
+         */
         return pos;
     } else if (ipos == back_index || pos.curr == (v->impl.finish - 1)) {
-        // if ipos == back_index
-        // or pos refers to rear vector element,
-        // redirect to popb and return early
+        /**
+         *  If ipos == back_index
+         *  or pos refers to rear vector element,
+         *  redirect to popb and return early
+         */
         vpopb(T)(v);
 
-        // pos will no longer refer to an existing element,
-        // so an iterator is returned referring to an element
-        // at the erased element's former index
+        /**
+         *  pos will no longer refer to an existing element,
+         *  so an iterator is returned referring to an element
+         *  at the erased element's former index
+         */
         return it_next_n(vbegin(T)(v), ipos);
     } else if (ipos < back_index && ipos >= 0) {
         if (v->ttbl->dtor) {
-            // if elements were deep copied, release their memory
+            /* If elements were deep copied, release their memory */
             v->ttbl->dtor(pos.curr);
         }
 
-        T *curr = NULL;
-        T *sentinel = v->impl.finish;
-        // v->impl.finish and it_finish(pos) should refer to the same thing.
-        // undefined behavior if pos does not refer to container v!
+        curr = NULL;
+        sentinel = v->impl.finish;
+
+        /**
+         *  v->impl.finish and it_finish(pos) should refer to the same thing.
+         *  Undefined behavior if pos does not refer to container v!
+         */
 
         while ((curr = it_curr(pos)) != sentinel) {
-            // swapping it_curr(pos) and it_curr(it_next(pos))
-            // will shift it_curr(it_next(pos)) one element
-            // to the left. this process continues until
-            // it_curr(pos) equals v->impl.finish.
+            /**
+             *  Swapping it_curr(pos) and it_curr(it_next(pos))
+             *  will shift it_curr(it_next(pos)) one element
+             *  to the left. this process continues until
+             *  it_curr(pos) equals v->impl.finish.
+             */
             vswapaddr(T)(v, curr, it_curr(it_next(pos)));
             it_incr(&pos);
         }
 
-        // decrementing the finish pointer 1 block to the left
+        /* decrementing the finish pointer 1 block to the left */
         --v->impl.finish;
     }
 
-    // pos will no longer refer to an existing element,
-    // so an iterator is returned referring to an element
-    // at the erased element's former index
+    /**
+     *  pos will no longer refer to an existing element,
+     *  so an iterator is returned referring to an element
+     *  at the erased element's former index
+     */
     return it_next_n(vbegin(T)(v), ipos);
 }
 
@@ -1834,49 +2029,66 @@ iterator verase(T)(vector(T) *v, iterator pos) {
  *  if a dtor function is NOT defined within v's ttbl.
  */
 iterator verasernge(T)(vector(T) *v, iterator pos, iterator last) {
+    int ipos = 0;
+    int lpos = 0;
+    int delta = 0;
+
+    size_t back_index = 0;
+
+    T *curr = NULL;
+    T *sentinel = NULL;
+
     assert(v);
 
-    int ipos = it_distance(NULL, &pos);     // index of pos
-    int lpos = it_distance(NULL, &last);    // index of last
-    int delta = it_distance(&pos, &last);   // diff between pos/last
+    ipos = it_distance(NULL, &pos);     /**< index of pos */
+    lpos = it_distance(NULL, &last);    /**< index of last */
+    delta = it_distance(&pos, &last);   /**< diff between pos/last */
 
-    const size_t back_index = vsize(T)(v) - 1;
+    back_index = vsize(T)(v) - 1;
 
     if ((ipos < 0) || (ipos >= back_index + 1)) {
-        // if ipos is negative or ipos is greater than or equal to v_size(v),
-        // no-op
+        /**
+         *  If ipos is negative or ipos is greater than or equal to vsize(T)(v),
+         *  no-op
+         */
         return pos;
     } else if (ipos == back_index || pos.curr == (v->impl.finish - 1)) {
-        // if ipos == back_index
-        // or pos refers to rear vector element,
-        // redirect to popb and return early
+        /**
+         *  If ipos == back_index
+         *  or pos refers to rear vector element,
+         *  redirect to popb and return early
+         */
         vpopb(T)(v);
 
-        // pos will no longer refer to an existing element,
-        // so an iterator is returned referring to an element
-        // at the erased element's former index
+        /**
+         *  pos will no longer refer to an existing element,
+         *  so an iterator is returned referring to an element
+         *  at the erased element's former index
+         */
         return it_next_n(vbegin(T)(v), ipos);
     } else if (ipos < back_index && ipos >= 0) {
-        T *curr = NULL;
-        T *sentinel = it_curr(last);
+        curr = NULL;
+        sentinel = it_curr(last);
 
         if (v->ttbl->dtor) {
-            // if range of elements were deep copied, release their memory
+            /* if range of elements were deep copied, release their memory */
             while ((curr = it_curr(pos)) != sentinel) {
                 v->ttbl->dtor(curr);
                 it_incr(&pos);
             }
         }
 
-        // restoring pos to its original index
+        /* restoring pos to its original index */
         pos = it_next_n(vbegin(T)(v), ipos);
 
-        // reassigning sentinel to one block past the last elem
+        /* reassigning sentinel to one block past the last elem */
         sentinel = v->impl.finish;
 
-        // iterator last will advance until it reaches sentinel
-        // (finish pointer) as iterator pos advances alongside it -- they will swap elements between each other
-        // until last reaches the end of the vector.
+        /**
+         *  iterator last will advance until it reaches sentinel
+         *  (finish pointer) as iterator pos advances alongside it -- they will swap elements between each other
+         *  until last reaches the end of the vector.
+         */
         while ((curr = it_curr(last)) != sentinel) {
             vswapaddr(T)(v, curr, it_curr(pos));
 
@@ -1884,14 +2096,18 @@ iterator verasernge(T)(vector(T) *v, iterator pos, iterator last) {
             it_incr(&last);
         }
 
-        // using the delta (difference between pos and last),
-        // the finish pointer is decremented to the first null element (one past the last non-null element)
-        --v->impl.finish;
+        /**
+         *  Using the delta (difference between pos and last),
+         *  the finish pointer is decremented to the first null element (one past the last non-null element)
+         */
+        v->impl.finish = v->impl.finish - delta;
     }
 
-    // pos will no longer refer to an existing element,
-    // so an iterator is returned referring to an element
-    // at the beginning of the erased element's former range
+    /**
+     *  pos will no longer refer to an existing element,
+     *  so an iterator is returned referring to an element
+     *  at the beginning of the erased element's former range
+     */
     return it_next_n(vbegin(T)(v), ipos);
 }
 
@@ -1902,17 +2118,19 @@ iterator verasernge(T)(vector(T) *v, iterator pos, iterator last) {
  *  @param[out] other   address of pointer to vector
  */
 void vswap(T)(vector(T) **v, vector(T) * *other) {
+    vector(T) *temp = NULL;
+
     assert((*v));
     assert((*other));
 
-    vector(T) *temp = (*v);
+    temp = (*v);
 
-    // change of ownership between v and other
+    /* change of ownership between v and other */
     (*v)->impl.start = (*other)->impl.start;
     (*v)->impl.finish = (*other)->impl.finish;
     (*v)->impl.end_of_storage = (*other)->impl.end_of_storage;
 
-    // vectors holding two different types can be swapped
+    /* vectors holding two different types can be swapped */
     (*v)->ttbl = (*other)->ttbl;
 
     (*other)->impl.start = temp->impl.start;
@@ -1936,18 +2154,22 @@ void vclear(T)(vector(T) *v) {
     assert(v);
 
     if (v->impl.finish == v->impl.start) {
-        // if vector is empty
-        // (start and finish pointers share same address),
-        // it's a no-op.
+        /**
+         *  if vector is empty
+         *  (start and finish pointers share same address),
+         *  it's a no-op.
+         */
         return;
     }
 
     if (v->ttbl->dtor) {
-        // if elements were deep-copied,
-        // their memory must be released as per the
-        // client-supplied dtor function in ttbl.
+        /* decrementing finish pointer to match the address of the last element */
 
-        // decrementing finish pointer to match the address of the last element
+        /**
+         *  If elements were deep-copied,
+         *  their memory must be released as per the
+         *  client-supplied dtor function in ttbl.
+         */
         --v->impl.finish;
 
         while (v->impl.finish != v->impl.start) {
@@ -1955,13 +2177,15 @@ void vclear(T)(vector(T) *v) {
         }
 
         v->ttbl->dtor(v->impl.finish);
-        memset(v->impl.start, 0, vsize(T)(v) * v->ttbl->width);
-        // v->impl.finish is already at v->impl.start.
+        bzero(v->impl.start, vsize(T)(v));
+        /* v->impl.finish is already at v->impl.start. */
     } else {
-        // if elements were shallow copied,
-        // (no dtor function specified in ttbl) --
-        // we just memset and reset the finish pointer.
-        memset(v->impl.start, 0, vsize(T)(v) * v->ttbl->width);
+        /**
+         *  If elements were shallow copied,
+         *  (no dtor function specified in ttbl) --
+         *  we just memset and reset the finish pointer.
+         */
+        bzero(v->impl.start, vsize(T)(v));
         v->impl.finish = v->impl.start;
     }
 }
@@ -1979,44 +2203,56 @@ void vclear(T)(vector(T) *v) {
  *  using memcpy.
  */
 void vinsertat(T)(vector(T) *v, size_t index, T val) {
+    size_t size = 0;
+
+    T *curr = NULL;
+
     assert(v);
 
-    const size_t size = vsize(T)(v);
+    size = vsize(T)(v);
 
     if (index >= size) {
-        ERROR(__FILE__, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
+        char str[256];
+        sprintf(str, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
+        ERROR(__FILE__, str);
         return;
     }
 
-    // a doubling strategy is employed when the finish pointer
-    // meets the end_of_storage pointer.
+    /**
+     *  A doubling strategy is employed when the finish pointer
+     *  meets the end_of_storage pointer.
+     */
     if (v->impl.finish == v->impl.end_of_storage) {
         vresize(T)(v, vcapacity(T)(v) * 2);
     }
 
-    // to insert within indices (0, v_size(v)),
-    // begin by appending val to the rear of the vector.
+    /**
+     *  To insert within indices (0, vsize(T)(v)),
+     *  begin by appending val to the rear of the vector.
+     */
 
     if (v->ttbl->copy) {
-        // if copy fn defined in ttbl, deep copy
+        /* if copy fn defined in ttbl, deep copy */
         v->ttbl->copy(v->impl.finish, &val);
     } else {
-        // if no copy defined in ttbl, shallow copy
+        /* if no copy defined in ttbl, shallow copy */
         memcpy(v->impl.finish, &val, v->ttbl->width);
     }
 
-    // all of the above was code for pushb,
-    // but incrementing the finish pointer was omitted.
-
-    // use index to swap elements from [index, vsize(T)(v))
-    // val will reside at the index originally specified by
-    // index
-    T *curr = v->impl.start + index;
+    /**
+     *  All of the above was code for pushb,
+     *  but incrementing the finish pointer was omitted.
+     * 
+     *  Use index to swap elements from [index, vsize(T)(v))
+     *  val will reside at the index originally specified by
+     *  index.
+     */
+    curr = v->impl.start + index;
     while (curr != v->impl.finish) {
         vswapaddr(T)(v, curr++, v->impl.finish);
     }
 
-    // restore finish pointer to address of rear element
+    /* restore finish pointer to address of rear element */
     ++v->impl.finish;
 }
 
@@ -2033,45 +2269,57 @@ void vinsertat(T)(vector(T) *v, size_t index, T val) {
  *  using memcpy.
  */
 void vinsertatptr(T)(vector(T) *v, size_t index, T *valaddr) {
+    size_t size = 0;
+
+    T *curr = NULL;
+
     assert(v);
     assert(valaddr);
 
-    const size_t size = vsize(T)(v);
+    size = vsize(T)(v);
 
     if (index >= size) {
-        ERROR(__FILE__, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
+        char str[256];
+        sprintf(str, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
+        ERROR(__FILE__, str);
         return;
     }
 
-    // a doubling strategy is employed when the finish pointer
-    // meets the end_of_storage pointer.
+    /**
+     *  A doubling strategy is employed when the finish pointer
+     *  meets the end_of_storage pointer.
+     */
     if (v->impl.finish == v->impl.end_of_storage) {
         vresize(T)(v, vcapacity(T)(v) * 2);
     }
 
-    // to insert within indices (0, v_size(v)),
-    // begin by appending valaddr to the rear of the vector.
+    /**
+     *  To insert within indices (0, vsize(T)(v)),
+     *  begin by appending valaddr to the rear of the vector.
+     */
 
     if (v->ttbl->copy) {
-        // if copy fn defined in ttbl, deep copy
+        /* if copy fn defined in ttbl, deep copy */
         v->ttbl->copy(v->impl.finish, valaddr);
     } else {
-        // if no copy defined in ttbl, shallow copy
+        /* if no copy defined in ttbl, shallow copy */
         memcpy(v->impl.finish, valaddr, v->ttbl->width);
     }
 
-    // all of the above was code for pushb,
-    // but incrementing the finish pointer was omitted.
-
-    // use index to swap elements from [index, vsize(T)(v))
-    // valaddr will reside at the index originally specified by
-    // index
-    T *curr = v->impl.start + index;
+    /**
+     *  All of the above was code for pushb,
+     *  but incrementing the finish pointer was omitted.
+     * 
+     *  Use index to swap elements from [index, vsize(T)(v))
+     *  val will reside at the index originally specified by
+     *  index.
+     */
+    curr = v->impl.start + index;
     while (curr != v->impl.finish) {
         vswapaddr(T)(v, curr++, v->impl.finish);
     }
 
-    // restore finish pointer to address of rear element
+    /* restore finish pointer to address of rear element */
     ++v->impl.finish;
 }
 
@@ -2090,41 +2338,54 @@ void vinsertatptr(T)(vector(T) *v, size_t index, T *valaddr) {
  *  if a dtor function is NOT defined within v's ttbl.
  */
 void veraseat(T)(vector(T) *v, size_t index) {
+    size_t size = 0;
+    size_t back_index = 0;
+
+    T *curr = NULL;
+    T *next = NULL;
+    T *sentinel = NULL;
+
     assert(v);
 
-    const size_t size = vsize(T)(v);
+    size = vsize(T)(v);
 
     if (index >= size) {
-        ERROR(__FILE__, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
+        char str[256];
+        sprintf(str, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
+        ERROR(__FILE__, str);
         return;
     }
 
-    const size_t back_index = size - 1;
+    back_index = size - 1;
 
-    T *curr = v->impl.start + index;                     // element at index
-    T *next = index <= vcapacity(T)(v) ? (curr + 1) : NULL;// element adj to curr
-    T *sentinel = v->impl.finish;                         // one block after last elem
+    curr = v->impl.start + index;   /* element at index */
+    next = index <= vcapacity(T)(v) ? (curr + 1) : NULL;    /* elem adj to curr */
+    sentinel = v->impl.finish;                                    /* one block after last elem */
 
     if (index == back_index || curr == (v->impl.finish - 1)) {
-        // if index == back_index
-        // or pos refers to rear vector element,
-        // redirect to popb and return early
+        /**
+         *  If index == back_index
+         *  or pos refers to rear vector element,
+         *  redirect to popb and return early
+         */
         vpopb(T)(v);
         return;
     } else if (index < back_index && index >= 0) {
         if (v->ttbl->dtor) {
-            // if elements were deep copied, release their memory
+            /* if elements were deep copied, release their memory */
             v->ttbl->dtor(curr);
         }
 
         while (curr != sentinel) {
-            // swapping curr and next will shift next
-            // one element to the left. this process continues
-            // until next equals v->impl.finish.
+            /**
+             *  Swapping curr and next will shift next
+             *  one element to the left. This process continues
+             *  until next equals v->impl.finish.
+             */
             vswapaddr(T)(v, curr++, next++);
         }
 
-        // decrementing the finish pointer 1 block to the left
+        /* decrementing the finish pointer 1 block to the left */
         --v->impl.finish;
     }
 }
@@ -2152,28 +2413,35 @@ void veraseat(T)(vector(T) *v, size_t index) {
  *  using memcpy.
  */
 void vreplaceat(T)(vector(T) *v, size_t index, T val) {
+    size_t size = 0;
+    size_t back_index = 0;
+
+    T *curr = NULL;
+
     assert(v);
 
-    const size_t size = vsize(T)(v);
+    size = vsize(T)(v);
 
     if (index >= size) {
-        ERROR(__FILE__, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
+        char str[256];
+        sprintf(str, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
+        ERROR(__FILE__, str);
         return;
     }
 
-    const size_t back_index = (size - 1);
-    T *curr = v->impl.start + index;
+    back_index = (size - 1);
+    curr = v->impl.start + index;
 
     if (v->ttbl->dtor) {
-        // deep-copied elements are destroyed (if dtor defined)
+        /* deep-copied elements are destroyed (if dtor defined) */
         v->ttbl->dtor(curr);
     }
 
     if (v->ttbl->copy) {
-        // if copy defined, replacement elem is deep-copied
+        /* if copy defined, replacement element is deep-copied */
         v->ttbl->copy(curr, &val);
     } else {
-        // if no copy defined, replace elem is shallow-copied
+        /* if no copy defined, replacement element is shallow-copied */
         memcpy(curr, &val, v->ttbl->width);
     }
 }
@@ -2201,28 +2469,35 @@ void vreplaceat(T)(vector(T) *v, size_t index, T val) {
  *  using memcpy.
  */
 void vreplaceatptr(T)(vector(T) *v, size_t index, T *valaddr) {
+    size_t size = 0;
+    size_t back_index = 0;
+
+    T *curr = NULL;
+
     assert(v);
 
-    const size_t size = vsize(T)(v);
+    size = vsize(T)(v);
 
     if (index >= size) {
-        ERROR(__FILE__, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
+        char str[256];
+        sprintf(str, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
+        ERROR(__FILE__, str);
         return;
     }
 
-    const size_t back_index = (size - 1);
-    T *curr = v->impl.start + index;
+    back_index = (size - 1);
+    curr = v->impl.start + index;
 
     if (v->ttbl->dtor) {
-        // deep-copied elements are destroyed (if dtor defined)
+        /* deep-copied elements are destroyed (if dtor defined) */
         v->ttbl->dtor(curr);
     }
 
     if (v->ttbl->copy) {
-        // if copy defined, replacement elem is deep-copied
+        /* if copy defined, replacement element is deep-copied */
         v->ttbl->copy(curr, valaddr);
     } else {
-        // if no copy defined, replace elem is shallow-copied
+        /* if no copy defined, replacement element is shallow-copied */
         memcpy(curr, valaddr, v->ttbl->width);
     }
 }
@@ -2235,21 +2510,31 @@ void vreplaceatptr(T)(vector(T) *v, size_t index, T *valaddr) {
  *  @param[in]  n2  index of second element
  */
 void vswapelem(T)(vector(T) *v, size_t n1, size_t n2) {
+    size_t size = 0;
+    size_t capacity = 0;
+
+    bool n1_bad = false;
+    bool n2_bad = false;
+    bool good_indices = false;
+
+    T *temp = NULL;
+    T *data_1 = NULL;
+    T *data_2 = NULL;
+
     assert(v);
 
-    size_t size = vsize(T)(v);
-    size_t capacity = vcapacity(T)(v);
+    size = vsize(T)(v);
+    capacity = vcapacity(T)(v);
 
-    bool n1_bad = n1 >= size || n1 >= capacity;
-    bool n2_bad = n2 >= size || n2 >= capacity;
+    n1_bad = n1 >= size || n1 >= capacity;
+    n2_bad = n2 >= size || n2 >= capacity;
 
-    bool good_indices = !n1_bad && !n2_bad;
+    good_indices = !n1_bad && !n2_bad;
 
     if (good_indices && size > 0) {
-        T *data_1 = v->impl.start + n1;
-        T *data_2 = v->impl.start + n2;
+        data_1 = v->impl.start + n1;
+        data_2 = v->impl.start + n2;
 
-        T *temp = NULL;
         temp = malloc(v->ttbl->width);
         assert(temp);
         memcpy(temp, data_1, v->ttbl->width);
@@ -2260,7 +2545,9 @@ void vswapelem(T)(vector(T) *v, size_t n1, size_t n2) {
         free(temp);
         temp = NULL;
     } else {
-        ERROR(__FILE__, "indices n1 [%lu] and/or n2 [%lu] are out of bounds.", n1, n2);
+        char str[256];
+        sprintf(str, "indices n1 [%lu] and/or n2 [%lu] are out of bounds.", n1, n2);
+        ERROR(__FILE__, str);
         return;
     }
 }
@@ -2283,52 +2570,20 @@ void vswapelem(T)(vector(T) *v, size_t n1, size_t n2) {
  *  if a dtor function is NOT defined within v's ttbl.
  */
 void vremove(T)(vector(T) *v, T val) {
-    assert(v);
+    size_t i = 0;
+    size_t size = 0;
 
-    //
-    //  Need to come up with something more efficient than this.
-    //  Running veraseat(T) in a loop means
-    //      When element to erase is found at index i
-    //      Erase element at i
-    //      Then shift elements from [i + 1, vsize(T)(v))
-    //          one block left
-    //      Repeat for all elements found.
-    //      (that's more shifting than necessary)
-    //
-    //  An alternative idea would be:
-    //      In one pass, delete and/or set NULL
-    //      any element that matches that of valaddr
-    //      Do not do any shifting of elements yet.
-    //
-    //      In the next pass,
-    //          For each block
-    //              Find a NULL block
-    //                  When NULL block found,
-    //                      Advance from NULL block n times
-    //                      until a non-null block is found.
-    //                          When non-NULL block found,
-    //                          do v_swap_addr with NULL block
-    //
-    //  Another idea would be:
-    //      Keep a bool del_index[vsize(T)(v)] array.
-    //      Destroy the elements that are to be removed in one pass.
-    //      Mark the indices in the del_index array.
-    //
-    //      In the next pass,
-    //          Go through the vector and specifically visit
-    //          the NULL indices, and vswapaddr(T) that NULL
-    //          element with the first non-NULL element found.
-    //          Repeat until there are no more NULLs to swap with
-    //          Decrement the finish pointer based on how many
-    //          elements were removed.
+    T *curr = NULL;
+
+    assert(v);
 
     if (v->impl.start == v->impl.finish) {
         return;
     }
 
-    size_t i = 0;
-    size_t size = vsize(T)(v);
-    T *curr = v->impl.start;
+    i = 0;
+    size = vsize(T)(v);
+    curr = v->impl.start;
 
     if (v->ttbl->compare(curr, &val) == 0) {
         veraseat(T)(v, i);
@@ -2374,9 +2629,11 @@ void vremoveif(T)(vector(T) *v, T val, bool (*unary_predicate)(const void *)) {
         return;
     }
 
-    // if unary_predicate returns true
-    // from evaluating the contents of valaddr,
-    // redirect to v_remove
+    /**
+     *  If unary_predicate returns true
+     *  from evaluating the contents of val,
+     *  redirect to vremove
+     */
     if (unary_predicate(&val) == false) {
         return;
     } else {
@@ -2395,44 +2652,56 @@ void vremoveif(T)(vector(T) *v, T val, bool (*unary_predicate)(const void *)) {
  *  The merging of vector(T) v and vector(T) other does not mutate other.
  */
 vector(T) *vmerge(T)(vector(T) *v, vector(T) * other) {
+    size_t size_other = 0;
+    size_t capacity_v = 0;
+
+    T *sentinel = NULL;
+
     assert(v);
     assert(other);
 
-    const size_t size_other = vsize(T)(v);
-    const size_t capacity_v = vcapacity(T)(v);
+    size_other = vsize(T)(v);
+    capacity_v = vcapacity(T)(v);
 
     if (size_other >= capacity_v) {
-        // if other's size + v's current size will exceed
-        // that of v's capacity, resize v
+        /**
+         *  If (other's size + v's current size) 
+         *  will exceed that of v's capacity,
+         *  resize v
+         */
         vresize(T)(v, capacity_v * 2);
     }
 
-    T *sentinel = other->impl.finish;
+    sentinel = other->impl.finish;
     other->impl.finish = other->impl.start;
 
-    // the merging of v and other does not mutate other.
+    /* the merging of v and other does not mutate other. */
     if ((v->ttbl->copy && other->ttbl->copy)
         && (v->ttbl->copy == other->ttbl->copy)) {
-        // if v has a copy function defined in its ttbl,
-        // other has a copy function defined in its ttbl,
-        // and v shares the same copy function with other,
-        // do a deep copy of other's elements into v.
-
-        // a deep copy from other to v for types with
-        // dynamically allocated memory means that clearing
-        // v does not affect other whatsoever.
+        /**
+         *  If v has a copy function defined in its ttbl,
+         *  other has a copy function defined in its ttbl,
+         *  and v shares the same copy function with other,
+         *  do a deep copy of other's elements into v.
+         * 
+         *  A deep copy from other to v for types with
+         *  dynamically allocated memory means that clearing
+         *  v does not affect other whatsoever.
+         */
         while (other->impl.finish != sentinel) {
             v->ttbl->copy(v->impl.finish++, other->impl.finish++);
         }
     } else {
-        // if either v/other lack a copy function,
-        // and/or they do not share the same copy function,
-        // a shallow copy of other's elements into v will occur.
-
-        // a shallow copy from other to v for types with
-        // dynamically allocated memory means that clearing
-        // v will clear the memory associated with the elements
-        // that were shallow copied from other to v.
+        /**
+         *  If either v/other lack a copy function,
+         *  and/or they do not share the same copy function,
+         *  a shallow copy of other's elements into v will occur.
+         *  
+         *  A shallow copy from other to v for types with
+         *  dynamically allocated memory means that clearing
+         *  v will clear the memory associated with the elements
+         *  that were shallow copied from other to v.
+         */
         while (other->impl.finish != sentinel) {
             memcpy(v->impl.finish++, other->impl.finish++, v->ttbl->width);
         }
@@ -2447,25 +2716,37 @@ vector(T) *vmerge(T)(vector(T) *v, vector(T) * other) {
  *  @param[in]  v   pointer to vector
  */
 void vreverse(T)(vector(T) *v) {
+    size_t size = 0;
+
+    T *back = NULL;
+    T *restore = NULL;
+
     assert(v);
 
-    const size_t size = vsize(T)(v);
-    T *back = v->impl.finish - 1;
+    size = vsize(T)(v);
+    back = v->impl.finish - 1;
 
-    // saving the address of the finish pointer for later,
-    // as the finish pointer will be set to the beginning of the vector
-    T *restore = v->impl.finish;
+    /**
+     *  saving the address of the finish pointer for later,
+     *  as the finish pointer will be set to the beginning of the vector
+     */
+    restore = v->impl.finish;
     v->impl.finish = v->impl.start;
 
     while (v->impl.finish != back) {
-        // swap addresses at finish and back
-        // increment finish, decrement back --
-        // until finish's address matches that of back
+        /* swap addresses at finish and back */
         vswapaddr(T)(v, v->impl.finish++, back--);
+
+        /**
+         *  Increment finish, decrement back --
+         *  until finish's address matches that of back
+         */
     }
 
-    // restoring the finish pointer - size of vector is the same
-    // (the first swap ensures that restore is the desired finish position)
+    /**
+     *  Restoring the finish pointer - size of vector is the same
+     *  (the first swap ensures that restore is the desired finish position)
+     */
     v->impl.finish = restore;
 }
 
@@ -2479,21 +2760,30 @@ void vreverse(T)(vector(T) *v) {
  *  @return     pointer to vector(T) with contents of base
  */
 vector(T) *varrtov(T)(T *base, size_t length) {
+    struct typetable *table = NULL;
+    vector(T) *v = NULL;
+
+    T *target = NULL;
+
     assert(base);
 
-    // an appropriate typetable must be chosen that matches
-    // that of the type T for base.
-    vector(T) *v = vnewr(T)(length);
+    /**
+     *  An appropriate typetable must be chosen that matches
+     *  that of the type T for base.
+     */
+    table = vector_type_table_ptr_id(T)
+    ? vector_type_table_ptr_id(T) : _void_ptr_;
+    v = vnewr(T)(length);
 
-    T *target = base;
+    target = base;
 
     if (v->ttbl->copy) {
-        // deep copy
+        /* deep copy */
         while (v->impl.finish != v->impl.end_of_storage) {
             v->ttbl->copy(v->impl.finish++, target++);
         }
     } else {
-        // shallow copy
+        /* shallow copy */
         while (v->impl.finish != v->impl.end_of_storage) {
             memcpy(v->impl.finish++, target++, v->ttbl->width);
         }
@@ -2509,16 +2799,18 @@ vector(T) *varrtov(T)(T *base, size_t length) {
  *  @param[in]  val     a copy of an element to find
  */
 int vsearch(T)(vector(T) *v, T val) {
-    assert(v);
+    int (*comparator)(const void *, const void *) = NULL;
 
-    int (*comparator)(const void *, const void *) =
-    v->ttbl->compare ? v->ttbl->compare : void_ptr_compare;
-
-    T *curr = v->impl.start;
+    T *curr = NULL;
     bool found = false;
     int result = 0;
 
-    // standard linear search of valaddr using comparator
+    assert(v);
+
+    comparator = v->ttbl->compare ? v->ttbl->compare : void_ptr_compare;
+    curr = v->impl.start;
+
+    /* standard linear search of val using comparator */
     while (curr != v->impl.finish) {
         if (comparator(curr, &val) == 0) {
             found = true;
@@ -2529,7 +2821,7 @@ int vsearch(T)(vector(T) *v, T val) {
         ++result;
     }
 
-    // if found, return result, else (-1) to denote not found
+    /* if found, return result, else (-1) to denote not found */
     return found ? result : -1;
 }
 
@@ -2539,26 +2831,29 @@ int vsearch(T)(vector(T) *v, T val) {
  *  @param[in]  v   pointer to vector(T)
  */
 void vsort(T)(vector(T) *v) {
+    size_t size = 0;
+    int (*comparator)(const void *, const void *) = NULL;
+
     assert(v);
 
-    size_t size = vsize(T)(v);
+    size = vsize(T)(v);
 
     if (size < 2) {
-        // why sort a data structure if size < 2?
+        /* why sort a data structure if size < 2? */
         return;
     }
 
-    int (*comparator)(const void *, const void *)
-    = v->ttbl->compare ? v->ttbl->compare : void_ptr_compare;
+    comparator = v->ttbl->compare 
+    ? v->ttbl->compare : void_ptr_compare;
 
-    // cstdlib qsort (best performance)
-    qsort(v->impl.start, size, v->ttbl->width, comparator);
+    /* cstdlib qsort (best performance) */
+    /* qsort(v->impl.start, size, v->ttbl->width, comparator); */
 
-    // cstdlib mergesort
-    //mergesort(v->impl.start, size, v->ttbl->width, comparator);
+    /* cstdlib mergesort */
+    /* mergesort(v->impl.start, size, v->ttbl->width, comparator); */
 
-    // gcslib mergesort
-    //v_mergesort_iterative(v->impl.start, size, v->ttbl->width, comparator);
+    /* gcslib mergesort */
+    v_mergesort_iterative(v->impl.start, size, v->ttbl->width, comparator);
 }
 
 /**
@@ -2567,7 +2862,7 @@ void vsort(T)(vector(T) *v) {
  *  @param[in]  v   pointer to vector(T)
  */
 void vputs(T)(vector(T) *v) {
-    // redirect to vfputs with stream stdout
+    /* redirect to vfputs with stream stdout */
     vfputs(T)(v, stdout);
 }
 
@@ -2583,7 +2878,7 @@ void vputs(T)(vector(T) *v) {
  */
 void vputsf(T)(vector(T) *v, const char *before, const char *after,
                const char *postelem, const char *empty, size_t breaklim) {
-    // redirect to vfputsf with stream stdout
+    /* redirect to vfputsf with stream stdout */
     vfputsf(T)(v, stdout, before, after, postelem, empty, breaklim);
 }
 
@@ -2594,25 +2889,26 @@ void vputsf(T)(vector(T) *v, const char *before, const char *after,
  *  @param[in]  dest    file stream (e.g stdout, stderr, a file)
  */
 void vfputs(T)(vector(T) *v, FILE *dest) {
-    assert(v);
-    assert(dest);
-
     char buffer1[MAXIMUM_STACK_BUFFER_SIZE];
     char buffer2[MAXIMUM_STACK_BUFFER_SIZE];
 
     const char *link = "------------------------------";
+    const char *bytes_label = NULL;
+    const char *postelem = "";
+    const char *empty = "--- Container is empty ---";
+
+    const size_t breaklim = 1;
+
+    assert(v);
+    assert(dest);
 
     sprintf(buffer1, "\n%s\n%s\n%s\n", link, "Elements", link);
 
-    const char *bytes_label = v->ttbl->width == 1 ? "byte" : "bytes";
+    bytes_label = v->ttbl->width == 1 ? "byte" : "bytes";
 
     sprintf(buffer2, "%s\n%s\t\t%lu\n%s\t%lu\n%s\t%lu %s\n%s\n", link, "Size",
             vsize(T)(v), "Capacity", vcapacity(T)(v), "Element size", v->ttbl->width,
             bytes_label, link);
-
-    const char *postelem = "";
-    const char *empty = "--- Container is empty ---";
-    const size_t breaklim = 1;
 
     vfputsf(T)(v, dest, buffer1, buffer2, postelem, empty, breaklim);
 }
@@ -2632,26 +2928,33 @@ void vfputs(T)(vector(T) *v, FILE *dest) {
 void vfputsf(T)(vector(T) *v, FILE *dest, const char *before,
                 const char *after, const char *postelem, const char *empty,
                 size_t breaklim) {
+    void (*print)(const void *, FILE *dest) = NULL;
+
+    size_t size = 0;
+    size_t i = 0;
+    size_t curr = 0;
+
+    T *target = NULL;
+
     assert(v);
     assert(dest);
 
     fprintf(dest, "%s", before ? before : "");
 
-    void (*print)(const void *, FILE *dest)
-    = v->ttbl->print ? v->ttbl->print : void_ptr_print;
+    print = v->ttbl->print ? v->ttbl->print : void_ptr_print;
 
-    size_t size = vsize(T)(v);
+    size = vsize(T)(v);
 
     if (size == 0) {
         fprintf(dest, "%s\n", empty ? empty : "");
     } else {
-        T *target = v->impl.start;
+        target = v->impl.start;
 
-        for (size_t i = 0, curr = 1; i < size; i++, curr++) {
+        for (i = 0, curr = 1; i < size; i++, curr++) {
             print(target, dest);
 
-            // address - disable for release
-            fprintf(dest, "\t\t(%s%p%s)", KCYN, target, KNRM);
+            /* address - disable for release */
+            fprintf(dest, "\t\t(%s%p%s)", KCYN, (void *)(target), KNRM);
 
             if (i < size - 1) {
                 fprintf(dest, "%s", postelem ? postelem : "");
@@ -2678,10 +2981,13 @@ void vfputsf(T)(vector(T) *v, FILE *dest, const char *before,
  *  @return     a pointer to vector(T)
  */
 void *tmpl_vector_copy(T)(void *arg, const void *other) {
+    vector(T) **dest = NULL;
+    vector(T) **source = NULL;
+
     assert(other);
 
-    vector(T) **dest = (vector(T) **)(arg);
-    vector(T) **source = (vector(T) **)(other);
+    dest = (vector(T) **)(arg);
+    source = (vector(T) **)(other);
 
     (*dest) = vnewcopy(T)((*source));
 
@@ -2694,9 +3000,11 @@ void *tmpl_vector_copy(T)(void *arg, const void *other) {
  *  @param[in]  arg     address of a vector(T) pointer
  */
 void tmpl_vector_dtor(T)(void *arg) {
+    vector(T) **v = NULL;
+    
     assert(arg);
 
-    vector(T) **v = (vector(T) **)(arg);
+    v = (vector(T) **)(arg);
     vdelete(T)(v);
 }
 
@@ -2730,32 +3038,47 @@ void tmpl_vector_swap(T)(void *s1, void *s2) {
  *              0 means they are both equivalent, within their common length.
  */
 int tmpl_vector_compare(T)(const void *c1, const void *c2) {
+    vector(T) *v1 = NULL;
+    vector(T) *v2 = NULL;
+
+    vector(T) *vec1 = NULL;
+    vector(T) *vec2 = NULL;
+
+    size_t size1 = 0;
+    size_t size2 = 0;
+    size_t size = 0;
+
+    T *target1 = NULL;
+    T *target2 = NULL;
+
+    int delta = 0;
+    int i = 0;
+
     assert(c1);
     assert(c2);
 
-    vector(T) *v1 = *(vector(T) **)(c1);
-    vector(T) *v2 = *(vector(T) **)(c2);
+    v1 = *(vector(T) **)(c1);
+    v2 = *(vector(T) **)(c2);
 
     if (v1->ttbl->compare != v2->ttbl->compare) {
         return -1;
     }
 
-    vector(T) *vec1 = vnewcopy(T)(v1);
-    vector(T) *vec2 = vnewcopy(T)(v2);
+    vec1 = vnewcopy(T)(v1);
+    vec2 = vnewcopy(T)(v2);
 
     vsort(T)(vec1);
     vsort(T)(vec2);
 
-    size_t size1 = vsize(T)(vec1);
-    size_t size2 = vsize(T)(vec2);
+    size1 = vsize(T)(vec1);
+    size2 = vsize(T)(vec2);
 
-    size_t size = size1 < size2 ? size1 : size2;
+    size = size1 < size2 ? size1 : size2;
 
-    T *target1 = vec1->impl.start;
-    T *target2 = vec2->impl.start;
+    target1 = vec1->impl.start;
+    target2 = vec2->impl.start;
 
-    int delta = 0;
-    for (int i = 0; i < size; i++) {
+    for (i = 0; i < size; i++) {
         delta += vec1->ttbl->compare(&target1, &target2);
 
         ++target1;
@@ -2765,7 +3088,7 @@ int tmpl_vector_compare(T)(const void *c1, const void *c2) {
     vdelete(T)(&vec2);
     vdelete(T)(&vec1);
 
-    // if delta == 0, both vectors are equivalent within their common length.
+    /* if delta == 0, both vectors are equivalent within their common length. */
     return delta;
 }
 
@@ -2776,10 +3099,12 @@ int tmpl_vector_compare(T)(const void *c1, const void *c2) {
  *  @param[in]  dest    file stream (stdout, stderr, a file)
  */
 void tmpl_vector_print(T)(const void *arg, FILE *dest) {
+    vector(T) *v = NULL;
+
     assert(arg);
     assert(dest);
 
-    vector(T) *v  = *(vector(T) **)(arg);
+    v = *(vector(T) **)(arg);
     vfputs(T)(v, dest);
 }
 
@@ -2896,6 +3221,8 @@ static vector(T) *vallocate(T)(void) {
  *  @param[in]  capacity    capacity desired for vector
  */
 static void vinit(T)(vector(T) *v, size_t capacity) {
+    T *start = NULL;
+
     assert(v);
 
     v->ttbl = vector_type_table_ptr_id(T)
@@ -2910,7 +3237,6 @@ static void vinit(T)(vector(T) *v, size_t capacity) {
 
     capacity = (capacity <= 0) ? 1 : capacity;
 
-    T *start = NULL;
     start = calloc(capacity, v->ttbl->width);
     assert(start);
 
@@ -2947,11 +3273,12 @@ static void vdeinit(T)(vector(T) *v) {
  *  @param[out] second  second address to swap content
  */
 static void vswapaddr(T)(vector(T) *v, T *first, T *second) {
+    T *temp = NULL;
+
     assert(v);
     assert(first);
     assert(second);
 
-    T *temp = NULL;
     temp = malloc(v->ttbl->width);
     assert(temp);
     memcpy(temp, first, v->ttbl->width);
@@ -2972,11 +3299,13 @@ static void vswapaddr(T)(vector(T) *v, T *first, T *second) {
  *              position is at v's first element
  */
 static iterator vibegin(T)(void *arg) {
+    vector(T) *v = NULL;
+    iterator it;
+
     assert(arg);
 
-    vector(T) *v = (vector(T) *)(arg);
+    v = (vector(T) *)(arg);
 
-    iterator it;
     it.itbl = vector_iterator_table_ptr_id(T);
     it.container = v;
     it.curr = v->impl.start;
@@ -2993,11 +3322,13 @@ static iterator vibegin(T)(void *arg) {
  *              position is at one block past v's last element
  */
 static iterator viend(T)(void *arg) {
+    vector(T) *v = NULL;
+    iterator it;
+
     assert(arg);
 
-    vector(T) *v = (vector(T) *)(arg);
+    v = (vector(T) *)(arg);
 
-    iterator it;
     it.itbl = vector_iterator_table_ptr_id(T);
     it.container = v;
     it.curr = v->impl.finish;
@@ -3014,14 +3345,18 @@ static iterator viend(T)(void *arg) {
  *  @return     a new iterator that is one block past it's current position
  */
 static iterator vinext(T)(iterator it) {
-    vector(T) *v = (vector(T) *)(it.container);
-
+    vector(T) *v = NULL;
     iterator iter;
+
+    T **ptr = NULL;
+
+    v = (vector(T) *)(it.container);
+
     iter.itbl = vector_iterator_table_ptr_id(T);
     iter.container = v;
     iter.curr = it.curr;
 
-    T **ptr = (T **)(&iter.curr);
+    ptr = (T **)(&iter.curr);
     ++(*ptr);
 
     return iter;
@@ -3036,14 +3371,18 @@ static iterator vinext(T)(iterator it) {
  *  @return     a new iterator that is n block's past it's current position
  */
 static iterator vinextn(T)(iterator it, int n) {
-    vector(T) *v = (vector(T) *)(it.container);
-
+    vector(T) *v = NULL;
     iterator iter;
+
+    T **ptr = NULL;
+
+    v = (vector(T) *)(it.container);
+
     iter.itbl = vector_iterator_table_ptr_id(T);
     iter.container = v;
     iter.curr = it.curr;
 
-    T **ptr = (T **)(&iter.curr);
+    ptr = (T **)(&iter.curr);
     (*ptr) += n;
 
     return iter;
@@ -3059,13 +3398,15 @@ static iterator vinextn(T)(iterator it, int n) {
  */
 static iterator viprev(T)(iterator it) {
     vector(T) *v = (vector(T) *)(it.container);
-
     iterator iter;
+
+    T **ptr = NULL;
+
     iter.itbl = vector_iterator_table_ptr_id(T);
     iter.container = v;
     iter.curr = it.curr;
 
-    T **ptr = (T **)(&iter.curr);
+    ptr = (T **)(&iter.curr);
     --(*ptr);
 
     return iter;
@@ -3081,13 +3422,15 @@ static iterator viprev(T)(iterator it) {
  */
 static iterator viprevn(T)(iterator it, int n) {
     vector(T) *v = (vector(T) *)(it.container);
-
     iterator iter;
+
+    T **ptr = NULL;
+
     iter.itbl = vector_iterator_table_ptr_id(T);
     iter.container = v;
     iter.curr = it.curr;
 
-    T **ptr = (T **)(&iter.curr);
+    ptr = (T **)(&iter.curr);
     (*ptr) -= n;
 
     return iter;
@@ -3112,17 +3455,14 @@ static int vidistance(T)(iterator *first, iterator *last) {
 
     if (first == NULL && last != NULL) {
         v = (vector(T) *)(last->container);
-        //return ptr_distance(v->impl.start, last->curr, v->ttbl->width);
         return (int)((T *)(last->curr) - v->impl.start);
     } else if (last == NULL && first != NULL) {
         v = (vector(T) *)(first->container);
-        //return ptr_distance(v->impl.start, first->curr, v->ttbl->width);
         return (int)((T *)(first->curr) - v->impl.start);
     } else if (first == NULL && last == NULL) {
         return 0;
     } else {
         v = (vector(T) *)(first->container);
-        //return ptr_distance(first->curr, last->curr, v->ttbl->width);
         return (int)((T *)(last->curr) - (T *)(first->curr));
     }
 }
@@ -3136,11 +3476,14 @@ static int vidistance(T)(iterator *first, iterator *last) {
  *  @return     pointer to iterator
  */
 static iterator *viadvance(T)(iterator *it, int n) {
+    vector(T) *v = NULL;
+    T **ptr = NULL;
+
     assert(it);
 
-    vector(T) *v = (vector(T) *)(it->container);
+    v = (vector(T) *)(it->container);
 
-    T **ptr = (T **)(&it->curr);
+    ptr = (T **)(&it->curr);
     (*ptr) += n;
 
     return it;
@@ -3154,11 +3497,14 @@ static iterator *viadvance(T)(iterator *it, int n) {
  *  @return     pointer to iterator
  */
 static iterator *viincr(T)(iterator *it) {
+    vector(T) *v = NULL;
+    T **ptr = NULL;
+
     assert(it);
 
-    vector(T) *v = (vector(T) *)(it->container);
+    v = (vector(T) *)(it->container);
 
-    T **ptr = (T **)(&it->curr);
+    ptr = (T **)(&it->curr);
     ++(*ptr);
     return it;
 }
@@ -3171,11 +3517,14 @@ static iterator *viincr(T)(iterator *it) {
  *  @return     pointer to iterator
  */
 static iterator *videcr(T)(iterator *it) {
+    vector(T) *v = NULL;
+    T **ptr = NULL;
+
     assert(it);
 
-    vector(T) *v = (vector(T) *)(it->container);
+    v = (vector(T) *)(it->container);
 
-    T **ptr = (T **)(&it->curr);
+    ptr = (T **)(&it->curr);
     --(*ptr);
     return it;
 }
@@ -3257,4 +3606,6 @@ static struct typetable *vigetttbl(T)(void *arg) {
     return v->ttbl;
 }
 
-#endif /* T */
+#else
+typedef int __PLACEHOLDER_TYPEDEF_GCSLIB__;
+#endif
