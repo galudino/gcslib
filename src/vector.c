@@ -526,7 +526,6 @@ void v_resize(vector *v, size_t n) {
  *  initialized, with each block consisting of copies of valaddr.
  */
 void v_resizefill(vector *v, size_t n, const void *valaddr) {
-    size_t old_size = 0;
     size_t old_capacity = 0;
 
     void *sentinel = NULL;
@@ -534,7 +533,6 @@ void v_resizefill(vector *v, size_t n, const void *valaddr) {
 
     assert(v);
 
-    old_size = v_size(v);
     old_capacity = v_capacity(v);
 
     sentinel = (char *)(v->impl.start) + (n * v->ttbl->width);
@@ -1690,7 +1688,6 @@ iterator v_erase(vector *v, iterator pos) {
  */
 iterator v_erasernge(vector *v, iterator pos, iterator last) {
     int ipos = 0;
-    int lpos = 0;
     int delta = 0;
 
     size_t back_index = 0;
@@ -1701,7 +1698,6 @@ iterator v_erasernge(vector *v, iterator pos, iterator last) {
     assert(v);
 
     ipos = it_distance(NULL, &pos);     /**< index of pos */
-    lpos = it_distance(NULL, &last);    /**< index of last */
     delta = it_distance(&pos, &last);   /**< diff between pos/last */
 
     back_index = v_size(v) - 1;
@@ -2015,7 +2011,6 @@ void v_erase_at(vector *v, size_t index) {
  */
 void v_replace_at(vector *v, size_t index, const void *valaddr) {
     size_t size = 0;
-    size_t back_index = 0;
 
     void *curr = NULL;
 
@@ -2030,7 +2025,6 @@ void v_replace_at(vector *v, size_t index, const void *valaddr) {
         return;
     }
 
-    back_index = (size - 1);
     curr = (char *)(v->impl.start) + (index * v->ttbl->width);
 
     if (v->ttbl->dtor) {
@@ -2274,14 +2268,11 @@ vector *v_merge(vector *v, vector *other) {
  *  @param[in]  v   pointer to vector
  */
 void v_reverse(vector *v) {
-    size_t size = 0;
-
     void *back = NULL;
     void *restore = NULL;
 
     assert(v);
 
-    size = v_size(v);
     back = (char *)(v->impl.finish) - (v->ttbl->width);
 
     /**

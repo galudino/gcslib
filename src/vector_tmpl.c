@@ -36,6 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 
 /**
  *  @file       utils.h
@@ -593,7 +594,6 @@ void vresize(T)(vector(T) *v, size_t n) {
  *  initialized, with each block consisting of copies of val.
  */
 void vresizefill(T)(vector(T) *v, size_t n, T val) {
-    size_t old_size = 0;
     size_t old_capacity = 0;
 
     T *sentinel = NULL;
@@ -601,7 +601,6 @@ void vresizefill(T)(vector(T) *v, size_t n, T val) {
 
     assert(v);
 
-    old_size = vsize(T)(v);
     old_capacity = vcapacity(T)(v);
 
     sentinel = v->impl.start + n;
@@ -690,7 +689,6 @@ void vresizefill(T)(vector(T) *v, size_t n, T val) {
  *  initialized, with each block consisting of copies of valaddr.
  */
 void vresizefillptr(T)(vector(T) *v, size_t n, T *valaddr) {
-    size_t old_size = 0;
     size_t old_capacity = 0;
 
     T *sentinel = NULL;
@@ -698,7 +696,6 @@ void vresizefillptr(T)(vector(T) *v, size_t n, T *valaddr) {
 
     assert(v);
 
-    old_size = vsize(T)(v);
     old_capacity = vcapacity(T)(v);
 
     sentinel = v->impl.start + n;
@@ -2058,7 +2055,6 @@ iterator verase(T)(vector(T) *v, iterator pos) {
  */
 iterator verasernge(T)(vector(T) *v, iterator pos, iterator last) {
     int ipos = 0;
-    int lpos = 0;
     int delta = 0;
 
     size_t back_index = 0;
@@ -2069,7 +2065,6 @@ iterator verasernge(T)(vector(T) *v, iterator pos, iterator last) {
     assert(v);
 
     ipos = it_distance(NULL, &pos);     /**< index of pos */
-    lpos = it_distance(NULL, &last);    /**< index of last */
     delta = it_distance(&pos, &last);   /**< diff between pos/last */
 
     back_index = vsize(T)(v) - 1;
@@ -2442,7 +2437,6 @@ void veraseat(T)(vector(T) *v, size_t index) {
  */
 void vreplaceat(T)(vector(T) *v, size_t index, T val) {
     size_t size = 0;
-    size_t back_index = 0;
 
     T *curr = NULL;
 
@@ -2457,7 +2451,6 @@ void vreplaceat(T)(vector(T) *v, size_t index, T val) {
         return;
     }
 
-    back_index = (size - 1);
     curr = v->impl.start + index;
 
     if (v->ttbl->dtor) {
@@ -2498,7 +2491,6 @@ void vreplaceat(T)(vector(T) *v, size_t index, T val) {
  */
 void vreplaceatptr(T)(vector(T) *v, size_t index, T *valaddr) {
     size_t size = 0;
-    size_t back_index = 0;
 
     T *curr = NULL;
 
@@ -2513,7 +2505,6 @@ void vreplaceatptr(T)(vector(T) *v, size_t index, T *valaddr) {
         return;
     }
 
-    back_index = (size - 1);
     curr = v->impl.start + index;
 
     if (v->ttbl->dtor) {
@@ -2744,14 +2735,11 @@ vector(T) *vmerge(T)(vector(T) *v, vector(T) * other) {
  *  @param[in]  v   pointer to vector
  */
 void vreverse(T)(vector(T) *v) {
-    size_t size = 0;
-
     T *back = NULL;
     T *restore = NULL;
 
     assert(v);
 
-    size = vsize(T)(v);
     back = v->impl.finish - 1;
 
     /**
@@ -2788,19 +2776,12 @@ void vreverse(T)(vector(T) *v) {
  *  @return     pointer to vector(T) with contents of base
  */
 vector(T) *varrtov(T)(T *base, size_t length) {
-    struct typetable *table = NULL;
     vector(T) *v = NULL;
 
     T *target = NULL;
 
     assert(base);
 
-    /**
-     *  An appropriate typetable must be chosen that matches
-     *  that of the type T for base.
-     */
-    table = vector_type_table_ptr_id(T)
-    ? vector_type_table_ptr_id(T) : _void_ptr_;
     v = vnewr(T)(length);
 
     target = base;

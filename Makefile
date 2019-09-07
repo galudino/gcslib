@@ -34,11 +34,11 @@ CSTD 				= -std=c89
 DEBUG 				= -g
 PTHREAD				= -pthread
 MATH 				= -lm
-PEDANTIC			= -pedantic-errors
+PEDANTIC			= -pedantic
 
 SANTIIZED 			= #-fsanitize=address
-W_ALL 				= -Wall
-W_ERR 				= -Werror
+W_ALL 				= #-Wall
+W_ERR 				= #-Werror
 
 ## Add new flag categories here ##############################################
 CFLAGS 				= $(DEBUG) $(CSTD) $(PEDANTIC) $(W_ALL) $(W_ERR) $(SANITIZED)

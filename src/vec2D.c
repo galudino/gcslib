@@ -36,6 +36,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef M_PI
+#define M_PI   3.14159265358979323846264338327950288
+#endif
+
 #define VEC2D_ATTRIBUTE_COUNT 4
 enum vec2D_attrs { X, Y, MAGNITUDE, THETA };
 
@@ -238,7 +242,7 @@ void vec2D_print(const void *arg, FILE *dest) {
 void vec2D_print_override_simple(const void *arg, FILE *dest) {
     vec2D *v = (vec2D *)(arg);
     /* fprintf(dest, "(%lfi, %lfj)", vec2D_x(v), vec2D_y(v)); */
-    fprintf(dest, "%0.3lf at %0.3lf%s", v->attrs[MAGNITUDE], v->attrs[THETA], DEGREE_SYMBOL);
+    fprintf(dest, "%0.3f at %0.3f%s", v->attrs[MAGNITUDE], v->attrs[THETA], DEGREE_SYMBOL);
 }
 
 void *vec2D_ptr_copy(void *arg, const void *other) {
@@ -308,7 +312,7 @@ void vec2D_ptr_print(const void *arg, FILE *dest) {
 void vec2D_ptr_print_override_simple(const void *arg, FILE *dest) {
     vec2D *v = *(vec2D **)(arg);
     /* fprintf(dest, "(%lfi, %lfj)", vec2D_x(v), vec2D_y(v)); */
-    fprintf(dest, "%0.3lf at %0.3lf%s", v->attrs[MAGNITUDE], v->attrs[THETA], DEGREE_SYMBOL);
+    fprintf(dest, "%0.3f at %0.3f%s", v->attrs[MAGNITUDE], v->attrs[THETA], DEGREE_SYMBOL);
 }
 
 static vec2D *vec2D_allocate() {

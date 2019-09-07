@@ -34,15 +34,13 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <assert.h>
-
-#define _POSIX_C_SOURCE 200809L
-#define _GNU_SOURCE 1
+#if _POSIX_C_SOURCE >= 200890L
 #include <string.h>
 
-#ifdef __STRICT_ANSI__
-int n = 9999;
+#if __STD_VERSION__ >= 199901L
+/* content */
 #else
-int n = 2;
+/* default */
 #endif
 
 /*
@@ -80,7 +78,6 @@ int main(int argc, const char * argv[]) {
     str_copy(&str, &copyme);
 
     printf("result: %s\n", str);
-    printf("n = %d\n", n);
 
     return EXIT_SUCCESS;
 }
