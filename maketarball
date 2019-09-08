@@ -1,0 +1,29 @@
+#!/bin/bash
+
+## default filename if $1 is an empty string
+filename_default="gcslib_$(date +%Y-%m-%d_%H%M%S).tar.gz"
+
+## command to create a tar archive
+cmd=tar
+
+## flag options
+archive_create=c
+archive_filename=f
+archive_contents=t
+archive_verbose=v
+archive_extract=x
+archive_gzip=z
+
+## flag variable - create, use gzip, verbose messages, show filename
+flags=-$archive_create$archive_gzip$archive_verbose$archive_filename
+
+## clean build folder prior to archive creation
+make clean
+
+## remember to provide the .tar.gz extension for user-defined filenames
+if [ -z $1 ]
+then
+    $cmd $flags $filename_default Makefile maketarball README.md _debug build client dat doc include src temp test    
+else
+    $cmd $flags $1 Makefile maketarball README.md _debug build client dat doc include src temp test
+fi

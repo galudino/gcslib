@@ -24,7 +24,7 @@ EXE_CLI 			= gcslib
 ###############################################################################
 
 ## COMPILER ###################################################################
-CC 					= gcc
+CC 				= gcc
 ###############################################################################
 
 ## FLAGS ######################################################################
@@ -34,7 +34,7 @@ CSTD 				= -std=c89
 DEBUG 				= -g
 PTHREAD				= -pthread
 MATH 				= -lm
-PEDANTIC			= -pedantic
+PEDANTIC			= -pedantic-errors
 
 SANTIIZED 			= #-fsanitize=address
 W_ALL 				= #-Wall
@@ -88,6 +88,7 @@ ALL_EXE	= $(EXE_CLI)
 ##
 
 ## Source code is preprocessed, compiled, and assembled - .o object files produced
+
 $(DIR_OBJ)/%$(EXT_OBJ): $(DIR_SRC)/%$(EXT_SRC)
 	$(CC) -c $< -o $@ $(CFLAGS) $(INC)
 
