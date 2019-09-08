@@ -2,6 +2,8 @@
 *.out
 *.DS_Store
 gcslib
+test
+build/*.o
 _debug/.DS_Store
 _debug/.DS_Store
 gcslib.dSYM/Contents/Info.plist

@@ -17,13 +17,14 @@ archive_gzip=z
 ## flag variable - create, use gzip, verbose messages, show filename
 flags=-$archive_create$archive_gzip$archive_verbose$archive_filename
 
-## clean build folder prior to archive creation
-make clean
+exclude=exclude.txt
+
+target=.
 
 ## remember to provide the .tar.gz extension for user-defined filenames
 if [ -z $1 ]
 then
-    $cmd $flags $filename_default Makefile maketarball README.md _debug build client dat doc include src temp test    
+    $cmd $flags $filename_default -X $exclude $target
 else
-    $cmd $flags $1 Makefile maketarball README.md _debug build client dat doc include src temp test
+    $cmd $flags $1 -X $exclude $target
 fi

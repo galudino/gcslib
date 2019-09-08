@@ -11,16 +11,18 @@
 DIR_OBJ				= build
 DIR_INC				= include
 DIR_SRC				= src
-DIR_TST				= test
+DIR_TST				= tests
 DIR_CLI				= client
 ###############################################################################
 
 ## EXECUTABLE SOURCE FILE NAMES ###############################################
 SRC_CLI				= gcslib.c
+SRC_TST				= test.c
 ###############################################################################
 
 ## EXECUTABLE NAMES ###########################################################
 EXE_CLI 			= gcslib
+EXE_TST				= test
 ###############################################################################
 
 ## COMPILER ###################################################################
@@ -55,7 +57,7 @@ EXT_OBJ := .o
 SOURCES	:= $(wildcard $(DIR_SRC)/*$(EXT_SRC))
 OBJECTS := $(patsubst $(DIR_SRC)/%$(EXT_SRC), $(DIR_OBJ)/%$(EXT_OBJ), $(SOURCES))
 
-ALL_EXE	= $(EXE_CLI)
+ALL_EXE	= $(EXE_CLI) $(EXE_TST)
 ###############################################################################
 
 ## DIRECTIVES #################################################################
@@ -87,10 +89,9 @@ ALL_EXE	= $(EXE_CLI)
 ## object files -- the intermediary steps have been skipped for brevity.
 ##
 
-## Source code is preprocessed, compiled, and assembled - .o object files produced
+all:	$(ALL_EXE)
 
-$(DIR_OBJ)/%$(EXT_OBJ): $(DIR_SRC)/%$(EXT_SRC)
-	$(CC) -c $< -o $@ $(CFLAGS) $(INC)
+gcslib: $(OBJECTS)
 
 ## Links .o object files - binary executable produced
 $(EXE_CLI): $(OBJECTS)
@@ -104,9 +105,21 @@ $(EXE_CLI): $(OBJECTS)
 	@echo "Linking complete."
 	@echo;
 
-all:	$(ALL_EXE)
+## Links .o object files - binary executable produced
+$(EXE_TST): $(OBJECTS)
+	@echo;
+	@echo "Linking $(EXE_TST)..."
+	@echo;
 
-gcslib: $(OBJECTS)
+	$(CC) -o $(EXE_TST) $(DIR_TST)/$(SRC_TST) $(OBJECTS) $(CFLAGS) $(LIB) $(INC)
+
+	@echo;
+	@echo "Linking complete."
+	@echo;
+
+## Source code is preprocessed, compiled, and assembled - .o object files produced
+$(DIR_OBJ)/%$(EXT_OBJ): $(DIR_SRC)/%$(EXT_SRC)
+	$(CC) -c $< -o $@ $(CFLAGS) $(INC)
 
 clean:
 	@echo;

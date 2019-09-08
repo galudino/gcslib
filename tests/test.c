@@ -30,22 +30,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdarg.h>
 #include <assert.h>
 
 #include <string.h>
 
-void *str_copy(void *arg, const void *other) {
-    char **target = (char **)(arg);
-    char **source = (char **)(other);
-
-    (*target) = strdup((*source));
-
-    return (*target);
-}
-
+#include "gcslib.h"
+#include "vec2D.h"
 
 typedef struct parent parent;
 struct parent {
@@ -72,6 +64,8 @@ int main(int argc, const char * argv[]) {
     child second = { { NULL, NULL }, "jane doe" };
     child third = { { NULL, NULL }, "jessica doe" };
 
+    parent *p = NULL;
+
     first.base.next = (parent *)(&second);
 
     second.base.prev = (parent *)(&first);
@@ -79,7 +73,7 @@ int main(int argc, const char * argv[]) {
 
     third.base.prev = (parent *)(&second);
     
-    parent *p = (parent *)(&first);
+    p = (parent *)(&first);
 
     while (p != NULL) {
         child c = *(child *)(p);
