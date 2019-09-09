@@ -39,12 +39,14 @@
 #include "gcslib.h"
 #include "vec2D.h"
 
+/* represents list_node_base */
 typedef struct parent parent;
 struct parent {
-    parent *prev;
     parent *next;
+    parent *prev;
 };
 
+/* represents list_node */
 typedef struct child child;
 struct child {
     struct parent base;
@@ -60,6 +62,7 @@ struct child {
  *  @return     exit status
  */
 int main(int argc, const char * argv[]) {
+    /*
     child first = { { NULL, NULL }, "john doe" };
     child second = { { NULL, NULL }, "jane doe" };
     child third = { { NULL, NULL }, "jessica doe" };
@@ -79,6 +82,59 @@ int main(int argc, const char * argv[]) {
         child c = *(child *)(p);
         printf("name: %s\n", c.name);
         p = c.base.next;
+    }
+    */
+
+    /* allocate memory for child (list_node) objects */
+    child *first = malloc(sizeof *first);
+    child *second = malloc(sizeof *second);
+    child *third = malloc(sizeof *third);
+    
+    /* cursor pointers for parent and child */
+    parent *p = NULL;
+    child *c = first;
+
+    /* handling list_node by base type only */
+    parent *pf = NULL;
+    parent *ps = NULL;
+    parent *pt = NULL;
+
+    /* initializing links to all NULL */
+    first->base.prev = first->base.next = NULL;
+    second->base.prev = second->base.next = NULL;
+    third->base.prev = third->base.next = NULL;
+
+    /* initializing values for first, second, third */
+    first->name = "John Doe";
+    second->name = "Jane Doe";
+    third->name = "Jessica Doe";
+
+    /* assigning base-type pointers to derived type instances */
+    pf = *(parent **)(&first);
+    ps = *(parent **)(&second);
+    pt = *(parent **)(&third);
+
+    pf->next = ps;
+
+    ps->prev = pf;
+    ps->next = pt;
+
+    pt->prev = ps;
+    
+    /*
+    first->base.next = *(parent **)(&second);
+
+    second->base.prev = *(parent **)(&first);
+    second->base.next = *(parent **)(&third);
+
+    third->base.prev = *(parent **)(&second);
+    */
+
+    p = *(parent **)(&c);
+    while (p != NULL) {
+        c = (child *)(p);
+        printf("name: %s\n", c->name);
+        p = p->next;
     }
 
     return EXIT_SUCCESS;

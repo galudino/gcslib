@@ -20,6 +20,7 @@
         "hashtable": "cpp",
         "complex": "cpp",
         "assert.h": "c",
-        "slist": "c"
+        "slist": "c",
+        "mergesort.h": "c"
     }
 }

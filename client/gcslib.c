@@ -57,6 +57,7 @@ void test_str_tmpl(void);
  *  @return     exit status
  */
 int main(int argc, const char *argv[]) {
+    
     /* 
     test_int_vp();
     test_str_vp();
@@ -65,11 +66,47 @@ int main(int argc, const char *argv[]) {
 
     test_int_tmpl();
     */
+
+    /*
     LOG(__FILE__, "void ptr");
     test_str_vp();
 
     LOG(__FILE__, "tmpl");
     test_str_tmpl();
+    */
+
+    list *l = l_new(_int_);
+    int i = 0;
+
+    int *curr = NULL;
+    iterator it;
+    
+    for (i = 0; i < 16; i++) {
+        l_pushb(l, &i);
+    }
+
+    it = l_begin(l);
+    
+    /* 
+    while ((curr = it_curr(it)) != it_finish(it)) {
+        printf("next: %d\n", (*curr));
+        it_incr(&it);
+    }
+    */
+
+    l_clear(l);
+
+    i = 54;
+    l_pushb(l, &i);
+
+    i = 92;
+    l_pushb(l, &i);
+
+    printf("front: %d\n", *(int *)(l_front(l)));
+    printf("back: %d\n", *(int *)(l_back(l)));
+
+    l_puts(l);
+    l_delete(&l);
 
     return EXIT_SUCCESS;
 }

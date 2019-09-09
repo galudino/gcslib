@@ -30,14 +30,14 @@
 
 #include "utils.h"
 
-#include <stdio.h>
+#include <assert.h>
+#include <ctype.h>
+#include <errno.h>
+#include <limits.h>
 #include <stdarg.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
-#include <errno.h>
-#include <ctype.h>
-#include <limits.h>
 #include <string.h>
 
 struct typetable ttbl_char;
@@ -101,7 +101,7 @@ struct typetable ttbl_uint64;
 void *str_copy(void *arg, const void *other) {
     char **target = (char **)(arg);
     char **source = (char **)(other);
-    
+
     /*
     (*target) = strdup((*source));
     return (*target);
@@ -139,12 +139,9 @@ void str_dtor(void *arg) {
     (*target) = NULL;
 }
 
-void cstr_dtor(void *arg) {
-    str_dtor(arg);
-}
+void cstr_dtor(void *arg) { str_dtor(arg); }
 
-void void_ptr_dtor(void *arg) {
-    /* DO NOT CHANGE - empty body */
+void void_ptr_dtor(void *arg) { /* DO NOT CHANGE - empty body */
 }
 
 void str_swap(void *arg, void *other) {
@@ -184,8 +181,8 @@ int signed_char_compare(const void *c1, const void *c2) {
 }
 
 int unsigned_char_compare(const void *c1, const void *c2) {
-    return (unsigned int)*(unsigned char *)(c1)
-    - (unsigned int)*(unsigned char *)(c2);
+    return (unsigned int)*(unsigned char *)(c1) -
+           (unsigned int)*(unsigned char *)(c2);
 }
 
 int short_int_compare(const void *c1, const void *c2) {
@@ -234,7 +231,8 @@ int signed_long_long_int_compare(const void *c1, const void *c2) {
 }
 
 int unsigned_long_long_int_compare(const void *c1, const void *c2) {
-    return (int)(*((unsigned long long int *)c1) - *((unsigned long long int *)c2));
+    return (int)(*((unsigned long long int *)c1) -
+                 *((unsigned long long int *)c2));
 }
 #endif
 
@@ -321,15 +319,15 @@ int str_compare(const void *c1, const void *c2) {
     char *first = *((char **)(c1));
     char *second = *((char **)(c2));
 
-    #if __STD_VERSION__ >= 199901L
+#if __STD_VERSION__ >= 199901L
     char cfirst[strlen(first) + 1];
     char csecond[strlen(second) + 1];
-    #else
+#else
     char *cfirst = malloc(strlen(first) + 1);
     char *csecond = malloc(strlen(second) + 1);
     assert(cfirst);
     assert(csecond);
-    #endif
+#endif
 
     strcpy(cfirst, first);
     strcpy(csecond, second);
@@ -339,13 +337,13 @@ int str_compare(const void *c1, const void *c2) {
 
     result = strcmp(cfirst, csecond);
 
-    #if __STD_VERSION__ >= 199901L
+#if __STD_VERSION__ >= 199901L
     free(cfirst);
     cfirst = NULL;
 
     free(csecond);
     csecond = NULL;
-    #endif
+#endif
 
     return result;
 }
@@ -356,15 +354,15 @@ int str_compare_ignore_case(const void *c1, const void *c2) {
 
     int i = 0;
 
-    #if __STD_VERSION__ >= 199901L
+#if __STD_VERSION__ >= 199901L
     char cfirst[strlen(first) + 1];
     char csecond[strlen(second) + 1];
-    #else
+#else
     char *cfirst = malloc(strlen(first) + 1);
     char *csecond = malloc(strlen(second) + 1);
     assert(cfirst);
     assert(csecond);
-    #endif
+#endif
 
     strcpy(cfirst, first);
     strcpy(csecond, second);
@@ -383,20 +381,18 @@ int str_compare_ignore_case(const void *c1, const void *c2) {
         }
     }
 
-    #if __STD_VERSION__ >= 199901L
+#if __STD_VERSION__ >= 199901L
     free(cfirst);
     cfirst = NULL;
-    
+
     free(csecond);
     csecond = NULL;
-    #endif
+#endif
 
     return i;
 }
 
-int cstr_compare(const void *c1, const void *c2) {
-    return str_compare(c1, c2);
-}
+int cstr_compare(const void *c1, const void *c2) { return str_compare(c1, c2); }
 
 int cstr_compare_ignore_case(const void *c1, const void *c2) {
     return str_compare_ignore_case(c1, c2);
@@ -478,9 +474,7 @@ void int_print(const void *arg, FILE *dest) {
     fprintf(dest, "%d", *(int *)arg);
 }
 
-void signed_int_print(const void *arg, FILE *dest) {
-    int_print(arg, dest);
-}
+void signed_int_print(const void *arg, FILE *dest) { int_print(arg, dest); }
 
 void unsigned_int_print(const void *arg, FILE *dest) {
     fprintf(dest, "%u", *(unsigned int *)arg);
@@ -528,33 +522,21 @@ void bool_print(const void *arg, FILE *dest) {
     fprintf(dest, "%s", *((bool *)arg) ? "true" : "false");
 }
 
-void char_ptr_print(const void *arg, FILE *dest) {
-    str_print(arg, dest);
-}
+void char_ptr_print(const void *arg, FILE *dest) { str_print(arg, dest); }
 
 void str_print(const void *arg, FILE *dest) {
     fprintf(dest, "%s", *(char **)arg);
 }
 
-void cstr_print(const void *arg, FILE *dest) {
-    str_print(arg, dest);
-}
+void cstr_print(const void *arg, FILE *dest) { str_print(arg, dest); }
 
-void void_ptr_print(const void *arg, FILE *dest) {
-    fprintf(dest, "%p", arg);
-}
+void void_ptr_print(const void *arg, FILE *dest) { fprintf(dest, "%p", arg); }
 
-void int8_print(const void *arg, FILE *dest) {
-    char_print(arg, dest);
-}
+void int8_print(const void *arg, FILE *dest) { char_print(arg, dest); }
 
-void int16_print(const void *arg, FILE *dest) {
-    short_int_print(arg, dest);
-}
+void int16_print(const void *arg, FILE *dest) { short_int_print(arg, dest); }
 
-void int32_print(const void *arg, FILE *dest) {
-    int_print(arg, dest);
-}
+void int32_print(const void *arg, FILE *dest) { int_print(arg, dest); }
 
 #if __STD_VERSION__ >= 199901L
 void int64_print(const void *arg, FILE *dest) {
@@ -635,9 +617,7 @@ char *short_int_parse(const void *arg) {
     return parsed;
 }
 
-char *signed_short_int_parse(const void *arg) {
-    return short_int_parse(arg);
-}
+char *signed_short_int_parse(const void *arg) { return short_int_parse(arg); }
 
 char *unsigned_short_int_parse(const void *arg) {
     const char value = *(unsigned short int *)arg;
@@ -667,9 +647,7 @@ char *int_parse(const void *arg) {
     return parsed;
 }
 
-char *signed_int_parse(const void *arg) {
-    return int_parse(arg);
-}
+char *signed_int_parse(const void *arg) { return int_parse(arg); }
 
 char *unsigned_int_parse(const void *arg) {
     const char value = *(unsigned int *)arg;
@@ -699,9 +677,7 @@ char *long_int_parse(const void *arg) {
     return parsed;
 }
 
-char *signed_long_int_parse(const void *arg) {
-    return long_int_parse(arg);
-}
+char *signed_long_int_parse(const void *arg) { return long_int_parse(arg); }
 
 char *unsigned_long_int_parse(const void *arg) {
     const char value = *(unsigned long int *)arg;
@@ -805,9 +781,7 @@ char *bool_parse(const void *arg) {
     return parsed;
 }
 
-char *char_ptr_parse(const void *arg) {
-    return str_parse(arg);
-}
+char *char_ptr_parse(const void *arg) { return str_parse(arg); }
 
 char *str_parse(const void *arg) {
     const char *value = *(char **)arg;
@@ -823,9 +797,7 @@ char *str_parse(const void *arg) {
     return parsed;
 }
 
-char *cstr_parse(const void *arg) {
-    return str_parse(arg);
-}
+char *cstr_parse(const void *arg) { return str_parse(arg); }
 
 char *void_ptr_parse(const void *arg) {
     const char *format = "%p";
@@ -840,35 +812,21 @@ char *void_ptr_parse(const void *arg) {
     return parsed;
 }
 
-char *int8_parse(const void *arg) {
-    return char_parse(arg);
-}
+char *int8_parse(const void *arg) { return char_parse(arg); }
 
-char *int16_parse(const void *arg) {
-    return short_int_parse(arg);
-}
+char *int16_parse(const void *arg) { return short_int_parse(arg); }
 
-char *int32_parse(const void *arg) {
-    return int_parse(arg);
-}
+char *int32_parse(const void *arg) { return int_parse(arg); }
 
 #if __STD_VERSION__ >= 199901L
-char *int64_parse(const void *arg) {
-    return long_long_int_parse(arg);
-}
+char *int64_parse(const void *arg) { return long_long_int_parse(arg); }
 #endif
 
-char *uint8_parse(const void *arg) {
-    return unsigned_char_parse(arg);
-}
+char *uint8_parse(const void *arg) { return unsigned_char_parse(arg); }
 
-char *uint16_parse(const void *arg) {
-    return unsigned_short_int_parse(arg);
-}
+char *uint16_parse(const void *arg) { return unsigned_short_int_parse(arg); }
 
-char *uint32_parse(const void *arg) {
-    return unsigned_int_parse(arg);
-}
+char *uint32_parse(const void *arg) { return unsigned_int_parse(arg); }
 
 #if __STD_VERSION__ >= 199901L
 char *uint64_parse(const void *arg) {
@@ -932,402 +890,220 @@ char *str_trim(char *to_trim, const char *charset) {
     return str_trim_left(str_trim_right(to_trim, charset), charset);
 }
 
-
 void void_ptr_swap(void **n1, void **n2) {
     void *temp = *n1;
     *n1 = *n2;
     *n2 = temp;
 }
 
-struct typetable ttbl_char = {
-    sizeof(char),
-    NULL,
-    NULL,
-    NULL,
-    char_compare,
-    char_print
-};
+struct typetable ttbl_char = {sizeof(char), NULL,         NULL,
+                              NULL,         char_compare, char_print};
 
 struct typetable ttbl_signed_char = {
-    sizeof(signed char),
-    NULL,
-    NULL,
-    NULL,
-    signed_char_compare,
-    signed_char_print
-};
+    sizeof(signed char), NULL, NULL, NULL, signed_char_compare,
+    signed_char_print};
 
 struct typetable ttbl_unsigned_char = {
-    sizeof(unsigned char),
-    NULL,
-    NULL,
-    NULL,
-    unsigned_char_compare,
-    unsigned_char_print
-};
+    sizeof(unsigned char), NULL, NULL, NULL, unsigned_char_compare,
+    unsigned_char_print};
 
 struct typetable ttbl_short_int = {
-    sizeof(short int),
-    NULL,
-    NULL,
-    NULL,
-    short_int_compare,
-    short_int_print
-};
+    sizeof(short int), NULL, NULL, NULL, short_int_compare, short_int_print};
 
 struct typetable ttbl_signed_short_int = {
-    sizeof(signed short int),
-    NULL,
-    NULL,
-    NULL,
-    signed_int_compare,
-    signed_int_print
-};
+    sizeof(signed short int), NULL, NULL, NULL, signed_int_compare,
+    signed_int_print};
 
 struct typetable ttbl_unsigned_short_int = {
-    sizeof(unsigned short int),
-    NULL,
-    NULL,
-    NULL,
-    unsigned_int_compare,
-    unsigned_int_print
-};
+    sizeof(unsigned short int), NULL, NULL, NULL, unsigned_int_compare,
+    unsigned_int_print};
 
-struct typetable ttbl_int = {
-    sizeof(int),
-    NULL,
-    NULL,
-    NULL,
-    int_compare,
-    int_print
-};
+struct typetable ttbl_int = {sizeof(int), NULL,        NULL,
+                             NULL,        int_compare, int_print};
 
 struct typetable ttbl_signed_int = {
-    sizeof(signed int),
-    NULL,
-    NULL,
-    NULL,
-    signed_int_compare,
-    signed_int_print
-};
+    sizeof(signed int), NULL, NULL, NULL, signed_int_compare, signed_int_print};
 
 struct typetable ttbl_unsigned_int = {
-    sizeof(unsigned int),
-    NULL,
-    NULL,
-    NULL,
-    unsigned_int_compare,
-    unsigned_int_print
-};
+    sizeof(unsigned int), NULL, NULL, NULL, unsigned_int_compare,
+    unsigned_int_print};
 
-struct typetable ttbl_long_int = {
-    sizeof(long int),
-    NULL,
-    NULL,
-    NULL,
-    long_int_compare,
-    long_int_print
-};
+struct typetable ttbl_long_int = {sizeof(long int), NULL,          NULL, NULL,
+                                  long_int_compare, long_int_print};
 
 struct typetable ttbl_signed_long_int = {
-    sizeof(signed long int),
-    NULL,
-    NULL,
-    NULL,
-    signed_long_int_compare,
-    signed_long_int_print
-};
+    sizeof(signed long int), NULL, NULL, NULL, signed_long_int_compare,
+    signed_long_int_print};
 
 struct typetable ttbl_unsigned_long_int = {
-    sizeof(unsigned long int),
-    NULL,
-    NULL,
-    NULL,
-    unsigned_long_int_compare,
-    unsigned_long_int_print
-};
+    sizeof(unsigned long int), NULL, NULL, NULL, unsigned_long_int_compare,
+    unsigned_long_int_print};
 
 #if __STD_VERSION__ >= 199901L
 struct typetable ttbl_long_long_int = {
-    sizeof(long long int),
-    NULL,
-    NULL,
-    NULL,
-    long_long_int_compare,
-    long_long_int_print
-};
+    sizeof(long long int), NULL, NULL, NULL, long_long_int_compare,
+    long_long_int_print};
 
-struct typetable ttbl_signed_long_long_int = {
-    sizeof(signed long long int),
-    NULL,
-    NULL,
-    NULL,
-    signed_long_long_int_compare,
-    signed_long_long_int_print
-};
+struct typetable ttbl_signed_long_long_int = {sizeof(signed long long int),
+                                              NULL,
+                                              NULL,
+                                              NULL,
+                                              signed_long_long_int_compare,
+                                              signed_long_long_int_print};
 
-struct typetable ttbl_unsigned_long_long_int = {
-    sizeof(unsigned long long int),
-    NULL,
-    NULL,
-    NULL,
-    unsigned_long_long_int_compare,
-    unsigned_long_long_int_print
-};
+struct typetable ttbl_unsigned_long_long_int = {sizeof(unsigned long long int),
+                                                NULL,
+                                                NULL,
+                                                NULL,
+                                                unsigned_long_long_int_compare,
+                                                unsigned_long_long_int_print};
 #endif
 
-struct typetable ttbl_float = {
-    sizeof(float),
-    NULL,
-    NULL,
-    NULL,
-    float_compare,
-    float_print
-};
+struct typetable ttbl_float = {sizeof(float), NULL,          NULL,
+                               NULL,          float_compare, float_print};
 
-struct typetable ttbl_double = {
-    sizeof(double),
-    NULL,
-    NULL,
-    NULL,
-    double_compare,
-    double_print
-};
+struct typetable ttbl_double = {sizeof(double), NULL,           NULL,
+                                NULL,           double_compare, double_print};
 
 struct typetable ttbl_long_double = {
-    sizeof(long double),
-    NULL,
-    NULL,
-    NULL,
-    long_double_compare,
-    long_double_print
-};
+    sizeof(long double), NULL, NULL, NULL, long_double_compare,
+    long_double_print};
 
-struct typetable ttbl_bool = {
-    sizeof(bool),
-    NULL,
-    NULL,
-    NULL,
-    bool_compare,
-    bool_print
-};
+struct typetable ttbl_bool = {sizeof(bool), NULL,         NULL,
+                              NULL,         bool_compare, bool_print};
 
-struct typetable ttbl_char_ptr = {
-    sizeof(char *),
-    NULL,
-    NULL,
-    NULL,
-    char_ptr_compare,
-    char_ptr_print
-};
+struct typetable ttbl_char_ptr = {sizeof(char *),   NULL,          NULL, NULL,
+                                  char_ptr_compare, char_ptr_print};
 
-struct typetable ttbl_str = {
-    sizeof(char *),
-    str_copy,
-    str_dtor,
-    str_swap,
-    str_compare,
-    str_print
-};
+struct typetable ttbl_str = {sizeof(char *), str_copy,    str_dtor,
+                             str_swap,       str_compare, str_print};
 
 struct typetable ttbl_str_ignore_case = {
-    sizeof(char *),
-    str_copy,
-    str_dtor,
-    str_swap,
-    str_compare_ignore_case,
-    str_print
-};
+    sizeof(char *),          str_copy, str_dtor, str_swap,
+    str_compare_ignore_case, str_print};
 
-struct typetable ttbl_cstr = {
-    sizeof(char *),
-    NULL,
-    NULL,
-    cstr_swap,
-    cstr_compare,
-    cstr_print
-};
+struct typetable ttbl_cstr = {sizeof(char *), NULL,         NULL,
+                              cstr_swap,      cstr_compare, cstr_print};
 
 struct typetable ttbl_cstr_ignore_case = {
-    sizeof(char *),
-    NULL,
-    NULL,
-    cstr_swap,
-    cstr_compare_ignore_case,
-    cstr_print
-};
+    sizeof(char *),           NULL,      NULL, cstr_swap,
+    cstr_compare_ignore_case, cstr_print};
 
-struct typetable ttbl_cstr_strdup = {
-    sizeof(char *),
-    cstr_copy,
-    cstr_dtor,
-    cstr_swap,
-    cstr_compare,
-    cstr_print
-};
+struct typetable ttbl_cstr_strdup = {sizeof(char *), cstr_copy,    cstr_dtor,
+                                     cstr_swap,      cstr_compare, cstr_print};
 
 struct typetable ttbl_cstr_ignore_case_strdup = {
-    sizeof(char *),
-    cstr_copy,
-    cstr_dtor,
-    cstr_swap,
-    cstr_compare_ignore_case,
-    cstr_print
-};
+    sizeof(char *),           cstr_copy, cstr_dtor, cstr_swap,
+    cstr_compare_ignore_case, cstr_print};
 
-struct typetable ttbl_void_ptr = {
-    sizeof(void *),
-    NULL,
-    void_ptr_dtor,
-    NULL,
-    void_ptr_compare,
-    void_ptr_print
-};
+struct typetable ttbl_void_ptr = {sizeof(void *),   NULL,
+                                  void_ptr_dtor,    NULL,
+                                  void_ptr_compare, void_ptr_print};
 
-struct typetable ttbl_int8 = {
-    sizeof(char),
-    NULL,
-    NULL,
-    NULL,
-    char_compare,
-    char_print
-};
+struct typetable ttbl_int8 = {sizeof(char), NULL,         NULL,
+                              NULL,         char_compare, char_print};
 
-struct typetable ttbl_int16 = {
-    sizeof(short int),
-    NULL,
-    NULL,
-    NULL,
-    short_int_compare,
-    short_int_print
-};
+struct typetable ttbl_int16 = {sizeof(short int), NULL,           NULL, NULL,
+                               short_int_compare, short_int_print};
 
-struct typetable ttbl_int32 = {
-    sizeof(int),
-    NULL,
-    NULL,
-    NULL,
-    int_compare,
-    int_print
-};
+struct typetable ttbl_int32 = {sizeof(int), NULL,        NULL,
+                               NULL,        int_compare, int_print};
 
 #if __STD_VERSION__ >= 199901L
 struct typetable ttbl_int64 = {
-    sizeof(long long int),
-    NULL,
-    NULL,
-    NULL,
-    long_long_int_compare,
-    long_long_int_print
-};
+    sizeof(long long int), NULL, NULL, NULL, long_long_int_compare,
+    long_long_int_print};
 #endif
 
 struct typetable ttbl_uint8 = {
-    sizeof(unsigned char),
-    NULL,
-    NULL,
-    NULL,
-    unsigned_char_compare,
-    unsigned_char_print
-};
+    sizeof(unsigned char), NULL, NULL, NULL, unsigned_char_compare,
+    unsigned_char_print};
 
 struct typetable ttbl_uint16 = {
-    sizeof(unsigned short int),
-    NULL,
-    NULL,
-    NULL,
-    unsigned_int_compare,
-    unsigned_int_print
-};
+    sizeof(unsigned short int), NULL, NULL, NULL, unsigned_int_compare,
+    unsigned_int_print};
 
 struct typetable ttbl_uint32 = {
-    sizeof(unsigned int),
-    NULL,
-    NULL,
-    NULL,
-    unsigned_int_compare,
-    unsigned_int_print
-};
+    sizeof(unsigned int), NULL, NULL, NULL, unsigned_int_compare,
+    unsigned_int_print};
 
 #if __STD_VERSION__ >= 199901L
-struct typetable ttbl_uint64 = {
-    sizeof(unsigned long long int),
-    NULL,
-    NULL,
-    NULL,
-    unsigned_long_long_int_compare,
-    unsigned_long_long_int_print
-};
+struct typetable ttbl_uint64 = {sizeof(unsigned long long int),
+                                NULL,
+                                NULL,
+                                NULL,
+                                unsigned_long_long_int_compare,
+                                unsigned_long_long_int_print};
 #endif
 
-struct typetable *_char_                   = &ttbl_char;
-struct typetable *_signed_char_            = &ttbl_signed_char;
-struct typetable *_unsigned_char_          = &ttbl_unsigned_char;
+struct typetable *_char_ = &ttbl_char;
+struct typetable *_signed_char_ = &ttbl_signed_char;
+struct typetable *_unsigned_char_ = &ttbl_unsigned_char;
 
-struct typetable *_short_int_              = &ttbl_short_int;
-struct typetable *_signed_short_int_       = &ttbl_signed_short_int;
-struct typetable *_unsigned_short_int_     = &ttbl_unsigned_short_int;
+struct typetable *_short_int_ = &ttbl_short_int;
+struct typetable *_signed_short_int_ = &ttbl_signed_short_int;
+struct typetable *_unsigned_short_int_ = &ttbl_unsigned_short_int;
 
-struct typetable *_int_                    = &ttbl_int;
-struct typetable *_signed_int_             = &ttbl_signed_int;
-struct typetable *_unsigned_int_           = &ttbl_unsigned_int;
+struct typetable *_int_ = &ttbl_int;
+struct typetable *_signed_int_ = &ttbl_signed_int;
+struct typetable *_unsigned_int_ = &ttbl_unsigned_int;
 
-struct typetable *_long_int_               = &ttbl_long_int;
-struct typetable *_signed_long_int_        = &ttbl_signed_long_int;
-struct typetable *_unsigned_long_int_      = &ttbl_unsigned_long_int;
+struct typetable *_long_int_ = &ttbl_long_int;
+struct typetable *_signed_long_int_ = &ttbl_signed_long_int;
+struct typetable *_unsigned_long_int_ = &ttbl_unsigned_long_int;
 
 #if __STD_VERSION__ >= 199901L
-struct typetable *_long_long_int_          = &ttbl_long_long_int;
-struct typetable *_signed_long_long_int_   = &ttbl_signed_long_long_int;
+struct typetable *_long_long_int_ = &ttbl_long_long_int;
+struct typetable *_signed_long_long_int_ = &ttbl_signed_long_long_int;
 struct typetable *_unsigned_long_long_int_ = &ttbl_unsigned_long_long_int;
 #endif
 
-struct typetable *_float_                  = &ttbl_float;
-struct typetable *_double_                 = &ttbl_double;
-struct typetable *_long_double_            = &ttbl_long_double;
+struct typetable *_float_ = &ttbl_float;
+struct typetable *_double_ = &ttbl_double;
+struct typetable *_long_double_ = &ttbl_long_double;
 
-struct typetable *_bool_                   = &ttbl_bool;
+struct typetable *_bool_ = &ttbl_bool;
 
-struct typetable *_char_ptr_               = &ttbl_char_ptr;
+struct typetable *_char_ptr_ = &ttbl_char_ptr;
 
-struct typetable *_str_                    = &ttbl_str;
-struct typetable *_str_ignore_case_        = &ttbl_str_ignore_case;
+struct typetable *_str_ = &ttbl_str;
+struct typetable *_str_ignore_case_ = &ttbl_str_ignore_case;
 
-struct typetable *_cstr_                   = &ttbl_cstr;
-struct typetable *_cstr_ignore_case_       = &ttbl_cstr_ignore_case;
-struct typetable *_cstr_strdup_            = &ttbl_cstr_strdup;
-struct typetable *_cstr_ignore_case_strdup_= &ttbl_cstr_ignore_case_strdup;
+struct typetable *_cstr_ = &ttbl_cstr;
+struct typetable *_cstr_ignore_case_ = &ttbl_cstr_ignore_case;
+struct typetable *_cstr_strdup_ = &ttbl_cstr_strdup;
+struct typetable *_cstr_ignore_case_strdup_ = &ttbl_cstr_ignore_case_strdup;
 
-struct typetable *_void_ptr_               = &ttbl_void_ptr;
+struct typetable *_void_ptr_ = &ttbl_void_ptr;
 
-struct typetable *_int8_                   = &ttbl_int8;
-struct typetable *_int8_t_                 = &ttbl_int8;
-struct typetable *_int16_                  = &ttbl_int16;
-struct typetable *_int16_t_                = &ttbl_int16;
-struct typetable *_int32_                  = &ttbl_int32;
-struct typetable *_int32_t_                = &ttbl_int32;
+struct typetable *_int8_ = &ttbl_int8;
+struct typetable *_int8_t_ = &ttbl_int8;
+struct typetable *_int16_ = &ttbl_int16;
+struct typetable *_int16_t_ = &ttbl_int16;
+struct typetable *_int32_ = &ttbl_int32;
+struct typetable *_int32_t_ = &ttbl_int32;
 
 #if __STD_VERSION__ >= 199901L
-struct typetable *_int64_                  = &ttbl_int64;
-struct typetable *_int64_t_                = &ttbl_int64;
+struct typetable *_int64_ = &ttbl_int64;
+struct typetable *_int64_t_ = &ttbl_int64;
 #endif
 
-struct typetable *_uint8_                  = &ttbl_uint8;
-struct typetable *_uint8_t_                = &ttbl_uint8;
-struct typetable *_uint16_                 = &ttbl_uint16;
-struct typetable *_uint16_t_               = &ttbl_uint16;
-struct typetable *_uint32_                 = &ttbl_uint32;
-struct typetable *_uint32_t_               = &ttbl_uint32;
+struct typetable *_uint8_ = &ttbl_uint8;
+struct typetable *_uint8_t_ = &ttbl_uint8;
+struct typetable *_uint16_ = &ttbl_uint16;
+struct typetable *_uint16_t_ = &ttbl_uint16;
+struct typetable *_uint32_ = &ttbl_uint32;
+struct typetable *_uint32_t_ = &ttbl_uint32;
 
 #if __STD_VERSION__ >= 199901L
-struct typetable *_uint64_                 = &ttbl_uint64;
-struct typetable *_uint64_t_               = &ttbl_uint64;
+struct typetable *_uint64_ = &ttbl_uint64;
+struct typetable *_uint64_t_ = &ttbl_uint64;
 #endif
 
 struct typetable *_pthread_t_ = NULL;
 
-bool ulog_disable[] = { false, false, false, false, false };
-bool ulog_attrs_disable[] = { false, false, false, false, false, false, false };
+bool ulog_disable[] = {false, false, false, false, false};
+bool ulog_attrs_disable[] = {false, false, false, false, false, false, false};
 
 /**
  *  Utility function for debugging/error messages
@@ -1341,12 +1117,8 @@ bool ulog_attrs_disable[] = { false, false, false, false, false, false, false };
  *
  *  @return         character count of buffer (from fprintf)
  */
-int ulog(FILE *dest,
-         const char *level,
-         const char *file,
-         const char *func,
-         long double line,
-         const char *fmt, ...) {
+int ulog(FILE *dest, const char *level, const char *file, const char *func,
+         long double line, const char *fmt, ...) {
 
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
     char temp[256];
@@ -1357,18 +1129,16 @@ int ulog(FILE *dest,
     bool found = false;
     bool is_integer = false;
     bool is_currency = *file == '$';
-    
+
     int j = 0;
 
-    if (ulog_disable[ALL] || (ulog_attrs_disable[DATE]
-                              && ulog_attrs_disable[TIME]
-                              && ulog_attrs_disable[LEVEL]
-                              && ulog_attrs_disable[FILENAME]
-                              && ulog_attrs_disable[LINE]
-                              && ulog_attrs_disable[FUNCTION]
-                              && ulog_attrs_disable[MESSAGE])
-        || dest == NULL || level == NULL || file == NULL || func == NULL
-        || line == -666 || fmt == NULL) {
+    if (ulog_disable[ALL] ||
+        (ulog_attrs_disable[DATE] && ulog_attrs_disable[TIME] &&
+         ulog_attrs_disable[LEVEL] && ulog_attrs_disable[FILENAME] &&
+         ulog_attrs_disable[LINE] && ulog_attrs_disable[FUNCTION] &&
+         ulog_attrs_disable[MESSAGE]) ||
+        dest == NULL || level == NULL || file == NULL || func == NULL ||
+        line == -666 || fmt == NULL) {
         return 0;
     }
 
@@ -1419,11 +1189,11 @@ int ulog(FILE *dest,
 
     /* char digit = strchr(temp, '.'); */
 
-    #if __STD_VERSION__ >= 199901L
+#if __STD_VERSION__ >= 199901L
     is_integer = line / (long long int)(line) == 1.000000 || line == 0.00000;
-    #else
+#else
     is_integer = line / (long int)(line) == 1.000000 || line == 0.00000;
-    #endif
+#endif
 
     is_integer = is_currency ? false : is_integer;
 
@@ -1448,22 +1218,21 @@ int ulog(FILE *dest,
         j += sprintf(buffer + j, "%s", leveltype);
     }
 
-    if (ulog_attrs_disable[FILENAME] == false
-        && ulog_attrs_disable[LINE]) {
+    if (ulog_attrs_disable[FILENAME] == false && ulog_attrs_disable[LINE]) {
         char filename[1024];
         sprintf(filename, "[%s] ", file);
 
         j += sprintf(buffer + j, "%s", filename);
-    } else if (ulog_attrs_disable[FILENAME]
-               && ulog_attrs_disable[LINE] == false) {
+    } else if (ulog_attrs_disable[FILENAME] &&
+               ulog_attrs_disable[LINE] == false) {
         char linenumber[1024];
 
         if (is_integer) {
-            #if __STD_VERSION__ >= 199901L
+#if __STD_VERSION__ >= 199901L
             sprintf(linenumber, "[%lli] ", (long long int)(line));
-            #else
+#else
             sprintf(linenumber, "[%li] ", (long int)(line));
-            #endif
+#endif
         } else {
             if (is_currency) {
                 sprintf(linenumber, "[%0.2Lf] ", line);
@@ -1473,16 +1242,16 @@ int ulog(FILE *dest,
         }
 
         j += sprintf(buffer + j, "%s", linenumber);
-    } else if (ulog_attrs_disable[FILENAME] == false
-               && ulog_attrs_disable[LINE] == false) {
+    } else if (ulog_attrs_disable[FILENAME] == false &&
+               ulog_attrs_disable[LINE] == false) {
         char fileline[1024];
 
         if (is_integer) {
-            #if __STD_VERSION__ >= 199901L
+#if __STD_VERSION__ >= 199901L
             sprintf(fileline, "[%s:%lli] ", file, (long long int)(line));
-            #else
+#else
             sprintf(fileline, "[%s:%li] ", file, (long int)(line));
-            #endif
+#endif
         } else {
             if (is_currency) {
                 sprintf(fileline, "[%s%0.2Lf] ", file, line);
@@ -1501,8 +1270,8 @@ int ulog(FILE *dest,
         j += sprintf(buffer + j, "%s", function);
     }
 
-    if (ulog_attrs_disable[FUNCTION] == false
-        && ulog_attrs_disable[MESSAGE] == false) {
+    if (ulog_attrs_disable[FUNCTION] == false &&
+        ulog_attrs_disable[MESSAGE] == false) {
         j += sprintf(buffer + j, "%s", ": ");
     }
 

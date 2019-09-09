@@ -53,7 +53,9 @@ typedef struct list_node *          list_node_ptr;
 typedef struct list_node **         list_node_dptr;
 
 struct list_node {
-    struct list_node_base link;
+    struct list_node *next;
+    struct list_node *prev;
+
     void *data;
 };
 
@@ -84,8 +86,8 @@ list *l_newmove(list **l);
 void l_delete(list **l);
 
 /**< list: iterator functions */
-iterator *l_begin(list *l);
-iterator *l_end(list *l);
+iterator l_begin(list *l);
+iterator l_end(list *l);
 
 /**< list: length functions */
 size_t l_size(list *l);
@@ -116,15 +118,15 @@ void l_pushb(list *l, const void *valaddr);
 void l_popb(list *l);
 
 /**< list: modifiers - insertion */
-iterator *l_insert(list *l, iterator *pos, const void *valaddr);
+iterator l_insert(list *l, iterator *pos, const void *valaddr);
 
-iterator *l_insertfill(list *l, iterator *pos, size_t n, const void *valaddr);
+iterator l_insertfill(list *l, iterator *pos, size_t n, const void *valaddr);
 
-iterator *l_insertrnge(list *l, iterator *pos, iterator *first, iterator *last);
+iterator l_insertrnge(list *l, iterator *pos, iterator *first, iterator *last);
 
 /**< list: modifiers - erasure */
-iterator *l_erase(list *l, iterator *pos);
-iterator *l_erasernge(list *l, iterator *pos, iterator *last);
+iterator l_erase(list *l, iterator *pos);
+iterator l_erasernge(list *l, iterator *pos, iterator *last);
 
 /**< list: container swappage */
 void l_swap(list **l, list **other);
@@ -141,9 +143,9 @@ void l_replace_at(list *l, size_t index, const void *valaddr);
 void l_swap_elem(list *l, size_t n1, size_t n2);
 
 /**< list: splice */
-iterator *l_splice(list *l, iterator *pos, list *other, iterator *opos);
-iterator *l_splicelist(list *l, iterator *pos, list *other);
-iterator *l_splicernge(list *l, iterator *pos, list *other, iterator *first,
+iterator l_splice(list *l, iterator *pos, list *other, iterator *opos);
+iterator l_splicelist(list *l, iterator *pos, list *other);
+iterator l_splicernge(list *l, iterator *pos, list *other, iterator *first,
                        iterator *last);
 
 /**< list: element removal by search */
@@ -189,15 +191,15 @@ int list_compare(const void *c1, const void *c2);
 void list_print(const void *arg, FILE *dest);
 
 /**< list: change typetable */
-void l_set_ttbl(list *v, struct typetable *ttbl);
+void l_set_ttbl(list *l, struct typetable *ttbl);
 
 /**< list: retrieve width/copy/dtor/swap/compare/print/typetable */
-size_t l_get_width(list *v);
-copy_fn l_get_copy(list *v);
-dtor_fn l_get_dtor(list *v);
-swap_fn l_get_swap(list *v);
-compare_fn l_get_compare(list *v);
-print_fn l_get_print(list *v);
-struct typetable *l_get_ttbl(list *v);
+size_t l_get_width(list *l);
+copy_fn l_get_copy(list *l);
+dtor_fn l_get_dtor(list *l);
+swap_fn l_get_swap(list *l);
+compare_fn l_get_compare(list *l);
+print_fn l_get_print(list *l);
+struct typetable *l_get_ttbl(list *l);
 
 #endif /* LIST_H */

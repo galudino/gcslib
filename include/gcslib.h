@@ -82,7 +82,7 @@
  *      iterator
  *      mergesort
  */
-/* #include "list.h" */
+#include "list.h"
 
 /**
  *  Dependencies:
