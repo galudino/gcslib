@@ -141,7 +141,7 @@ list *l_newfill(struct typetable *ttbl, size_t n, void *valaddr) {
     return l;
 }
 
-list *l_newrnge(iterator *first, iterator *last) { 
+list *l_newrnge(iterator first, iterator last) { 
     /* TODO */
     return 0;
 }
@@ -218,7 +218,7 @@ const void *l_back_const(list *l) {
     return l->impl.node.prev->data;
 }
 
-void l_assignrnge(list *l, iterator *first, iterator *last) { 
+void l_assignrnge(list *l, iterator first, iterator last) { 
     /* TODO */
 
 }
@@ -244,18 +244,15 @@ void l_popf(list *l) {
 
     node = l->impl.node.next;
 
-    if (l->ttbl->dtor) {
-        l->ttbl->dtor(node->data);
-    }
-
     ln_unhook(node);
+    ln_delete(&node, l->ttbl);
 }
 
 void l_pushb(list *l, const void *valaddr) { 
     list_node *new_node = NULL;
 
     assert(l);
-
+    
     new_node = ln_new(l->ttbl, valaddr);
     /* &(l->impl.node) is one node past the last elem. */
     ln_hook(new_node, &(l->impl.node));
@@ -267,21 +264,24 @@ void l_popb(list *l) {
 
     node = l->impl.node.prev;
 
-    if (l->ttbl->dtor) {
-        l->ttbl->dtor(node->data);
-    }
-
     ln_unhook(node);
+    ln_delete(&node, l->ttbl);
 }
 
-iterator l_insert(list *l, iterator *pos, const void *valaddr) { 
-    /* TODO */
-    iterator it;
+iterator l_insert(list *l, iterator pos, const void *valaddr) {
+    list_node *new_node = NULL;
+    size_t ipos = 0;
 
-    return it;
+    assert(l);
+
+    new_node = ln_new(l->ttbl, valaddr);
+    ipos = it_distance(NULL, &pos);
+    ln_hook(new_node, pos.curr);
+
+    return it_next_n(l_begin(l), ipos);
 }
 
-iterator l_insertfill(list *l, iterator *pos, size_t n,
+iterator l_insertfill(list *l, iterator pos, size_t n,
                        const void *valaddr) { 
     /* TODO */
     iterator it;
@@ -289,8 +289,8 @@ iterator l_insertfill(list *l, iterator *pos, size_t n,
     return it;
 }
 
-iterator l_insertrnge(list *l, iterator *pos, iterator *first,
-                       iterator *last) { 
+iterator l_insertrnge(list *l, iterator pos, iterator first,
+                       iterator last) { 
     /* TODO */
     iterator it;
 
@@ -298,14 +298,22 @@ iterator l_insertrnge(list *l, iterator *pos, iterator *first,
     return it;
 }
 
-iterator l_erase(list *l, iterator *pos) { 
-    /* TODO */
-    iterator it;
+iterator l_erase(list *l, iterator pos) { 
+    list_node *node = NULL;
+    int ipos = 0;
 
-    return it;
+    assert(l);
+
+    node = pos.curr;
+    ipos = it_distance(NULL, &pos);
+
+    ln_unhook(pos.curr);
+    ln_delete(&node, l->ttbl);
+
+    return it_next_n(l_begin(l), ipos);
 }
 
-iterator l_erasernge(list *l, iterator *pos, iterator *last) { 
+iterator l_erasernge(list *l, iterator pos, iterator last) { 
     /* TODO */
     iterator it;
 
@@ -354,23 +362,23 @@ void l_swap_elem(list *l, size_t n1, size_t n2) {
 
 }
 
-iterator l_splice(list *l, iterator *pos, list *other,
-                   iterator *opos) { 
+iterator l_splice(list *l, iterator pos, list *other,
+                   iterator opos) { 
     /* TODO */
     iterator it;
 
     return it;
 }
 
-iterator l_splicelist(list *l, iterator *pos, list *other) { 
+iterator l_splicelist(list *l, iterator pos, list *other) { 
     /* TODO */
     iterator it;
 
     return it;
 }
 
-iterator l_splicernge(list *l, iterator *pos, list *other, iterator *first,
-                       iterator *last) { 
+iterator l_splicernge(list *l, iterator pos, list *other, iterator first,
+                       iterator last) { 
     /* TODO */
     iterator it;
 
@@ -826,6 +834,7 @@ static void l_init(list *l, struct typetable *ttbl) {
 
     l->impl.node.next = &(l->impl.node);
     l->impl.node.prev = &(l->impl.node);
+    l->impl.node.data = NULL;
 
     l->ttbl = ttbl ? ttbl : _void_ptr_;
 
@@ -1030,10 +1039,8 @@ static iterator *li_incr(iterator *it) {
 
     assert(it);
 
-    l = (list *)(it->container);
-
     if (it->curr == &(l->impl.node)) {
-        ERROR(__FILE__, "Cannot increment - already at end.");
+        ERROR(__FILE__, "Cannot decrement - already at end.");
     } else {
         it->curr = ((list_node *)(it->curr))->next;
     }
@@ -1057,7 +1064,10 @@ static iterator *li_decr(iterator *it) {
     return it;
 }
 
-static void *li_curr(iterator it) { return it.curr; }
+static void *li_curr(iterator it) {
+    list_node *n = it.curr;
+    return n->data;
+}
 
 static void *li_start(iterator it) {
     list *l = (list *)(it.container);
@@ -1071,12 +1081,12 @@ static void *li_finish(iterator it) {
 
 static bool li_has_next(iterator it) {
     list *l = (list *)(it.container);
-    return it.curr != l->impl.node.data;
+    return it.curr != &(l->impl.node);
 }
 
 static bool li_has_prev(iterator it) {
     list *l = (list *)(it.container);
-    return it.curr != l->impl.node.next->data;
+    return it.curr != &(l->impl.node);
 }
 
 static struct typetable *li_get_ttbl(void *arg) {
