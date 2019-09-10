@@ -1308,3 +1308,89 @@ ptrdiff_t ptr_distance(const void *beg, const void *end, size_t width) {
 
     return ((finish - start) / width);
 }
+
+void lnb_swap(list_node_base *x, list_node_base *y) {
+    if (x->next != x) {
+        if (y->next != y) {
+            /* Both x and y are not empty. */
+            list_node_base *tmp_x_next = x->next;
+            list_node_base *tmp_x_prev = x->prev;
+
+            /* swap(x->next, y->next) */
+            x->next = y->next;
+            y->next = tmp_x_next;
+
+            /* swap(x->prev, y->prev) */
+            x->prev = y->prev;
+            y->prev = tmp_x_prev;
+        } else {
+            /* x is not empty, y is empty. */
+            y->next = x->next;
+            y->prev = x->prev;
+
+            y->next->prev = y;
+            y->prev->next = y;
+
+            x->next = x;
+            x->prev = x;
+        }
+    } else if (y->next != y) {
+        /* x is empty, y is not empty. */
+    }
+}
+
+void lnb_transfer(list_node_base *n, list_node_base *first, list_node_base *last) {
+    if (n != last) {
+        /* Remove [first, last) from its old position. */
+        last->prev->next = n;
+        first->prev->next = last;
+        n->prev->next = first;
+
+        /* Splice [first, last) into its new position. */
+        {
+            list_node_base *tmp_n_prev = n->prev;
+            n->prev = last->prev;
+            last->prev = first->prev;
+            first->prev = tmp_n_prev;
+        }
+    }
+}
+
+void lnb_reverse(list_node_base *n) {
+    list_node_base *tmp = n;
+    do {
+        /* swap(tmp->next, tmp->prev) */
+        list_node_base *tmp_next = tmp->next;
+        tmp->next = tmp->prev;
+        tmp->prev = tmp_next;
+
+        tmp = tmp->prev;
+    } while (tmp != n);
+}
+
+void lnb_hook(list_node_base *n, list_node_base *position) {
+    n->next = position;
+    n->prev = position->prev;
+
+    position->prev->next = n;
+    position->prev = n;
+}
+
+void lnb_unhook(list_node_base *n) {
+    list_node_base *next_node = n->next;
+    list_node_base *prev_node = n->prev;
+
+    prev_node->next = next_node;
+    next_node->prev = prev_node;
+}
+
+size_t lnb_distance(list_node_base *pos, list_node_base *end) {
+    size_t count = 0;
+
+    while (pos != end) {
+        ++count;
+        pos = pos->next;
+    }
+
+    return count;
+}

@@ -95,7 +95,7 @@ int main(int argc, const char *argv[]) {
     
     it = l_erase(l, it_next_n(l_begin(l), 5));
     it = l_erase(l, it);
-    
+
     printf("\nfront: %d\n", *(int *)(l_front(l)));
     printf("back: %d\n", *(int *)(l_back(l)));
 

@@ -51,7 +51,7 @@ static void ln_transfer(list_node *n, list_node *first, list_node *last);
 static void ln_reverse(list_node *n);
 static void ln_hook(list_node *n, list_node *position);
 static void ln_unhook(list_node *n);
-static size_t ln_distance(list_node *pos, list_node *end);
+/* static size_t ln_distance(list_node *pos, list_node *end); */
 
 /**
  *  @struct     list
@@ -63,10 +63,7 @@ static size_t ln_distance(list_node *pos, list_node *end);
  *  This is done to enforce encapsulation.
  */
 struct list {
-    struct list_base {
-        struct list_node node;
-    } impl;
-
+    struct list_node impl;
     struct typetable *ttbl;
 };
 
@@ -179,7 +176,7 @@ size_t l_size(list *l) {
     if (l->impl.node.next == NULL) {
         return 0;
     } else {
-        return ln_distance(l->impl.node.next, &(l->impl.node));
+        return lnb_distance(l->impl.node.next, &(l->impl.node));
     }
 }
 
@@ -200,22 +197,150 @@ bool l_empty(list *l) {
 
 void *l_front(list *l) { 
     assert(l);
-    return l->impl.node.next->data;
+    /**
+     *  Note that the address of an object
+     *  (instance of a struct)
+     *  is the same address as that
+     *  of said object's first field.
+     * 
+     *  l->impl.node.next is a (list_node_base *),
+     *  which is the head pointer of list.
+     *  
+     *  The object, named node, that houses list_node_base
+     *  is of type list_node.
+     * 
+     *  (&l->impl.node.next) is a (list_node_base **).
+     *  We can typecast (list_node_base **) to (list_node **),
+     *  like this:
+     *  (list_node **)(&l->impl.node.next);
+     *  and dereference it like this:
+     *  *(list_node **)(&l->impl.node.next);
+     *  to yield:
+     *  list_node *n = *(list_node **)(&l->impl.node.next);
+     * 
+     *  Now, we can access n's data field, via n->data.
+     * 
+     *  At the client level, l_front returns a (TYPENAME *).
+     * 
+     *  Retrieve a (TYPENAME *) like this:
+     *  TYPENAME *valaddr = (TYPENAME *)(l_front(l));
+     *  Retrieve a (TYPENAME) like this:
+     *  TYPENAME val = (*valaddr);
+     *  or
+     *  TYPENAME val = *(TYPENAME *)(l_front(l));
+     */
+    return (*(list_node **)(&l->impl.node.next))->data;
 }
 
 void *l_back(list *l) { 
     assert(l);
-    return l->impl.node.prev->data;
+    /**
+     *  Note that the address of an object
+     *  (instance of a struct)
+     *  is the same address as that
+     *  of said object's first field.
+     * 
+     *  l->impl.node.prev is a (list_node_base *),
+     *  which is the tail pointer of list.
+     *  
+     *  The object, named node, that houses list_node_base
+     *  is of type list_node.
+     * 
+     *  (&l->impl.node.prev) is a (list_node_base **).
+     *  We can typecast (list_node_base **) to (list_node **),
+     *  like this:
+     *  (list_node **)(&l->impl.node.prev);
+     *  and dereference it like this:
+     *  *(list_node **)(&l->impl.node.prev);
+     *  to yield:
+     *  list_node *n = *(list_node **)(&l->impl.node.prev);
+     * 
+     *  Now, we can access n's data field, via n->data.
+     * 
+     *  At the client level, l_back returns a (TYPENAME *).
+     * 
+     *  Retrieve a (TYPENAME *) like this:
+     *  TYPENAME *valaddr = (TYPENAME *)(l_back(l));
+     *  Retrieve a (TYPENAME) like this:
+     *  TYPENAME val = (*valaddr);
+     *  or
+     *  TYPENAME val = *(TYPENAME *)(l_back(l));
+     */
+    return (*(list_node **)(&l->impl.node.prev))->data;
 }
 
 const void *l_front_const(list *l) { 
     assert(l);
-    return l->impl.node.next->data;
+    /**
+     *  Note that the address of an object
+     *  (instance of a struct)
+     *  is the same address as that
+     *  of said object's first field.
+     * 
+     *  l->impl.node.next is a (list_node_base *),
+     *  which is the head pointer of list.
+     *  
+     *  The object, named node, that houses list_node_base
+     *  is of type list_node.
+     * 
+     *  (&l->impl.node.next) is a (list_node_base **).
+     *  We can typecast (list_node_base **) to (list_node **),
+     *  like this:
+     *  (list_node **)(&l->impl.node.next);
+     *  and dereference it like this:
+     *  *(list_node **)(&l->impl.node.next);
+     *  to yield:
+     *  list_node *n = *(list_node **)(&l->impl.node.next);
+     * 
+     *  Now, we can access n's data field, via n->data.
+     * 
+     *  At the client level, l_front returns a (TYPENAME *).
+     * 
+     *  Retrieve a (TYPENAME *) like this:
+     *  TYPENAME *valaddr = (TYPENAME *)(l_front(l));
+     *  Retrieve a (TYPENAME) like this:
+     *  TYPENAME val = (*valaddr);
+     *  or
+     *  TYPENAME val = *(TYPENAME *)(l_front(l));
+     */
+    return (*(list_node **)(&l->impl.node.next))->data;
 }
 
 const void *l_back_const(list *l) { 
     assert(l);
-    return l->impl.node.prev->data;
+    /**
+     *  Note that the address of an object
+     *  (instance of a struct)
+     *  is the same address as that
+     *  of said object's first field.
+     * 
+     *  l->impl.node.prev is a (list_node_base *),
+     *  which is the tail pointer of list.
+     *  
+     *  The object, named node, that houses list_node_base
+     *  is of type list_node.
+     * 
+     *  (&l->impl.node.prev) is a (list_node_base **).
+     *  We can typecast (list_node_base **) to (list_node **),
+     *  like this:
+     *  (list_node **)(&l->impl.node.prev);
+     *  and dereference it like this:
+     *  *(list_node **)(&l->impl.node.prev);
+     *  to yield:
+     *  list_node *n = *(list_node **)(&l->impl.node.prev);
+     * 
+     *  Now, we can access n's data field, via n->data.
+     * 
+     *  At the client level, l_back returns a (TYPENAME *).
+     * 
+     *  Retrieve a (TYPENAME *) like this:
+     *  TYPENAME *valaddr = (TYPENAME *)(l_back(l));
+     *  Retrieve a (TYPENAME) like this:
+     *  TYPENAME val = (*valaddr);
+     *  or
+     *  TYPENAME val = *(TYPENAME *)(l_back(l));
+     */
+    return (*(list_node **)(&l->impl.node.prev))->data;
 }
 
 void l_assignrnge(list *l, iterator first, iterator last) { 
@@ -235,16 +360,16 @@ void l_pushf(list *l, const void *valaddr) {
 
     new_node = ln_new(l->ttbl, valaddr);
     /* l->impl.node.next is the head pointer. */
-    ln_hook(new_node, l->impl.node.next);
+    lnb_hook(*(list_node_base **)(&new_node), l->impl.node.next);
 }
 
 void l_popf(list *l) { 
     list_node *node = NULL;
     assert(l);
 
-    node = l->impl.node.next;
-
-    ln_unhook(node);
+    node = *(list_node **)(&l->impl.node.next);
+    
+    lnb_unhook(*(list_node_base **)(&node));
     ln_delete(&node, l->ttbl);
 }
 
@@ -255,16 +380,16 @@ void l_pushb(list *l, const void *valaddr) {
     
     new_node = ln_new(l->ttbl, valaddr);
     /* &(l->impl.node) is one node past the last elem. */
-    ln_hook(new_node, &(l->impl.node));
+    lnb_hook(*(list_node_base **)(&new_node), &(l->impl.node)); 
 }
 
 void l_popb(list *l) { 
     list_node *node = NULL;
     assert(l);
 
-    node = l->impl.node.prev;
+    node = *(list_node **)(&l->impl.node.prev);
 
-    ln_unhook(node);
+    lnb_unhook(*(list_node_base **)(&node));
     ln_delete(&node, l->ttbl);
 }
 
@@ -276,7 +401,7 @@ iterator l_insert(list *l, iterator pos, const void *valaddr) {
 
     new_node = ln_new(l->ttbl, valaddr);
     ipos = it_distance(NULL, &pos);
-    ln_hook(new_node, pos.curr);
+    lnb_hook(*(list_node_base **)(&new_node), pos.curr);
 
     return it_next_n(l_begin(l), ipos);
 }
@@ -307,7 +432,7 @@ iterator l_erase(list *l, iterator pos) {
     node = pos.curr;
     ipos = it_distance(NULL, &pos);
 
-    ln_unhook(pos.curr);
+    lnb_unhook(pos.curr);
     ln_delete(&node, l->ttbl);
 
     return it_next_n(l_begin(l), ipos);
@@ -327,12 +452,12 @@ void l_swap(list **l, list **other) {
 
 void l_clear(list *l) { 
     /* l->impl.node.next is the head node pointer. */
-    list_node *curr = l->impl.node.next;
+    list_node *curr = *(list_node **)(&l->impl.node.next);
 
     /* &(l->impl.node) is the sentinel denoting EOL. */
-    while (curr != &(l->impl.node)) {
+    while (*(list_node_base **)(&curr) != &(l->impl.node)) {
         list_node *temp = curr;
-        curr = curr->next;
+        curr = *(list_node **)(&curr->node.next);
 
         ln_delete(&temp, l->ttbl);
     }
@@ -493,16 +618,16 @@ void l_fputsf(list *l, FILE *dest, const char *before, const char *after,
     if (l->impl.node.next == &(l->impl.node)) {
         fprintf(dest, "%s\n", empty ? empty : "");
     } else {
-        n = l->impl.node.next;
+        n = *(list_node **)(&l->impl.node.next);
         target = n->data;
 
-        while (n != &(l->impl.node)) {
+        while (*(list_node_base **)(&n) != &(l->impl.node)) {
             print(target, dest);
 
             /* address - disable for release */
             fprintf(dest, "\t\t(%s%p%s)", KCYN, target, KNRM);
 
-            if (n->next == &(l->impl.node)) {
+            if (*(list_node_base **)(&n->node.next) == &(l->impl.node)) {
                 fprintf(dest, "%s", postelem ? postelem : "");
             }
 
@@ -511,7 +636,7 @@ void l_fputsf(list *l, FILE *dest, const char *before, const char *after,
                 fprintf(dest, "\n");
             }
 
-            n = n->next;
+            n = *(list_node **)(&n->node.next);
             target = n->data;
 
             ++curr;
@@ -596,17 +721,17 @@ int list_compare(const void *c1, const void *c2) {
 
     size = size1 < size2 ? size1 : size2;
 
-    n1 = lst1->impl.node.next;
+    n1 = *(list_node **)(&lst1->impl.node.next);
     target1 = n1->data;
 
-    n2 = lst2->impl.node.next;
+    n2 = *(list_node **)(&lst2->impl.node.next);
     target2 = n2->data;
 
     for (i = 0; i < size; i++) {
         delta += lst1->ttbl->compare(&target1, &target2);
 
-        n1 = n1->next;
-        n2 = n2->next;
+        n1 = *(list_node **)(&n1->node.next);
+        n2 = *(list_node **)(&n2->node.next);
 
         target1 = n1->data;
         target2 = n2->data;
@@ -683,6 +808,7 @@ static list_node *ln_new(struct typetable *ttbl, const void *valaddr) {
 }
 
 static void ln_init(list_node *n, struct typetable *ttbl, const void *valaddr) {
+    /*
     void *data = NULL;
     struct typetable *table = NULL;
 
@@ -704,9 +830,33 @@ static void ln_init(list_node *n, struct typetable *ttbl, const void *valaddr) {
     } else {
         memcpy(n->data, valaddr, table->width);
     }
+    */
+
+    void *data = NULL;
+    struct typetable *table = NULL;
+
+    assert(n);
+    assert(valaddr);
+
+    n->node.next = NULL;
+    n->node.prev = NULL;
+    n->data = NULL;
+
+    table = ttbl ? ttbl : _void_ptr_;
+
+    data = malloc(table->width);
+    assert(data);
+    n->data = data;
+
+    if (table->copy) {
+        table->copy(n->data, valaddr);
+    } else {
+        memcpy(n->data, valaddr, table->width);
+    }
 }
 
 static void ln_deinit(list_node *n, struct typetable *ttbl) {
+    /*
     struct typetable *table = NULL;
 
     assert(n);
@@ -722,9 +872,27 @@ static void ln_deinit(list_node *n, struct typetable *ttbl) {
 
     n->next = NULL;
     n->prev = NULL;
+    */
+
+    struct typetable *table = NULL;
+
+    assert(n);
+   
+    table = ttbl ? ttbl : _void_ptr_;
+
+    if (table->dtor) {
+        table->dtor(n->data);
+    }
+
+    free(n->data);
+    n->data = NULL;
+
+    n->node.next = NULL;
+    n->node.prev = NULL;
 }
 
 static void ln_delete(list_node **n, struct typetable *ttbl) {
+    /*
     struct typetable *table = NULL;
 
     assert((*n));
@@ -734,92 +902,17 @@ static void ln_delete(list_node **n, struct typetable *ttbl) {
 
     free((*n));
     (*n) = NULL;
-}
+    */
 
-static void ln_swap(list_node *x, list_node *y) {
-    if (x->next != x) {
-        if (y->next != y) {
-            /* Both x and y are not empty. */
-            list_node *tmp_x_next = x->next;
-            list_node *tmp_x_prev = x->prev;
+    struct typetable *table = NULL;
 
-            /* swap(x->next, y->next) */
-            x->next = y->next;
-            y->next = tmp_x_next;
+    assert((*n));
 
-            /* swap(x->prev, y->prev) */
-            x->prev = y->prev;
-            y->prev = tmp_x_prev;
-        } else {
-            /* x is not empty, y is empty. */
-            y->next = x->next;
-            y->prev = x->prev;
+    table = ttbl ? ttbl : _void_ptr_;
+    ln_deinit((*n), table);
 
-            y->next->prev = y;
-            y->prev->next = y;
-
-            x->next = x;
-            x->prev = x;
-        }
-    } else if (y->next != y) {
-        /* x is empty, y is not empty. */
-    }
-}
-
-static void ln_transfer(list_node *n, list_node *first, list_node *last) {
-    if (n != last) {
-        /* Remove [first, last) from its old position. */
-        last->prev->next = n;
-        first->prev->next = last;
-        n->prev->next = first;
-
-        /* Splice [first, last) into its new position. */
-        {
-            list_node *tmp_n_prev = n->prev;
-            n->prev = last->prev;
-            last->prev = first->prev;
-            first->prev = tmp_n_prev;
-        }
-    }
-}
-
-static void ln_reverse(list_node *n) {
-    list_node *tmp = n;
-    do {
-        /* swap(tmp->next, tmp->prev) */
-        list_node *tmp_next = tmp->next;
-        tmp->next = tmp->prev;
-        tmp->prev = tmp_next;
-
-        tmp = tmp->prev;
-    } while (tmp != n);
-}
-
-static void ln_hook(list_node *n, list_node *position) {
-    n->next = position;
-    n->prev = position->prev;
-
-    position->prev->next = n;
-    position->prev = n;
-}
-
-static void ln_unhook(list_node *n) {
-    list_node *next_node = n->next;
-    list_node *prev_node = n->prev;
-
-    prev_node->next = next_node;
-    next_node->prev = prev_node;
-}
-
-static size_t ln_distance(list_node *pos, list_node *end) {
-    size_t count = 0;
-
-    while (pos != end) {
-        ++count;
-        pos = pos->next;
-    }
-
-    return count;
+    free((*n));
+    (*n) = NULL;
 }
 
 static list *l_allocate(void) {
@@ -834,7 +927,7 @@ static void l_init(list *l, struct typetable *ttbl) {
 
     l->impl.node.next = &(l->impl.node);
     l->impl.node.prev = &(l->impl.node);
-    l->impl.node.data = NULL;
+    l->impl.data = NULL;
 
     l->ttbl = ttbl ? ttbl : _void_ptr_;
 
@@ -908,7 +1001,7 @@ static iterator li_next(iterator it) {
     if (iter.curr == &(l->impl.node)) {
         ERROR(__FILE__, "Cannot advance - iterator already at end.");
     } else {
-        iter.curr = ((list_node *)(it.curr))->next;
+        iter.curr = ((list_node *)(iter.curr))->node.next;
     }
 
     return iter;
@@ -925,7 +1018,7 @@ static iterator li_next_n(iterator it, int n) {
     iter.container = l;
     iter.curr = it.curr;
 
-    pos = ln_distance(l->impl.node.next, iter.curr);
+    pos = lnb_distance(l->impl.node.next, iter.curr);
 
     if ((l_size(l) - pos) <= 0) {
         char str[256];
@@ -934,7 +1027,7 @@ static iterator li_next_n(iterator it, int n) {
     } else {
         int i = 0;
         for (i = 0; i < n; i++) {
-            iter.curr = ((list_node *)(iter.curr))->next;
+            iter.curr = ((list_node *)(iter.curr))->node.next;
         }
     }
 
@@ -954,7 +1047,7 @@ static iterator li_prev(iterator it) {
     if (iter.curr == l->impl.node.next) {
         ERROR(__FILE__, "Cannot retract - iterator already at begin.");
     } else {
-        iter.curr = ((list_node *)(it.curr))->prev;
+        iter.curr = ((list_node *)(it.curr))->node.prev;
     }
 
     return iter;
@@ -971,7 +1064,7 @@ static iterator li_prev_n(iterator it, int n) {
     iter.container = l;
     iter.curr = it.curr;
 
-    pos = ln_distance(l->impl.node.next, iter.curr);
+    pos = lnb_distance(l->impl.node.next, iter.curr);
 
     if ((l_size(l) - pos) <= 0) {
         char str[256];
@@ -980,7 +1073,7 @@ static iterator li_prev_n(iterator it, int n) {
     } else {
         int i = 0;
         for (i = 0; i < n; i++) {
-            iter.curr = ((list_node *)(iter.curr))->next;
+            iter.curr = ((list_node *)(iter.curr))->node.next;
         }
     }
 
@@ -992,26 +1085,26 @@ static int li_distance(iterator *first, iterator *last) {
 
     if (first == NULL && last != NULL) {
         l = (list *)(last->container);
-        return (int)(ln_distance(l->impl.node.next, last->curr));
+        return (int)(lnb_distance(l->impl.node.next, last->curr));
     } else if (last == NULL && first != NULL) {
         l = (list *)(first->container);
-        return (int)(ln_distance(l->impl.node.next, first->curr));
+        return (int)(lnb_distance(l->impl.node.next, first->curr));
     } else if (first == NULL && last == NULL) {
         ERROR(__FILE__, "Both iterator first and last are NULL.");
         return 0;
     } else {
         l = (list *)(first->container);
-        return (int)(ln_distance(first->curr, last->curr));
+        return (int)(lnb_distance(first->curr, last->curr));
     }
 }
-
+    
 static iterator *li_advance(iterator *it, int n) {
     list *l = NULL;
     int pos = 0;
 
     assert(it);
 
-    pos = ln_distance(l->impl.node.next, it->curr);
+    pos = lnb_distance(l->impl.node.next, it->curr);
 
     if ((l_size(l) - pos) < 0) {
         char str[256];
@@ -1022,11 +1115,11 @@ static iterator *li_advance(iterator *it, int n) {
 
         if (n > 0) {
             for (i = 0; i < n; i++) {
-                it->curr = ((list_node *)(it->curr))->next;
+                it->curr = ((list_node *)(it->curr))->node.next;
             }
         } else if (n < 0) {
             for (i = 0; i < n; i++) {
-                it->curr = ((list_node *)(it->curr))->prev;
+                it->curr = ((list_node *)(it->curr))->node.prev;
             }
         }
     }
@@ -1042,7 +1135,7 @@ static iterator *li_incr(iterator *it) {
     if (it->curr == &(l->impl.node)) {
         ERROR(__FILE__, "Cannot decrement - already at end.");
     } else {
-        it->curr = ((list_node *)(it->curr))->next;
+        it->curr = ((list_node *)(it->curr))->node.next;
     }
 
     return it;
@@ -1058,7 +1151,7 @@ static iterator *li_decr(iterator *it) {
     if (it->curr == l->impl.node.next) {
         ERROR(__FILE__, "Cannot decrement - already at begin.");
     } else {
-        it->curr = ((list_node *)(it->curr))->prev;
+        it->curr = ((list_node *)(it->curr))->node.prev;
     }
 
     return it;
@@ -1071,12 +1164,16 @@ static void *li_curr(iterator it) {
 
 static void *li_start(iterator it) {
     list *l = (list *)(it.container);
-    return l->impl.node.next->data;
+    list_node_base *nb = l->impl.node.next;
+    list_node *n = *(list_node **)(&nb);
+    return n->data;
 }
 
 static void *li_finish(iterator it) {
     list *l = (list *)(it.container);
-    return l->impl.node.data;
+    list_node_base *nb = l->impl.node.prev;
+    list_node *n = *(list_node **)(&nb);
+    return n->data;
 }
 
 static bool li_has_next(iterator it) {

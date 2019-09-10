@@ -52,10 +52,17 @@ typedef struct list_node            list_node;
 typedef struct list_node *          list_node_ptr;
 typedef struct list_node **         list_node_dptr;
 
+/*
 struct list_node {
     struct list_node *next;
     struct list_node *prev;
 
+    void *data;
+};
+*/
+
+struct list_node {
+    struct list_node_base node;
     void *data;
 };
 
