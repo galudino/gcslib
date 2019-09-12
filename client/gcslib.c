@@ -41,16 +41,12 @@
 #include <string.h>
 #include <unistd.h>
 
-void test_vectorvp_int(void);
-void test_vectorvp_str(void);
-void test_vectorvp_vec2D(void);
+void test_int_vp(void);
+void test_str_vp(void);
+void test_vec2D_vp(void);
 
-void test_vectortmpl_int(void);
-void test_vectortmpl_str(void);
-
-void test_listvp_int(void);
-void test_listvp_str(void);
-void test_listvp_vec2D(void);
+void test_int_tmpl(void);
+void test_str_tmpl(void);
 
 /**
  *  @brief  Program execution begins here
@@ -61,32 +57,71 @@ void test_listvp_vec2D(void);
  *  @return     exit status
  */
 int main(int argc, const char *argv[]) {
-    /*
-        test_vectorvp_int();
-        test_vectorvp_str();
-        test_vectorvp_vec2D();
+    
+    /* 
+    test_int_vp();
+    test_str_vp();
 
-        test_vectortmpl_int();
-        test_vectortmpl_str();
+    test_vec2D_vp();
+
+    test_int_tmpl();
     */
-        test_listvp_int();
-        test_listvp_str();
-        test_listvp_vec2D();
-     
+
+    /*
+    LOG(__FILE__, "void ptr");
+    test_str_vp();
+
+    LOG(__FILE__, "tmpl");
+    test_str_tmpl();
+    */
+
+    list *l = l_new(_int_);
+    int i = 0;
+
+    int *curr = NULL;
+    iterator it;
+    
+    for (i = 0; i < 16; i++) {
+        l_pushb(l, &i);
+    }
+
+    it = l_begin(l);
+    
+    /* 
+    while ((curr = it_curr(it)) != it_finish(it)) {
+        printf("next: %d\n", (*curr));
+        it_incr(&it);
+    }
+    */
+
+    l_clear(l);
+
+    i = 54;
+    l_pushb(l, &i);
+
+    i = 92;
+    l_pushb(l, &i);
+
+    printf("front: %d\n", *(int *)(l_front(l)));
+    printf("back: %d\n", *(int *)(l_back(l)));
+
+    l_puts(l);
+    l_delete(&l);
+
     return EXIT_SUCCESS;
 }
 
 /**
  *  @brief  Space to test container functionality for integral types
  */
-void test_vectorvp_int() {
+void test_int_vp() {
 
 }
 
 /**
  *  @brief  Space to test container functionality for (char *) types
  */
-void test_vectorvp_str() {
+void test_str_vp() {
     vector *vstr = NULL;
     vector *vs = NULL;
 
@@ -143,11 +178,12 @@ void test_vectorvp_str() {
 /**
  *  @brief  Space to test container functionality for "object" types
  */
-void test_vectorvp_vec2D() {
+void test_vec2D_vp() {
 
 }
 
-void test_vectortmpl_int() {
+
+void test_int_tmpl() {
     vector(int) *v = NULL;
     vector(int) *vr = NULL;
     vector(int) *vfill = NULL;
@@ -217,7 +253,7 @@ void test_vectortmpl_int() {
     vputs(int)(vr);
 }
 
-void test_vectortmpl_str() {
+void test_str_tmpl() {
     vector(str) *vstr = vnewr(str)(1);
     iterator first;
     iterator last;
@@ -254,34 +290,4 @@ void test_vectortmpl_str() {
 
     vdelete(str)(&vstr);
     vdelete(str)(&vs);
-}
-
-void test_listvp_int(void) {
-    list *l = l_new(_int_);
-    int i = -1;
-
-    iterator it = { NULL, NULL, NULL };
-    int *curr = NULL;
-
-    for (i = 0; i < 32; i++) {
-        l_pushb(l, &i);
-    }
-
-    l_puts(l);
-
-    it = l_begin(l);
-
-    while ((curr = it_curr(it)) != it_finish(it)) {
-        printf("iterator: %d\n", (*curr));
-    }
-
-    l_delete(&l);
-}
-
-void test_listvp_str(void) {
-
-}
-
-void test_listvp_vec2D(void) {
-
 }
