@@ -1148,7 +1148,7 @@ static iterator *li_decr(iterator *it) {
 
     l = (list *)(it->container);
 
-    if (it->curr == l->impl.node.next) {
+    if (it->curr == &(l->impl.node)) {
         ERROR(__FILE__, "Cannot decrement - already at begin.");
     } else {
         it->curr = ((list_node *)(it->curr))->node.prev;
@@ -1171,7 +1171,7 @@ static void *li_start(iterator it) {
 
 static void *li_finish(iterator it) {
     list *l = (list *)(it.container);
-    list_node_base *nb = l->impl.node.prev;
+    list_node_base *nb = &(l->impl.node);
     list_node *n = *(list_node **)(&nb);
     return n->data;
 }

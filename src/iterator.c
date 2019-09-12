@@ -165,7 +165,7 @@ iterator *it_decr(iterator *it) {
  *  @return     address of element at current position
  */
 void *it_curr(iterator it) {
-    return it.curr;
+    return it.itbl->curr(it);
 }
 
 /**
