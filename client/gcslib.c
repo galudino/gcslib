@@ -86,17 +86,23 @@ int main(int argc, const char *argv[]) {
     }
 
     it = l_begin(l);
-    while (it_has_next(it)) {
-        curr = ((list_node *)(it_curr(it)))->data;
-        
-        printf("%d\n", (*curr));
+    
+    /* 
+    while ((curr = it_curr(it)) != it_finish(it)) {
+        printf("next: %d\n", (*curr));
         it_incr(&it);
     }
-    
-    it = l_erase(l, it_next_n(l_begin(l), 5));
-    it = l_erase(l, it);
+    */
 
-    printf("\nfront: %d\n", *(int *)(l_front(l)));
+    l_clear(l);
+
+    i = 54;
+    l_pushb(l, &i);
+
+    i = 92;
+    l_pushb(l, &i);
+
+    printf("front: %d\n", *(int *)(l_front(l)));
     printf("back: %d\n", *(int *)(l_back(l)));
 
     l_puts(l);

@@ -905,18 +905,4 @@ enum node_traversal { INORDER, PREORDER, POSTORDER, LEVELORDER };
  */
 ptrdiff_t ptr_distance(const void *beg, const void *end, size_t width);
 
-typedef struct list_node_base list_node_base;
-struct list_node_base {
-    list_node_base *next;
-    list_node_base *prev;
-};
-
-void lnb_swap(list_node_base *x, list_node_base *y);
-void lnb_transfer(list_node_base *n, list_node_base *first, list_node_base *last);
-void lnb_reverse(list_node_base *n);
-void lnb_hook(list_node_base *n, list_node_base *position);
-void lnb_unhook(list_node_base *n);
-size_t lnb_distance(list_node_base *pos, list_node_base *end);
-
-
 #endif /* UTILS_H */

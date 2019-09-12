@@ -52,17 +52,10 @@ typedef struct list_node            list_node;
 typedef struct list_node *          list_node_ptr;
 typedef struct list_node **         list_node_dptr;
 
-/*
 struct list_node {
     struct list_node *next;
     struct list_node *prev;
 
-    void *data;
-};
-*/
-
-struct list_node {
-    struct list_node_base node;
     void *data;
 };
 
@@ -85,7 +78,7 @@ typedef struct list **  list_dptr;
 /**< list: constructors */
 list *l_new(struct typetable *ttbl);
 list *l_newfill(struct typetable *ttbl, size_t n, void *valaddr);
-list *l_newrnge(iterator first, iterator last);
+list *l_newrnge(iterator *first, iterator *last);
 list *l_newcopy(list *l);
 list *l_newmove(list **l);
 
@@ -115,7 +108,7 @@ const void *l_front_const(list *l);
 const void *l_back_const(list *l);
 
 /**< list: modifiers - assignment */
-void l_assignrnge(list *l, iterator first, iterator last);
+void l_assignrnge(list *l, iterator *first, iterator *last);
 void l_assignfill(list *l, size_t n, const void *valaddr);
 
 /**< list: modifiers - push/pop */
@@ -125,15 +118,15 @@ void l_pushb(list *l, const void *valaddr);
 void l_popb(list *l);
 
 /**< list: modifiers - insertion */
-iterator l_insert(list *l, iterator pos, const void *valaddr);
+iterator l_insert(list *l, iterator *pos, const void *valaddr);
 
-iterator l_insertfill(list *l, iterator pos, size_t n, const void *valaddr);
+iterator l_insertfill(list *l, iterator *pos, size_t n, const void *valaddr);
 
-iterator l_insertrnge(list *l, iterator pos, iterator first, iterator last);
+iterator l_insertrnge(list *l, iterator *pos, iterator *first, iterator *last);
 
 /**< list: modifiers - erasure */
-iterator l_erase(list *l, iterator pos);
-iterator l_erasernge(list *l, iterator pos, iterator last);
+iterator l_erase(list *l, iterator *pos);
+iterator l_erasernge(list *l, iterator *pos, iterator *last);
 
 /**< list: container swappage */
 void l_swap(list **l, list **other);
@@ -150,10 +143,10 @@ void l_replace_at(list *l, size_t index, const void *valaddr);
 void l_swap_elem(list *l, size_t n1, size_t n2);
 
 /**< list: splice */
-iterator l_splice(list *l, iterator pos, list *other, iterator opos);
-iterator l_splicelist(list *l, iterator pos, list *other);
-iterator l_splicernge(list *l, iterator pos, list *other, iterator first,
-                       iterator last);
+iterator l_splice(list *l, iterator *pos, list *other, iterator *opos);
+iterator l_splicelist(list *l, iterator *pos, list *other);
+iterator l_splicernge(list *l, iterator *pos, list *other, iterator *first,
+                       iterator *last);
 
 /**< list: element removal by search */
 void l_remove(list *l, const void *valaddr);
