@@ -918,5 +918,4 @@ void lnb_hook(list_node_base *n, list_node_base *position);
 void lnb_unhook(list_node_base *n);
 size_t lnb_distance(list_node_base *pos, list_node_base *end);
 
-
 #endif /* UTILS_H */

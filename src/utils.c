@@ -1336,6 +1336,10 @@ void lnb_swap(list_node_base *x, list_node_base *y) {
         }
     } else if (y->next != y) {
         /* x is empty, y is not empty. */
+        x->next = y->next;
+        x->prev = y->prev;
+        x->next->prev = x->prev->next = x;
+        y->next = y->prev = y;
     }
 }
 
@@ -1358,6 +1362,7 @@ void lnb_transfer(list_node_base *n, list_node_base *first, list_node_base *last
 
 void lnb_reverse(list_node_base *n) {
     list_node_base *tmp = n;
+    
     do {
         /* swap(tmp->next, tmp->prev) */
         list_node_base *tmp_next = tmp->next;

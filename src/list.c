@@ -165,11 +165,12 @@ list *l_newmove(list **l) {
     list *move = NULL;
 
     assert((*l));
+
     move = l_new((*l)->ttbl);
 
     move = (*l);
     (*l) = l_new(move->ttbl);
-    
+
     return move;
 }
 
@@ -466,8 +467,15 @@ iterator l_erasernge(list *l, iterator pos, iterator last) {
 }
 
 void l_swap(list **l, list **other) { 
-    /* TODO */
+    list *temp = NULL;
 
+    assert((*l));
+    assert((*other));
+
+    temp = (*l);
+
+    (*l) = (*other);
+    (*other) = temp;
 }
 
 void l_clear(list *l) { 
