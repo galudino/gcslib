@@ -203,12 +203,46 @@ size_t l_size(list *l) {
 
 size_t l_maxsize(list *l) { 
     /* TODO */
+    LOG(__FILE__, "TODO");
     return 0;
 }
 
 void l_resizefill(list *l, size_t n, const void *valaddr) { 
-    /* TODO */
+    size_t size = l_size(l);
 
+    if (n > size) {
+        size_t i = 0;
+        size_t delta = n - size;
+    
+        for (i = 0; i < delta; i++) {
+            l_pushb(l, valaddr);
+        }
+    } else {
+        int i = -1;
+
+        /**
+         *  Code for l_clear(), inlined.
+         */
+
+        /* l->impl.node.next is the head node pointer. */
+        list_node *curr = *(list_node **)(&l->impl.node.next);
+
+        /* &(l->impl.node) is the sentinel denoting EOL. */
+        while (*(list_node_base **)(&curr) != &(l->impl.node)) {
+            list_node *temp = curr;
+            curr = *(list_node **)(&curr->node.next);
+
+            ln_delete(&temp, l->ttbl);
+        }
+
+        /* Reinitialize l->impl.node */
+        l->impl.node.next = &(l->impl.node);
+        l->impl.node.prev = &(l->impl.node);
+
+        for (i = 0; i < n; i++) {
+            l_pushb(l, valaddr);
+        }
+    }
 }
 
 bool l_empty(list *l) { 
@@ -366,12 +400,46 @@ const void *l_back_const(list *l) {
 
 void l_assignrnge(list *l, iterator first, iterator last) { 
     /* TODO */
+    /*
+    iterator first1 = begin();
+    iterator last1 = end();
 
+    for (; 
+        first1 != last1 && first != last;
+        ++first1, ++first) {
+        *first1 = *first;
+    }
+    
+    if (first == last) {
+        erase(first1, last1);
+    } else {
+        insert(last1, first, last);
+    }
+    */
+
+    /*
+        determine delta between first and last
+        if delta is less than l_size(l)
+            you will replace delta elements
+            from [0, delta)
+        else if delta is greater than or eq to l_size(l)
+            clear all existing nodes and their data
+            push back delta elements from [0, delta)
+            
+     */
 }
 
 void l_assignfill(list *l, size_t n, const void *valaddr) { 
     /* TODO */
-
+    
+    /*
+        if n is less than l_size(l)
+            you will replace n elements
+            from [0, delta)
+        else if n is greater than or eq to l_size(l)
+            clear all existing nodes and their data
+            push back n elements from [0, n)
+    */
 }
 
 void l_pushf(list *l, const void *valaddr) { 
@@ -424,15 +492,24 @@ iterator l_insert(list *l, iterator pos, const void *valaddr) {
     ipos = it_distance(NULL, &pos);
     lnb_hook(*(list_node_base **)(&new_node), pos.curr);
 
-    return it_next_n(l_begin(l), ipos);
+    return pos;
 }
 
 iterator l_insertfill(list *l, iterator pos, size_t n,
-                       const void *valaddr) { 
-    /* TODO */
-    iterator it;
+                      const void *valaddr) {
+    size_t ipos = it_distance(NULL, &pos);
+    size_t i = 0;
 
-    return it;
+    assert(l);
+    
+    for (i = 0; i < n; i++) {
+        list_node *new_node = ln_new(l->ttbl, valaddr);
+
+        lnb_hook(*(list_node_base **)(&new_node), pos.curr);
+        ++ipos;
+    }
+    
+    return pos;
 }
 
 iterator l_insertrnge(list *l, iterator pos, iterator first,
