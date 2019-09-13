@@ -118,38 +118,59 @@ list *l_new(struct typetable *ttbl) {
 
 list *l_newfill(struct typetable *ttbl, size_t n, void *valaddr) {
     list *l = NULL;
-    int i = 0;
+    size_t i = 0;
 
     assert(valaddr);
 
     l = l_new(ttbl);
 
-    if (l->ttbl->copy) {
-        for (i = 0; i < n; i++) {
-            
-        }    
-    } else {
-        for (i = 0; i < n; i++) {
-
-        }
+    for (i = 0; i < n; i++) {
+        l_pushb(l, valaddr);
     }
 
     return l;
 }
 
 list *l_newrnge(iterator first, iterator last) { 
-    /* TODO */
-    return 0;
+    list *l = NULL;
+
+    struct typetable *ttbl_first = NULL;
+    void *sentinel = NULL;
+    void *curr = NULL;
+    
+    if (first.itbl != last.itbl) {
+        ERROR(__FILE__, "first and last must have matching container types and refer to the same container.");
+        return NULL;
+    }
+
+    ttbl_first = it_get_ttbl(first);
+    l = l_new(ttbl_first);
+
+    sentinel = it_curr(last);
+
+    while ((curr = it_curr(first)) != sentinel) {
+        l_pushb(l, curr);
+        it_incr(&first);
+    }
+
+    return l;
 }
 
 list *l_newcopy(list *l) { 
-    /* TODO */
-    return 0;
+    assert(l);
+    return l_newrnge(l_begin(l), l_end(l));
 }
 
 list *l_newmove(list **l) { 
-    /* TODO */
-    return 0;
+    list *move = NULL;
+
+    assert((*l));
+    move = l_new((*l)->ttbl);
+
+    move = (*l);
+    (*l) = l_new(move->ttbl);
+    
+    return move;
 }
 
 void l_delete(list **l) { 
@@ -807,30 +828,6 @@ static list_node *ln_new(struct typetable *ttbl, const void *valaddr) {
 }
 
 static void ln_init(list_node *n, struct typetable *ttbl, const void *valaddr) {
-    /*
-    void *data = NULL;
-    struct typetable *table = NULL;
-
-    assert(n);
-    assert(valaddr);
-
-    n->next = NULL;
-    n->prev = NULL;
-    n->data = NULL;
-
-    data = malloc(ttbl->width);
-    assert(data);
-    n->data = data;
-
-    table = ttbl ? ttbl : _void_ptr_;
-
-    if (table->copy) {
-        table->copy(n->data, valaddr);
-    } else {
-        memcpy(n->data, valaddr, table->width);
-    }
-    */
-
     void *data = NULL;
     struct typetable *table = NULL;
 
@@ -855,24 +852,6 @@ static void ln_init(list_node *n, struct typetable *ttbl, const void *valaddr) {
 }
 
 static void ln_deinit(list_node *n, struct typetable *ttbl) {
-    /*
-    struct typetable *table = NULL;
-
-    assert(n);
-
-    table = ttbl ? ttbl : _void_ptr_;
-
-    if (table->dtor) {
-        table->dtor(n->data);
-    }
-
-    free(n->data);
-    n->data = NULL;
-
-    n->next = NULL;
-    n->prev = NULL;
-    */
-
     struct typetable *table = NULL;
 
     assert(n);
@@ -891,18 +870,6 @@ static void ln_deinit(list_node *n, struct typetable *ttbl) {
 }
 
 static void ln_delete(list_node **n, struct typetable *ttbl) {
-    /*
-    struct typetable *table = NULL;
-
-    assert((*n));
-
-    table = ttbl ? ttbl : _void_ptr_;
-    ln_deinit((*n), table);
-
-    free((*n));
-    (*n) = NULL;
-    */
-
     struct typetable *table = NULL;
 
     assert((*n));
@@ -947,33 +914,51 @@ static void l_deinit(list *l) {
 
 static list_node *l_node_at(list *l, int index) { 
     list_node *n = NULL;
+    size_t size = 0;
 
     assert(l);
+    size = l_size(l);
 
-    n = (index <= l_size(l)
-    ? l_traverse_h(l, index) : l_traverse_t(l, index);
+    if (index < size) {
+        n = (index < (size / 2)) 
+        ? l_traverse_h(l, index) : l_traverse_t(l, index);
+    } else {
+        char str[256];
+        sprintf(str, "Index provided [%d] is out of bounds, size is [%lu]. NULL node returned.", index, size);
+        ERROR(__FILE__, str);
+    }
 
     return n;
 }
 
 static list_node *l_traverse_h(list *l, int index) { 
     list_node_base *n = NULL;
-    int back_index = -1;
     int i = -1;
 
     assert(l);
-    back_index = (int)(l_size(l) - 1);
 
-    i = 0;
-    while
+    for (i = 0, n = l->impl.node.next; 
+         i < index; i++, 
+         n = n->next) {
+        /* get to the node */
+    }
 
     return *(list_node **)(&n);
 }
 
 static list_node *l_traverse_t(list *l, int index) { 
     list_node_base *n = NULL;
+    int i = -1;
+    int delta = -1;
 
+    assert(l);
 
+    delta = (l_size(l) - 1) - index;
+    for (i = 0, n = l->impl.node.prev; 
+         i < delta; i++, 
+         n = n->prev) {
+        /* get to the node */
+    }
 
     return *(list_node **)(&n);
 }

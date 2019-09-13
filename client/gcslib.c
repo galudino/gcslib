@@ -295,8 +295,19 @@ void test_listvp_int() {
 
 void test_listvp_str() {
     list *l = l_new(_str_);
+    
+    list *lfill = NULL;
+    list *lrnge = NULL;
+    list *lcopy = NULL;
+    list *lmove = NULL;
+
     char *curr = NULL;
+
     iterator it = { NULL, NULL, NULL };
+    iterator end = { NULL, NULL, NULL };
+    iterator pos = { NULL, NULL, NULL };
+
+    int i = -1;
     void *sentinel = NULL;
 
     curr = "alpha";
@@ -322,25 +333,35 @@ void test_listvp_str() {
     
     l_puts(l);
 
-    it = l_begin(l);
-    sentinel = it_finish(it);
-
-    it = l_erase(l, it_next_n(l_begin(l), 1));
-    it = l_erase(l, it);
-
     printf("\nfront: %s\n", *(char **)(l_front(l)));
     printf("back: %s\n\n", *(char **)(l_back(l)));
 
-    it = l_begin(l);
-    sentinel = it_finish(it);
-    while ((curr = it_curr(it)) != sentinel) {
-        printf("iterator: %s\n", *(char **)(curr));
-        it_incr(&it);
+    curr = " -- fill me up -- ";
+    lfill = l_newfill(_str_, 16, &curr);
+
+    l_puts(lfill);
+
+    it = it_next_n(l_begin(l), 2);
+    end = it_next_n(l_begin(l), 5);
+    sentinel = it_curr(end);
+    lrnge = l_newrnge(it, end);
+
+    l_puts(lrnge);
+
+    lcopy = l_newcopy(lrnge);
+
+    l_puts(lcopy);
+
+    lmove = l_newmove(&lcopy);
+
+    LOG(__FILE__, "old:");
+    l_puts(lcopy);
+
+    LOG(__FILE__, "move:");
+    if (l_back(lmove)) {
+        printf("move front: %s\n", *(char **)(l_back(lmove)));
     }
-
-    list_node *n = l_node_at(l, 3);
-
-    printf("at index: %s\n", *(char **)(n->data));
+    l_puts(lmove);
 }
 
 void test_listvp_vec2D() {

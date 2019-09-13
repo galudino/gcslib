@@ -253,7 +253,7 @@ vector *v_newrnge(iterator first, iterator last) {
          *  different container types (this is determiend by what itbls
          *  they each point to)
          */
-        ERROR(__FILE__, "first and last must matching container types and refer to the same container.");
+        ERROR(__FILE__, "first and last must have matching container types and refer to the same container.");
         return NULL;
     }
 
@@ -342,7 +342,7 @@ vector *v_newcopy(vector *v) {
 vector *v_newmove(vector **v) {
     vector *move = NULL;
 
-    assert(v);
+    assert((*v));
 
     move = v_allocate();
 
