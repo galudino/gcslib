@@ -267,16 +267,18 @@ void test_vectortmpl_str() {
 void test_listvp_int() {
     list *l = l_new(_int_);
     int i = 0;
-
     int *curr = NULL;
     iterator it;
+    void *sentinel = NULL;
     
     for (i = 0; i < 16; i++) {
         l_pushb(l, &i);
     }
 
     it = l_begin(l);
-    while ((curr = it_curr(it)) != it_finish(it)) {
+    sentinel = it_finish(it);
+
+    while ((curr = it_curr(it)) != sentinel) {
         printf("iterator: %d\n", (*curr));
         it_incr(&it);
     }
@@ -292,7 +294,53 @@ void test_listvp_int() {
 }
 
 void test_listvp_str() {
+    list *l = l_new(_str_);
+    char *curr = NULL;
+    iterator it = { NULL, NULL, NULL };
+    void *sentinel = NULL;
 
+    curr = "alpha";
+    l_pushb(l, &curr);
+
+    curr = "beta";
+    l_pushb(l, &curr);
+
+    curr = "charlie";
+    l_pushb(l, &curr);
+
+    curr = "delta";
+    l_pushb(l, &curr);
+
+    curr = "echo";
+    l_pushb(l, &curr);
+
+    curr = "foxtrot";
+    l_pushb(l, &curr);
+
+    curr = "georgia";
+    l_pushb(l, &curr);
+    
+    l_puts(l);
+
+    it = l_begin(l);
+    sentinel = it_finish(it);
+
+    it = l_erase(l, it_next_n(l_begin(l), 1));
+    it = l_erase(l, it);
+
+    printf("\nfront: %s\n", *(char **)(l_front(l)));
+    printf("back: %s\n\n", *(char **)(l_back(l)));
+
+    it = l_begin(l);
+    sentinel = it_finish(it);
+    while ((curr = it_curr(it)) != sentinel) {
+        printf("iterator: %s\n", *(char **)(curr));
+        it_incr(&it);
+    }
+
+    list_node *n = l_node_at(l, 3);
+
+    printf("at index: %s\n", *(char **)(n->data));
 }
 
 void test_listvp_vec2D() {

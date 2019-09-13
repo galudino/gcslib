@@ -51,7 +51,6 @@ static void ln_transfer(list_node *n, list_node *first, list_node *last);
 static void ln_reverse(list_node *n);
 static void ln_hook(list_node *n, list_node *position);
 static void ln_unhook(list_node *n);
-/* static size_t ln_distance(list_node *pos, list_node *end); */
 
 /**
  *  @struct     list
@@ -947,15 +946,36 @@ static void l_deinit(list *l) {
 }
 
 static list_node *l_node_at(list *l, int index) { 
-    return NULL; 
+    list_node *n = NULL;
+
+    assert(l);
+
+    n = (index <= l_size(l)
+    ? l_traverse_h(l, index) : l_traverse_t(l, index);
+
+    return n;
 }
 
 static list_node *l_traverse_h(list *l, int index) { 
-    return NULL; 
+    list_node_base *n = NULL;
+    int back_index = -1;
+    int i = -1;
+
+    assert(l);
+    back_index = (int)(l_size(l) - 1);
+
+    i = 0;
+    while
+
+    return *(list_node **)(&n);
 }
 
 static list_node *l_traverse_t(list *l, int index) { 
-    return NULL; 
+    list_node_base *n = NULL;
+
+
+
+    return *(list_node **)(&n);
 }
 
 static iterator li_begin(void *arg) {
