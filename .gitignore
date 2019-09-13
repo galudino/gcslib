@@ -1,6 +1,12 @@
 *.o
 *.out
 *.DS_Store
+*.swp
+include/*.swp
+src/*.swp
+client/*.swp
+tests/*.swp
+temp/*.swp
 gcslib
 test
 build/*.o
