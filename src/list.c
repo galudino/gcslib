@@ -484,12 +484,10 @@ void l_popb(list *l) {
 
 iterator l_insert(list *l, iterator pos, const void *valaddr) {
     list_node *new_node = NULL;
-    size_t ipos = 0;
 
     assert(l);
 
     new_node = ln_new(l->ttbl, valaddr);
-    ipos = it_distance(NULL, &pos);
     lnb_hook(*(list_node_base **)(&new_node), pos.curr);
 
     return pos;
@@ -497,16 +495,13 @@ iterator l_insert(list *l, iterator pos, const void *valaddr) {
 
 iterator l_insertfill(list *l, iterator pos, size_t n,
                       const void *valaddr) {
-    size_t ipos = it_distance(NULL, &pos);
     size_t i = 0;
 
     assert(l);
     
     for (i = 0; i < n; i++) {
         list_node *new_node = ln_new(l->ttbl, valaddr);
-
         lnb_hook(*(list_node_base **)(&new_node), pos.curr);
-        ++ipos;
     }
     
     return pos;
@@ -514,33 +509,51 @@ iterator l_insertfill(list *l, iterator pos, size_t n,
 
 iterator l_insertrnge(list *l, iterator pos, iterator first,
                        iterator last) { 
-    /* TODO */
-    iterator it;
+    void *curr = NULL;
+    void *sentinel = NULL;
+    
+    assert(l);
+    sentinel = it_curr(last);
 
+    while ((curr = it_curr(first)) != sentinel) {
+        list_node *new_node = ln_new(l->ttbl, curr);
+        lnb_hook(*(list_node_base **)(&new_node), pos.curr);
 
-    return it;
+        it_incr(&first);
+    }
+
+    return pos;
 }
 
 iterator l_erase(list *l, iterator pos) { 
-    list_node *node = NULL;
-    int ipos = 0;
-
+    list_node *n = NULL;
     assert(l);
+    
+    n = *(list_node **)(&pos.curr);
 
-    node = pos.curr;
-    ipos = it_distance(NULL, &pos);
+    lnb_unhook(*(list_node_base **)(&n));
+    it_incr(&pos);
+    ln_delete(&n, l->ttbl);
 
-    lnb_unhook(pos.curr);
-    ln_delete(&node, l->ttbl);
-
-    return it_next_n(l_begin(l), ipos);
+    return pos;
 }
 
 iterator l_erasernge(list *l, iterator pos, iterator last) { 
-    /* TODO */
-    iterator it;
+    void *curr = NULL;
+    void *sentinel = NULL;
 
-    return it;
+    assert(l);
+    sentinel = it_curr(last);
+
+    while ((curr = it_curr(pos)) != sentinel) {
+        list_node *node = (*(list_node **)(&pos.curr));
+        it_incr(&pos);
+
+        lnb_unhook(*(list_node_base **)(&node));
+        ln_delete(&node, l->ttbl);
+    }
+
+    return pos;
 }
 
 void l_swap(list **l, list **other) { 

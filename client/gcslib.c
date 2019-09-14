@@ -361,17 +361,34 @@ void test_listvp_str() {
     if (l_back(lmove)) {
         printf("move front: %s\n", *(char **)(l_back(lmove)));
     }
-    curr = "resizefill";
-    l_resizefill(lmove, 16, &curr);
 
-    
-    curr = "insertfill";
-    it = l_insertfill(l, it_next_n(l_begin(lmove), 1), 5, &curr);
-    printf("position it: %s\n", *(char **)(it_curr(it)));
-    
-    curr = " -- new insertion -- ";
-    it = l_insert(l, it, &curr);
     l_puts(lmove);
+    
+    curr = " -- insertion -- ";
+    it = l_insert(l, it, &curr);
+    l_puts(l);
+
+    printf("it: %s\n", *(char **)(it_curr(it)));
+
+    curr = " -- fill me up -- ";
+    it = l_insertfill(l, it, 8, &curr);
+
+    l_puts(l);
+
+    printf("it: %s\n", *(char **)(it_curr(it)));
+
+    it = l_insertrnge(l, it, l_begin(lmove), l_end(lmove));
+    l_puts(l);
+
+    printf("it: %s\n", *(char **)(it_curr(it)));
+
+    it = l_erase(l, it);
+    l_puts(l);
+
+    printf("it: %s\n", *(char **)(it_curr(it)));
+
+    it = l_erasernge(l, it_next_n(l_begin(l), 3), it_next_n(l_begin(l), 11));
+    l_puts(l);
 }
 
 void test_listvp_vec2D() {
