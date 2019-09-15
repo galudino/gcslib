@@ -21,3 +21,6 @@ _debug/_future/.DS_Store
 _debug/_future/.DS_Store
 _debug/_future/.DS_Store
 _debug/_future/.DS_Store
+*.swp
+src/.list.c.swp
+client/.gcslib.c.swp
