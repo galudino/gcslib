@@ -53,7 +53,9 @@ void test_vectortmpl_str_assign(void);
 
 void test_listvp_int(void);
 void test_listvp_int_at(void);
+void test_listvp_int_splice(void);
 void test_listvp_str(void);
+void test_listvp_str_splice(void);
 void test_listvp_vec2D(void);
 
 void test_listtmpl_int(void);
@@ -80,31 +82,19 @@ int main(int argc, const char *argv[]) {
     test_vectortmpl_str_assign();
     */
 
-    test_listvp_int_at();
+    test_listvp_int_splice();
+    test_listvp_str_splice();
 
     /*
     test_listvp_int();
+    test_listvp_int_at();
+
     test_listvp_str();
     test_listvp_vec2D();
 
     test_listtmpl_int();
     test_listtmpl_str();
     */
-
-    {
-        list *l = l_new(_str_);
-        char *temp = NULL;
-
-        temp = "first";
-        l_pushb(l, &temp);
-
-        temp = "second";
-        l_pushb(l, &temp);
-
-        l_swap_elem(l, 0, 1);
-
-        l_puts(l);
-    }
 
     return EXIT_SUCCESS;
 }
@@ -550,6 +540,47 @@ void test_listvp_str() {
 
     l_assignfill(l, 16, &curr);
     l_puts(l);
+}
+
+void test_listvp_int_splice() {
+    list *l1 = l_new(_int_);
+    list *l2 = l_new(_int_);
+    int i = 0;
+    iterator it;
+    iterator pos;
+    iterator opos;
+    iterator first;
+    iterator last;
+
+    for (i = 0; i < 10; i++) {
+        l_pushb(l1, &i);
+    }
+
+    for (i = 10; i < 21; i++) {
+        l_pushb(l2, &i);
+    }
+
+    l_puts(l1);
+    l_puts(l2);
+
+    LOG(__FILE__, "l_splice for l1 at pos 4, l2 from opos 2");
+    pos = it_next_n(l_begin(l1), 4);
+    opos = it_next_n(l_begin(l2), 2);
+    it = l_splice(l1, pos, l2, opos);
+    l_puts(l1);
+    l_puts(l2);
+
+    LOG(__FILE__, "l_splicelist for l1 at pos 4, all of l2");
+    it = l_splicelist(l1, pos, l2);
+    l_puts(l1);
+    l_puts(l2);
+
+    l_delete(&l1);
+    l_delete(&l2);
+}
+
+void test_listvp_str_splice() {
+
 }
 
 void test_listvp_vec2D() {

@@ -690,17 +690,53 @@ void l_swap_elem(list *l, size_t n1, size_t n2) {
 
 iterator l_splice(list *l, iterator pos, list *other,
                    iterator opos) { 
-    /* TODO */
-    iterator it;
+    /*
+        iterator j = i;
+        ++j;
+        if (position == i || position == j)
+            return;
 
-    return it;
+        if (this != &x)
+            check_equal_allocators(x);
+
+        this->transfer(position, i, j);
+    */
+
+    iterator j = opos;
+    it_incr(&j);
+
+    assert(l);
+
+    if (pos.curr == opos.curr || pos.curr == j.curr) {
+        return pos;
+    }
+
+    if (l != other) {
+        if (l->ttbl != other->ttbl) {
+            ERROR(__FILE__, "Cannot splice lists using different typetables.");
+            return pos;
+        }
+    }
+
+    lnb_transfer(pos.curr, opos.curr, j.curr);
+    return pos;
 }
 
 iterator l_splicelist(list *l, iterator pos, list *other) { 
-    /* TODO */
-    iterator it;
+    assert(l);
 
-    return it;
+    if (l_empty(other) == false) {
+        if (l->ttbl != other->ttbl) {
+            ERROR(__FILE__, "Cannot splice lists using different typetables.");
+        } else {
+            list_node_base *beg = it_next_n(l_begin(other)).curr;
+            list_node_base *end = l_end(other).curr;
+
+            lnb_transfer(pos.curr, beg, end);
+        }
+    }
+
+    return pos;
 }
 
 iterator l_splicernge(list *l, iterator pos, list *other, iterator first,
