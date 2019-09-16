@@ -49,10 +49,10 @@ void test_vectortmpl_int(void);
 void test_vectortmpl_str(void);
 
 void test_vectorvp_str_assign(void);
-
 void test_vectortmpl_str_assign(void);
 
 void test_listvp_int(void);
+void test_listvp_int_at(void);
 void test_listvp_str(void);
 void test_listvp_vec2D(void);
 
@@ -80,13 +80,31 @@ int main(int argc, const char *argv[]) {
     test_vectortmpl_str_assign();
     */
 
+    test_listvp_int_at();
+
+    /*
     test_listvp_int();
     test_listvp_str();
     test_listvp_vec2D();
 
     test_listtmpl_int();
     test_listtmpl_str();
-    
+    */
+
+    {
+        list *l = l_new(_str_);
+        char *temp = NULL;
+
+        temp = "first";
+        l_pushb(l, &temp);
+
+        temp = "second";
+        l_pushb(l, &temp);
+
+        l_swap_elem(l, 0, 1);
+
+        l_puts(l);
+    }
 
     return EXIT_SUCCESS;
 }
@@ -375,6 +393,36 @@ void test_listvp_int() {
     printf("back: %d\n", *(int *)(l_back(l)));
 
     l_puts(l);
+    l_delete(&l);
+}
+
+void test_listvp_int_at() {
+    list *l = l_new(_int_);
+    int i = 0;
+    for (i = 0; i < 32; i++) {
+        l_pushb(l, &i);
+    }
+
+    l_puts(l);
+
+    LOG(__FILE__, "insert 9999 at 5");
+    i = 9999;
+    l_insert_at(l, 5, &i);
+    l_puts(l);
+
+    LOG(__FILE__, "erase 9999 at 5");
+    l_erase_at(l, 5);
+    l_puts(l);
+
+    LOG(__FILE__, "replace element at 24 with 48");
+    i = 48;
+    l_replace_at(l, 24, &i);
+    l_puts(l);
+
+    LOG(__FILE__, "swap 10 and 20");
+    l_swap_elem(l, 10, 20);
+    l_puts(l);
+
     l_delete(&l);
 }
 

@@ -571,23 +571,121 @@ void l_clear(list *l) {
 }
 
 void l_insert_at(list *l, size_t index, const void *valaddr) { 
-    /* TODO */
+    list_node *new_node = NULL;
+    list_node *pos = NULL;
 
+    assert(l);
+
+    if (index >= l_size(l)) {
+        ERROR(__FILE__, "Index out of bounds.");
+        return;
+    }
+
+    pos = l_node_at(l, index);          /**< traverse to node at index */
+    new_node = ln_new(l->ttbl, valaddr);/**< create new node */
+
+    /**
+     *  The former node at position (index) will move to position (index + 1).
+     *  new_node is now the node at position (index).
+     */
+    lnb_hook(*(list_node_base **)(&new_node), (*(list_node_base **)(&pos)));
 }
 
 void l_erase_at(list *l, size_t index) { 
-    /* TODO */
+    list_node *n = NULL;
 
+    assert(l);
+
+    if (index >= l_size(l)) {
+        ERROR(__FILE__, "Index out of bounds.");
+        return;
+    }
+
+    n = l_node_at(l, index);          /**< traverse to node at index */
+
+    /**
+     *  Unlink node at position (index) and release its memory.
+     */
+    lnb_unhook((*(list_node_base **)(&n)));
+    ln_delete(&n, l->ttbl);
 }
 
 void l_replace_at(list *l, size_t index, const void *valaddr) { 
-    /* TODO */
+    list_node *n = NULL;
 
+    assert(l);
+
+    if (index >= l_size(l)) {
+        ERROR(__FILE__, "Index out of bounds.");
+        return;
+    }
+
+    n = l_node_at(l, index);          /**< traverse to node at index */
+
+    /**
+     *  If element lives on the heap,
+     *  or has fields that live on the heap,
+     *  release their memory.
+     */
+    if (l->ttbl->dtor) {
+        l->ttbl->dtor(n->data);
+    }
+
+    /**
+     *  If element typetable can deep-copy,
+     *  deep copy valaddr into the node.
+     *  Else, shallow copy valaddr.
+     */
+    if (l->ttbl->copy) {
+        l->ttbl->copy(n->data, valaddr);
+    } else {
+        memcpy(n->data, valaddr, l->ttbl->width);
+    }
 }
 
 void l_swap_elem(list *l, size_t n1, size_t n2) { 
-    /* TODO */
+    size_t size = 0;
 
+    bool n1_bad = false;
+    bool n2_bad = false;
+    bool good_indices = false;
+
+    void *temp = NULL;
+    void *data_1 = NULL;
+    void *data_2 = NULL;
+
+    assert(l);
+
+    size = l_size(l);
+
+    n1_bad = n1 >= size;
+    n2_bad = n2 >= size;
+
+    good_indices = !n1_bad && !n2_bad;
+
+    if (good_indices && size > 0) {
+        data_1 = l_node_at(l, n1)->data;
+        data_2 = l_node_at(l, n2)->data;
+
+        if (l->ttbl->swap) {
+            l->ttbl->swap(data_1, data_2);
+        } else {
+            temp = malloc(l->ttbl->width);
+            assert(temp);
+            memcpy(temp, data_1, l->ttbl->width);
+
+            memcpy(data_1, data_2, l->ttbl->width);
+            memcpy(data_2, temp, l->ttbl->width);
+
+            free(temp);
+            temp = NULL;
+        }
+    } else {
+        char str[256];
+        sprintf(str, "Indices n1 [%lu] and/or n2 [%lu] are out of bounds.", n1, n2);
+        ERROR(__FILE__, str);
+        return;
+    }
 }
 
 iterator l_splice(list *l, iterator pos, list *other,

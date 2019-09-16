@@ -2413,15 +2413,19 @@ void vswapelem(T)(vector(T) *v, size_t n1, size_t n2) {
         data_1 = v->impl.start + n1;
         data_2 = v->impl.start + n2;
 
-        temp = malloc(v->ttbl->width);
-        assert(temp);
-        memcpy(temp, data_1, v->ttbl->width);
+        if (v->ttbl->swap) {
+            v->ttbl->swap(data_1, data_2);
+        } else {
+            temp = malloc(v->ttbl->width);
+            assert(temp);
+            memcpy(temp, data_1, v->ttbl->width);
 
-        memcpy(data_1, data_2, v->ttbl->width);
-        memcpy(data_2, temp, v->ttbl->width);
+            memcpy(data_1, data_2, v->ttbl->width);
+            memcpy(data_2, temp, v->ttbl->width);
 
-        free(temp);
-        temp = NULL;
+            free(temp);
+            temp = NULL;
+        }
     } else {
         char str[256];
         sprintf(str, "indices n1 [%lu] and/or n2 [%lu] are out of bounds.", n1, n2);
