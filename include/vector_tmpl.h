@@ -415,7 +415,7 @@ void vswapelem(T)(vector(T) *v, size_t n1, size_t n2);
 
 /**< vector(T): custom modifiers - element removal by search */
 void vremove(T)(vector(T) *v, T val);
-void vremoveif(T)(vector(T) *v, T val, bool (*unary_predicate)(const void *));
+void vremoveif(T)(vector(T) *v, bool (*unary_predicate)(const void *));
 
 /**< vector(T): custom modifiers - merge/reverse */
 vector(T) *vmerge(T)(vector(T) *v, vector(T) * other);

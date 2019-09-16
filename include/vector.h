@@ -175,8 +175,7 @@ void v_swap_elem(vector *v, size_t n1, size_t n2);
 
 /**< vector: custom modifiers - element removal by search */
 void v_remove(vector *v, const void *valaddr);
-void v_remove_if(vector *v, const void *valaddr,
-                 bool (*unary_predicate)(const void *));
+void v_remove_if(vector *v, bool (*unary_predicate)(const void *));
 
 
 /**< vector: custom modifiers - merge/reverse */

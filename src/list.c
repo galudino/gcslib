@@ -690,30 +690,24 @@ void l_swap_elem(list *l, size_t n1, size_t n2) {
 
 iterator l_splice(list *l, iterator pos, list *other,
                    iterator opos) { 
-    /*
-        iterator j = i;
-        ++j;
-        if (position == i || position == j)
-            return;
-
-        if (this != &x)
-            check_equal_allocators(x);
-
-        this->transfer(position, i, j);
-    */
-
     iterator j = opos;
     it_incr(&j);
 
     assert(l);
 
+    if (pos.itbl != _list_iterator_ || opos.itbl != _list_iterator_) {
+        ERROR(__FILE__, "iterator pos and iterator opos must refer to unique instances of (struct list *).");
+        return pos;
+    }
+
     if (pos.curr == opos.curr || pos.curr == j.curr) {
+        ERROR(__FILE__, "(pos.curr) and (opos.curr) must refer to unique instances of (struct list_node_base *).");
         return pos;
     }
 
     if (l != other) {
         if (l->ttbl != other->ttbl) {
-            ERROR(__FILE__, "Cannot splice lists using different typetables.");
+            ERROR(__FILE__, "Cannot splice lists that are using different typetables.");
             return pos;
         }
     }
@@ -725,9 +719,19 @@ iterator l_splice(list *l, iterator pos, list *other,
 iterator l_splicelist(list *l, iterator pos, list *other) { 
     assert(l);
 
+    if (pos.itbl != _list_iterator_) {
+        ERROR(__FILE__, "iterator pos and iterator opos must refer to unique instances of (struct list *).");
+        return pos;
+    }
+
+    if (pos.curr == other->impl.node.next) {
+        ERROR(__FILE__, "(pos.curr) and (other->impl.node.next) must refer to unique instances of (struct list_node_base *).");
+        return pos;
+    }
+
     if (l_empty(other) == false) {
         if (l->ttbl != other->ttbl) {
-            ERROR(__FILE__, "Cannot splice lists using different typetables.");
+            ERROR(__FILE__, "Cannot splice lists that are using different typetables.");
         } else {
             list_node_base *beg = l_begin(other).curr;
             list_node_base *end = l_end(other).curr;
@@ -741,26 +745,128 @@ iterator l_splicelist(list *l, iterator pos, list *other) {
 
 iterator l_splicernge(list *l, iterator pos, list *other, iterator first,
                        iterator last) { 
-    /* TODO */
-    iterator it;
+    assert(l);
 
-    return it;
+    if (pos.itbl != _list_iterator_ || first.itbl != _list_iterator_ || last.itbl != _list_iterator_) {
+        ERROR(__FILE__, "Each iterator (pos, first, and last) must refer to unique instances of (struct list *).");
+        return pos;
+    }
+
+    if (pos.curr == first.curr || pos.curr == last.curr) {
+        ERROR(__FILE__, "(.curr) in iterator pos and iterator opos must refer to unique instances of (struct list_node_base *).");
+        return pos;
+    }
+
+    if (l_empty(other) == false) {
+        if (l->ttbl != other->ttbl) {
+            ERROR(__FILE__, "Cannot splice lists that are using different typetables.");
+        } else {
+            list_node_base *beg = first.curr;
+            list_node_base *end = last.curr;
+
+            lnb_transfer(pos.curr, beg, end);
+        }
+    }
+
+    return pos;
 }
 
 void l_remove(list *l, const void *valaddr) { 
-    /* TODO */
+    iterator first = { NULL, NULL, NULL };
+    iterator last = { NULL, NULL, NULL };
 
+    int (*compare)(const void *, const void *) = NULL;
+
+    assert(l);
+
+    first = l_begin(l);
+    last = l_end(l);
+
+    compare = l->ttbl->compare ? l->ttbl->compare : void_ptr_compare;
+
+    while (first.curr != last.curr) {
+        iterator next = first;
+        it_incr(&next);
+
+        if (compare(it_curr(first), valaddr) == 0) {
+            l_erase(l, first);
+        }
+
+        first = next;
+    }
 }
 
-void l_remove_if(list *l, const void *valaddr,
-                 bool (*unary_predicate)(const void *)) { 
-    /* TODO */
+void l_remove_if(list *l, bool (*unary_predicate)(const void *)) { 
+    iterator first = { NULL, NULL, NULL };
+    iterator last = { NULL, NULL, NULL };
 
+    int (*compare)(const void *, const void *) = NULL;
+
+    assert(l);
+
+    first = l_begin(l);
+    last = l_end(l);
+
+    compare = l->ttbl->compare ? l->ttbl->compare : void_ptr_compare;
+
+    while (first.curr != last.curr) {
+        iterator next = first;
+        it_incr(&next);
+
+        if (unary_predicate(it_curr(first))) {
+            l_erase(l, first);
+        }
+
+        first = next;
+    }
 }
 
 void l_unique(list *l) { 
-    /* TODO */
+    /*
+    iterator first = begin();
+    iterator last = end();
 
+    if (first == last) {
+        return;
+    }
+
+    iterator next = first;
+
+    while (++next != last) {
+        if (*first == *next) {
+            erase(next);
+        } else {
+            first = next;
+        }
+
+        next = first;
+    }
+    */
+
+    /* TODO - not working
+    iterator first = { NULL, NULL, NULL };
+    iterator last = { NULL, NULL, NULL };
+    iterator next = { NULL, NULL, NULL };
+    void *curr = NULL;
+    void *sentinel = NULL;
+
+    int (*compare)(const void *, const void *) = NULL;
+
+    assert(l);
+
+    first = l_begin(l);
+    last = l_end(l);
+    sentinel = it_curr(last);
+
+    next.itbl = _list_iterator_;
+    next.container = l;
+    next.curr = first.curr;
+
+    while (next.curr != last.curr) {
+        printf("%d\n", *(int *)(it_curr(next)));
+        it_incr(&next);
+    }
+    */
 }
 
 list *l_merge(list *l, list *other) { 
@@ -776,18 +882,94 @@ list *l_merge_custom(list *l, list *other,
 }
 
 void l_reverse(list *l) { 
-    /* TODO */
-
+    assert(l);
+    lnb_reverse(l->impl.node.next);
 }
 
 void l_sort(list *l) { 
-    /* TODO */
+    size_t size = 0;
+    int (*comparator)(const void *, const void *) = NULL; 
 
+    assert(l);
+
+    size = l_size(l);
+
+    if (size < 2) {
+        /* why sort a data structure if size < 2? */
+        return;
+    }
+
+    comparator = l->ttbl->compare ? l->ttbl->compare : void_ptr_compare;
+
+    /* gcslib mergesort */
+    /*
+    lnb_mergesort_recursive(&(l->impl.node.next), &(l->impl.node.prev), comparator);
+    */
+
+
+    /*
+        // Do nothing if the list has length 0 or 1.
+    if (this->impl.node.next != &this->impl.node &&
+        this->impl.node.next->next != &this->impl.node) {
+        list carry;
+        list tmp[64];
+        list *fill = &tmp[0];
+        list *counter;
+
+        do {
+            carry.splice(carry.begin(), *this, begin());
+
+            for (counter = &tmp[0]; counter != fill && !counter->empty();
+                 ++counter) {
+                counter->merge(carry);
+                carry.swap(*counter);
+            }
+
+            carry.swap(*counter);
+
+            if (counter == fill) {
+                ++fill;
+            }
+        } while (!empty());
+
+        for (counter = &tmp[1]; counter != fill; ++counter) {
+            counter->merge(*(counter - 1));
+        }
+
+        swap(*(fill - 1));
+    }
+
+
+    TODO l_merge
+    TODO
+    */
 }
 
 int l_search(list *l, const void *valaddr) { 
-    /* TODO */
-    return 0;
+    iterator first = { NULL, NULL, NULL };
+    iterator last = { NULL, NULL, NULL };
+    int result = -1;
+
+    int (*compare)(const void *, const void *) = NULL;
+
+    assert(l);
+
+    first = l_begin(l);
+    last = l_end(l);
+
+    compare = l->ttbl->compare ? l->ttbl->compare : void_ptr_compare;
+
+    while (first.curr != last.curr) {
+        ++result;
+        if (compare(it_curr(first), valaddr) == 0) {
+            printf("found: %d\n", *(int *)(it_curr(first)));
+            break;
+        }
+
+        it_incr(&first);
+    }
+
+    return result;
 }
 
 list *l_arrtol(struct typetable *ttbl, void *base, size_t n) { 

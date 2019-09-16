@@ -148,8 +148,7 @@ iterator l_splicernge(list *l, iterator pos, list *other, iterator first,
 
 /**< list: element removal by search */
 void l_remove(list *l, const void *valaddr);
-void l_remove_if(list *l, const void *valaddr,
-                 bool (*unary_predicate)(const void *));
+void l_remove_if(list *l, bool (*unary_predicate)(const void *));
 
 /**< list: remove duplicates */
 void l_unique(list *l);

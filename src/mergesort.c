@@ -33,7 +33,9 @@
 
 /**< slist and list in the works */
 /* #include "slist.h" */
-/* #include "list.h" */
+
+#include "utils.h"
+#include "list.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -46,15 +48,40 @@ static void v_mergesort_iterative_merge(void *arr,
                                         int l, int m, int r,
                                         size_t width,
                                         int (*compare)(const void *, const void *));
+/*
+static list_node *ln_mergesort_recursive_merge(list_node *a, list_node *b, int (*compare)(const void *, const void *));
+static void lnb_mergesort_recursive_split(list_node_base *head, list_node_base **tail, list_node_base **a, list_node_base **b);
 
-/* slist and list in the works
-//static dlnode *dn_mergesort_recursive_merge(dlnode *a, dlnode *b, int (*compare)(const void *, const void *));
-//static void dn_mergesort_recursive_split(dlnode *head, dlnode **tail, dlnode **a, dlnode **b);
-
-//static void sn_mergesort_iterative_swap(void *a, void *b);
-//static int sn_mergesort_iterative_length(slnode *curr);
-//static void sn_mergesort_iterative_merge(slnode **start1, slnode **end1, slnode **start2, slnode **end2, int (*compare)(const void *, const void *));
+//static void sln_mergesort_iterative_swap(void *a, void *b);
+//static int slnb_mergesort_iterative_length(slist_node_base *curr);
+//static void sln_mergesort_iterative_merge(slist_node **start1, slist_node **end1, slist_node **start2, slist_node **end2, int (*compare)(const void *, const void *));
 */
+
+void v_mergesort_iterative(void *arr,
+                           size_t n, size_t width,
+                           int (*compare)(const void *, const void *)) {
+    int curr_size = -1;
+    int left_start = -1;
+
+    for (curr_size = 1; curr_size <= (n - 1); curr_size *= 2) {
+        for (left_start = 0; 
+             left_start < (n - 1);
+             left_start += (curr_size * 2)) {
+
+            int mid =
+            v_mergesort_min(left_start + curr_size - 1, (int)(n) - 1);
+
+            int right_end =
+            v_mergesort_min(left_start + curr_size * 2 - 1, (int)(n) - 1);
+
+            v_mergesort_iterative_merge(arr,
+                                        left_start, 
+                                        mid, 
+                                        right_end,
+                                        width, compare);
+        }
+    }
+}
 
 static int v_mergesort_min(int x, int y) {
     return (x < y) ? x : y;
@@ -169,171 +196,26 @@ static void v_mergesort_iterative_merge(void *arr, int l, int m, int r,
         /* arr[k++] = R[j++] */
     }
 }
-
-void v_mergesort_iterative(void *arr,
-                           size_t n, size_t width,
-                           int (*compare)(const void *, const void *)) {
-    int curr_size = -1;
-    int left_start = -1;
-
-    for (curr_size = 1; curr_size <= (n - 1); curr_size *= 2) {
-        for (left_start = 0; 
-             left_start < (n - 1);
-             left_start += (curr_size * 2)) {
-
-            int mid =
-            v_mergesort_min(left_start + curr_size - 1, (int)(n) - 1);
-
-            int right_end =
-            v_mergesort_min(left_start + curr_size * 2 - 1, (int)(n) - 1);
-
-            v_mergesort_iterative_merge(arr,
-                                        left_start, 
-                                        mid, 
-                                        right_end,
-                                        width, compare);
-        }
-    }
-}
-
 /*
-static dlnode *dn_mergesort_recursive_merge(dlnode *a, dlnode *b,
-                                     int (*compare)(const void *, const void *)) {
-    if (a == NULL) {
-        return b;
-    }
+void slnb_mergesort_iterative(void *arg_head, int (*compare)(const void *, const void *)) {
+    slist_node_base **head = (slist_node_base **)(arg_head);
 
-    if (b == NULL) {
-        return a;
-    }
+    slist_node_base *start1 = NULL;
+    slist_node_base *end1 = NULL;
 
-    if (compare(a->valaddr, b->valaddr) <= 0) {
-        a->next = dn_mergesort_recursive_merge(a->next, b, compare);
+    slist_node_base *start2 = NULL;
+    slist_node_base *end2 = NULL;
 
-        a->next->prev = a;
-        a->prev = NULL;
+    slist_node_base *prevend = NULL;
 
-        return a;
-    } else {
-        b->next = dn_mergesort_recursive_merge(a, b->next, compare);
-
-        b->next->prev = b;
-        b->prev = NULL;
-
-        return b;
-    }
-}
-
-static void dn_mergesort_recursive_split(dlnode *head, dlnode **tail, dlnode **a, dlnode **b) {
-    dlnode *slow = head;
-    dlnode *fast = head->next;
-
-    while (fast != NULL) {
-        fast = fast->next;
-
-        if (fast != NULL) {
-            slow = slow->next;
-            fast = fast->next;
-        }
-    }
-
-    *b = slow->next;
-    slow->next = NULL;
-}
-
-void dn_mergesort_recursive(dlnode **head, dlnode **tail, int (*compare)(const void *, const void *)) {
-    if ((*head) == NULL || (*head)->next == NULL) {
-        return;
-    }
-
-    dlnode *a = (*head);
-    dlnode *b = NULL;
-
-    dn_mergesort_recursive_split((*head), tail, &a, &b);
-
-    dn_mergesort_recursive(&a, NULL, compare);
-    dn_mergesort_recursive(&b, NULL, compare);
-
-    *head = dn_mergesort_recursive_merge(a, b, compare);
-}
-
-void dn_mergesort_iterative(dlnode **head, int (*compare)(const void *, const void *)) {
-
-}
-
-static void sn_mergesort_iterative_swap(void *a, void *b) {
-    slnode **first = (slnode **)(a);
-    slnode **second = (slnode **)(b);
-
-    slnode *temp = *first;
-    (*first) = (*second);
-    (*second) = temp;
-}
-
-static int sn_mergesort_iterative_length(slnode *curr) {
-    int count = 0;
-    while (curr != NULL) {
-        curr = curr->next;
-        ++count;
-    }
-
-    return count;
-}
-
-static void sn_mergesort_iterative_merge(slnode **start1, slnode **end1,
-                                  slnode **start2, slnode **end2,
-                                  int (*compare)(const void *, const void *)) {
-    if (compare((*start1)->valaddr, (*start2)->valaddr) > 0) {
-        sn_mergesort_iterative_swap(start1, start2);
-        sn_mergesort_iterative_swap(end1, end2);
-    }
-
-    slnode *astart = *start1;
-    slnode *aend = *end1;
-
-    slnode *bstart = *start2;
-    //slnode *bend = *end2;
-
-    slnode *bendnext = (*end2)->next;
-
-    while (astart != aend && bstart != bendnext) {
-        if (astart->next->valaddr > bstart->valaddr) {
-            slnode *temp = bstart->next;
-
-            bstart->next = astart->next;
-            astart->next = bstart;
-
-            bstart = temp;
-        }
-
-        astart = astart->next;
-    }
-
-    if (astart == aend) {
-        astart->next = bstart;
-    } else {
-        (*end2) = (*end1);
-    }
-}
-
-void sn_mergesort_iterative(void *arg_head, int (*compare)(const void *, const void *)) {
-    slnode **head = (slnode **)(arg_head);
+    int length = slnb_mergesort_iterative_length(*head);
+    int gap = 0;
 
     if (*head == NULL) {
         return;
     }
 
-    slnode *start1 = NULL;
-    slnode *end1 = NULL;
-
-    slnode *start2 = NULL;
-    slnode *end2 = NULL;
-
-    slnode *prevend = NULL;
-
-    int length = sn_mergesort_iterative_length(*head);
-
-    for (int gap = 1; gap < length; gap = gap * 2) {
+    for (gap = 1; gap < length; gap = gap * 2) {
         start1 = (*head);
 
         while (start1) {
@@ -363,9 +245,9 @@ void sn_mergesort_iterative(void *arg_head, int (*compare)(const void *, const v
                 end2 = end2->next;
             }
 
-            slnode *temp = end2->next;
+            slist_node_base *temp = end2->next;
 
-            sn_mergesort_iterative_merge(&start1, &end1, &start2, &end2, compare);
+            sln_mergesort_iterative_merge(&start1, &end1, &start2, &end2, compare);
 
             if (first_iter) {
                 (*head) = start1;
@@ -381,7 +263,130 @@ void sn_mergesort_iterative(void *arg_head, int (*compare)(const void *, const v
     }
 }
 
-void sn_mergesort_recursive(void *arg_head, int (*compare)(const void *, const void *)) {
-    slnode **head = (slnode **)(arg_head);
+void slnb_mergesort_recursive(void *arg_head, int (*compare)(const void *, const void *)) {
+    slist_node_base **head = (slist_node_base **)(arg_head);
+}
+
+void lnb_mergesort_iterative(list_node_base **head, int (*compare)(const void *, const void *)) {
+
+}
+
+void lnb_mergesort_recursive(list_node_base **head, list_node_base **tail, int (*compare)(const void *, const void *)) {
+    list_node_base *a = NULL;
+    list_node_base *b = NULL;
+
+    if ((*head) == NULL || (*head)->next == NULL) {
+        return;
+    }
+
+    a = (*head);
+    b = NULL;
+
+    ln_mergesort_recursive_split((*head), tail, &a, &b);
+
+    lnb_mergesort_recursive(&a, NULL, compare);
+    lnb_mergesort_recursive(&b, NULL, compare);
+
+    *head = lnb_mergesort_recursive_merge(a, b, compare);
+}
+
+
+static list_node *ln_mergesort_recursive_merge(list_node *a, list_node *b,
+                                     int (*compare)(const void *, const void *)) {
+    if (a == NULL) {
+        return b;
+    }
+
+    if (b == NULL) {
+        return a;
+    }
+
+    if (compare(a->data, b->data) <= 0) {
+        a->node.next = ln_mergesort_recursive_merge(a->node.next, b, compare);
+
+        a->node.next->prev = a;
+        a->node.prev = NULL;
+
+        return a;
+    } else {
+        b->node.next = ln_mergesort_recursive_merge(a, b->node.next, compare);
+
+        b->node.next->prev = b;
+        b->node.prev = NULL;
+
+        return b;
+    }
+}
+
+static void lnb_mergesort_recursive_split(list_node_base *head, list_node_base **tail, list_node_base **a, list_node_base **b) {
+    list_node_base *slow = head;
+    list_node_base *fast = head->next;
+
+    while (fast != NULL) {
+        fast = fast->next;
+
+        if (fast != NULL) {
+            slow = slow->next;
+            fast = fast->next;
+        }
+    }
+
+    *b = slow->next;
+    slow->next = NULL;
+}
+
+static void sln_mergesort_iterative_swap(void *a, void *b) {
+    slist_node **first = (slist_node **)(a);
+    slist_node **second = (slist_node **)(b);
+
+    slist_node *temp = *first;
+    (*first) = (*second);
+    (*second) = temp;
+}
+
+static int slnb_mergesort_iterative_length(slist_node_base *curr) {
+    int count = 0;
+    while (curr != NULL) {
+        curr = curr->next;
+        ++count;
+    }
+
+    return count;
+}
+
+static void sln_mergesort_iterative_merge(slist_node **start1, slist_node **end1,
+                                  slist_node **start2, slist_node **end2,
+                                  int (*compare)(const void *, const void *)) {
+    if (compare((*start1)->valaddr, (*start2)->valaddr) > 0) {
+        sln_mergesort_iterative_swap(start1, start2);
+        sln_mergesort_iterative_swap(end1, end2);
+    }
+
+    slist_node *astart = *start1;
+    slist_node *aend = *end1;
+
+    slist_node *bstart = *start2;
+    //slist_node *bend = *end2;
+
+    slist_node *bendnext = (*end2)->next;
+
+    while (astart != aend && bstart != bendnext) {
+        if (astart->next->valaddr > bstart->valaddr) {
+            slist_node *temp = bstart->next;
+
+            bstart->next = astart->next;
+            astart->next = bstart;
+
+            bstart = temp;
+        }
+
+        astart = astart->next;
+    }
+
+    if (astart == aend) {
+        astart->next = bstart;
+    } else {
+        (*end2) = (*end1);
+    }
 }
 */

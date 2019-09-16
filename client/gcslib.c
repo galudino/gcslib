@@ -61,6 +61,11 @@ void test_listvp_vec2D(void);
 void test_listtmpl_int(void);
 void test_listtmpl_str(void);
 
+bool remove_if_even(const void *arg) {
+    assert(arg);
+    return (*(int *)(arg)) % 2 == 0;
+}
+
 /**
  *  @brief  Program execution begins here
  *
@@ -546,6 +551,7 @@ void test_listvp_int_splice() {
     list *l1 = l_new(_int_);
     list *l2 = l_new(_int_);
     int i = 0;
+    int index = -1;
     iterator it;
     iterator pos;
     iterator opos;
@@ -571,9 +577,53 @@ void test_listvp_int_splice() {
     l_puts(l2);
 
     LOG(__FILE__, "l_splicelist for l1 at pos 4, all of l2");
-    it = l_splicelist(l1, pos, l2);
+    it = l_splicelist(l1, it, l2);
     l_puts(l1);
     l_puts(l2);
+
+    LOG(__FILE__, "l_splicernge for l2 at begin");
+    first = l_begin(l1);
+    last = it_next_n(l_begin(l1), 4);
+    it = l_splicernge(l2, l_begin(l2), l1, first, last);
+    l_puts(l1);
+    l_puts(l2);
+
+    LOG(__FILE__, "l_splicernge for l2 at it");
+    first = it_next_n(l_begin(l1), 20);
+    last = it_next_n(l_begin(l1), 25);
+    l_splicernge(l2, it, l1, first, last);
+    l_puts(l1);
+    l_puts(l2);
+
+    LOG(__FILE__, "l_remove for l2, 13");
+    i = 13;
+    l_remove(l2, &i);
+    l_puts(l2);
+
+    LOG(__FILE__, "l_remove_if, even numbers");
+    l_remove_if(l2, remove_if_even);
+    l_puts(l2);
+
+    LOG(__FILE__, "l_unique, get rid of 23's (except one");
+    i = 23;
+    l_pushf(l2, &i);
+    l_insert_at(l2, 3, &i);
+    l_insert_at(l2, 4, &i);
+    l_puts(l2);
+
+    LOG(__FILE__, "l_reverse");
+    l_reverse(l2);
+    l_puts(l2);
+
+    /*
+    LOG(__FILE__, "l_sort");
+    l_sort(l2);
+    l_puts(l2);
+    */
+
+    i = 1;
+    index = l_search(l2, &i);
+    printf("%d is at index %d\n", i, index);
 
     l_delete(&l1);
     l_delete(&l2);

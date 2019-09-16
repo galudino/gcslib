@@ -2063,43 +2063,45 @@ void v_remove(vector *v, const void *valaddr) {
 }
 
 /**
- *  @brief  Removes all occurences of valaddr from within v, by condition
- *
- *  @param[in]  v       pointer to vector
- *  @param[in]  valaddr address of element to remove (copy of)
- *
- *  If unary_predicate(valaddr) returns true...
- *
- *  ...this function uses the supplied compare function with v's
- *  ttbl to determine if valaddr matches any of the elements.
- *
- *  If a dtor function is defined in v's ttbl,
- *  the matched element will be destroyed using the dtor function
- *  from within ttbl.
- *
- *  Memory management of dynamically allocated elements/elements with
- *  dynamically allocated fields become the client's responsibility
- *  if a dtor function is NOT defined within v's ttbl.
+ *  @brief  Removes all occurences of elements that meet a condition within v
+ * 
+ *  @param[in]  v                   pointer to vector
+ *  @param[in]  unary_predicate     pointer to function
+ * 
+ *  For all elements e in v, if unary_predicate(e) == true,
+ *  it will be removed.
  */
-void v_remove_if(vector *v, const void *valaddr,
-                 bool (*unary_predicate)(const void *)) {
+void v_remove_if(vector *v, bool (*unary_predicate)(const void *)) {
+    size_t i = 0;
+    size_t size = 0;
+
+    void *curr = NULL;
+
     assert(v);
-    assert(valaddr);
     assert(unary_predicate);
 
     if (v->impl.start == v->impl.finish) {
         return;
     }
 
-    /**
-     *  If unary_predicate returns true
-     *  from evaluating the contents of valaddr,
-     *  redirect to v_remove
-     */
-    if (unary_predicate(valaddr) == false) {
-        return;
-    } else {
-        v_remove(v, valaddr);
+    i = 0;
+    size = v_size(v);
+    curr = v->impl.start;
+
+    if (unary_predicate(curr) == true) {
+        v_erase_at(v, i);
+        --size;
+        curr = (char *)(curr) + (v->ttbl->width);
+    }
+
+    for (i = 1; i < size; i++) {
+        if (unary_predicate(curr) == true) {
+            curr = (char *)(curr) - (v->ttbl->width);
+            v_erase_at(v, i--);
+            --size;
+        }
+
+        curr = (char *)(curr) + (v->ttbl->width);
     }
 }
 

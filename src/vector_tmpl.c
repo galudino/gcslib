@@ -2485,25 +2485,20 @@ void vremove(T)(vector(T) *v, T val) {
 }
 
 /**
- *  @brief  Removes all occurences of val from within v, by condition
- *
- *  @param[in]  v       pointer to vector
- *  @param[in]  val     element to remove (copy of)
- *
- *  If unary_predicate(val) returns true...
- *
- *  ...this function uses the supplied compare function with v's
- *  ttbl to determine if val matches any of the elements.
- *
- *  If a dtor function is defined in v's ttbl,
- *  the matched element will be destroyed using the dtor function
- *  from within ttbl.
- *
- *  Memory management of dynamically allocated elements/elements with
- *  dynamically allocated fields become the client's responsibility
- *  if a dtor function is NOT defined within v's ttbl.
+ *  @brief  Removes all occurences of elements that meet a condition within v
+ * 
+ *  @param[in]  v                   pointer to vector
+ *  @param[in]  unary_predicate     pointer to function
+ * 
+ *  For all elements e in v, if unary_predicate(e) == true,
+ *  it will be removed.
  */
-void vremoveif(T)(vector(T) *v, T val, bool (*unary_predicate)(const void *)) {
+void vremoveif(T)(vector(T) *v, bool (*unary_predicate)(const void *)) {
+    size_t i = 0;
+    size_t size = 0;
+
+    T *curr = NULL;
+
     assert(v);
     assert(unary_predicate);
 
@@ -2511,15 +2506,24 @@ void vremoveif(T)(vector(T) *v, T val, bool (*unary_predicate)(const void *)) {
         return;
     }
 
-    /**
-     *  If unary_predicate returns true
-     *  from evaluating the contents of val,
-     *  redirect to vremove
-     */
-    if (unary_predicate(&val) == false) {
-        return;
-    } else {
-        vremove(T)(v, val);
+    i = 0;
+    size = vsize(T)(v);
+    curr = v->impl.start;
+
+    if (unary_predicate(curr) == true) {
+        veraseat(T)(v, i);
+        --size;
+        ++curr;
+    }
+
+    for (i = 1; i < size; i++) {
+        if (unary_predicate(curr) == true) {
+            --curr;
+            v_erase_at(v, i--);
+            --size;
+        }
+
+        ++curr;
     }
 }
 

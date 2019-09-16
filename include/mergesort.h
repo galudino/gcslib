@@ -37,16 +37,16 @@
 void v_mergesort_iterative(void *arr, size_t n, size_t width,
                            int (*compare)(const void *, const void *));
 
-/**< dnode: mergesort (iterative/recursive) */
-void dn_mergesort_iterative(void *arg_head,
+/**< list_node_base: mergesort (iterative/recursive) */
+void lnb_mergesort_iterative(void *arg_head,
                             int (*compare)(const void *, const void *));
-void dn_mergesort_recursive(void *arg_head, void *arg_tail,
+void lnb_mergesort_recursive(void *arg_head, void *arg_tail,
                             int (*compare)(const void *, const void *));
 
-/**< snode: mergesort (iterative/recursive) */
-void sn_mergesort_iterative(void *arg_head,
+/**< slist_node_base: mergesort (iterative/recursive) */
+void slnb_mergesort_iterative(void *arg_head,
                             int (*compare)(const void *, const void *));
-void sn_mergesort_recursive(void *arg_head,
+void slnb_mergesort_recursive(void *arg_head,
                             int (*compare)(const void *, const void *));
 
 #endif /* MERGESORT_H */
