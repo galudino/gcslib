@@ -78,14 +78,15 @@ int main(int argc, const char *argv[]) {
 
     test_vectorvp_str_assign();
     test_vectortmpl_str_assign();
-    
+    */
+
     test_listvp_int();
     test_listvp_str();
     test_listvp_vec2D();
 
     test_listtmpl_int();
     test_listtmpl_str();
-    */
+    
 
     return EXIT_SUCCESS;
 }
@@ -384,6 +385,7 @@ void test_listvp_str() {
     list *lrnge = NULL;
     list *lcopy = NULL;
     list *lmove = NULL;
+    list *dummy = NULL;
 
     char *curr = NULL;
 
@@ -416,6 +418,26 @@ void test_listvp_str() {
     l_pushb(l, &curr);
     
     l_puts(l);
+
+    dummy = l_new(_str_);
+
+    curr = "b";
+    l_pushb(dummy, &curr);
+
+    curr = "c";
+    l_pushb(dummy, &curr);
+
+    curr = "d";
+    l_pushb(dummy, &curr);
+
+    curr = "e";
+    l_pushb(dummy, &curr);
+
+    curr = "f";
+    l_pushb(dummy, &curr);
+
+    curr = "g";
+    l_pushb(dummy, &curr);
 
     printf("\nfront: %s\n", *(char **)(l_front(l)));
     printf("back: %s\n\n", *(char **)(l_back(l)));
@@ -475,7 +497,10 @@ void test_listvp_str() {
     l_puts(l);
 
     LOG(__FILE__, "l_assignrnge:");
-    l_assignrnge(l, l_begin(lmove), l_end(lmove));
+    l_assignrnge(l, l_begin(dummy), l_end(dummy));
+    l_puts(l);
+
+    l_assignfill(l, 16, &curr);
     l_puts(l);
 }
 

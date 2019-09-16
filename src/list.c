@@ -399,49 +399,32 @@ const void *l_back_const(list *l) {
 }
 
 void l_assignrnge(list *l, iterator first, iterator last) { 
-    /* TODO */
-    /*
-    iterator first1 = begin();
-    iterator last1 = end();
+    void *curr = NULL;
+    void *sentinel = NULL;
 
-    for (; 
-        first1 != last1 && first != last;
-        ++first1, ++first) {
-        *first1 = *first;
-    }
+    assert(l);
+    l_clear(l);
+
+    sentinel = it_curr(last);
     
-    if (first == last) {
-        erase(first1, last1);
-    } else {
-        insert(last1, first, last);
+    while ((curr = it_curr(first)) != sentinel) {
+        list_node *new_node = ln_new(l->ttbl, curr);
+        lnb_hook(*(list_node_base **)(&new_node), &(l->impl.node));
+
+        it_incr(&first);
     }
-    */
-
-
-
-    /*
-        determine delta between first and last
-        if delta is less than l_size(l)
-            you will replace delta elements
-            from [0, delta)
-        else if delta is greater than or eq to l_size(l)
-            clear all existing nodes and their data
-            push back delta elements from [0, delta)
-            
-     */
 }
 
 void l_assignfill(list *l, size_t n, const void *valaddr) { 
-    /* TODO */
+    size_t i = 0;
+    assert(l);
     
-    /*
-        if n is less than l_size(l)
-            you will replace n elements
-            from [0, delta)
-        else if n is greater than or eq to l_size(l)
-            clear all existing nodes and their data
-            push back n elements from [0, n)
-    */
+    l_clear(l);
+
+    for (i = 0; i < n; i++) {
+        list_node *new_node = ln_new(l->ttbl, valaddr);
+        lnb_hook(*(list_node_base **)(&new_node), &(l->impl.node));
+    }
 }
 
 void l_pushf(list *l, const void *valaddr) { 
