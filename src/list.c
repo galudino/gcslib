@@ -417,6 +417,8 @@ void l_assignrnge(list *l, iterator first, iterator last) {
     }
     */
 
+
+
     /*
         determine delta between first and last
         if delta is less than l_size(l)

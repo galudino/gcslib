@@ -912,14 +912,11 @@ const void *v_data_const(vector *v) {
  *  @param[in]  first   represents the beginning of the range (inc)
  *  @param[in]  last    represents the end of the range, (exc)
  *
- *  If the numeric range [first, last) exceeds that of
- *  v_size(v), the old elements will be destroyed,
- *  and a new buffer will be assigned to v, with copies
- *  of elements from the iterator range.
- *
- *  If the range does not exceed that of v_size(v),
- *  only beginning of the vector will be overwritten
- *  with the contents from the range.
+ *  Elements in this vector will be destroyed, and replaced with
+ *  contents from [first, last).
+ *  
+ *  If the range of [first, last) exceeds that of v_capacity(v),
+ *  the capacity will be increased to that of size it_distance(&first, &last).
  */
 void v_assignrnge(vector *v, iterator first, iterator last) {
     int delta = it_distance(&first, &last);
@@ -927,9 +924,6 @@ void v_assignrnge(vector *v, iterator first, iterator last) {
 
     void *sentinel = it_curr(last);
     void *curr = NULL;
-
-    size_t old_size = v_size(v);
-    size_t old_capacity = v_capacity(v);
 
     if (first.itbl != last.itbl) {
         /**
@@ -945,45 +939,33 @@ void v_assignrnge(vector *v, iterator first, iterator last) {
         return;
     }
 
-    if (delta >= old_capacity) {
-        /**
-         *  If range [first, last) exceeds that of old_capacity,
-         *  resize the vector to accomodate the new elements
-         */
+    /**
+     *  Clear the vector. 
+     */
+    v_clear(v);
+
+    /**
+     *  Resize vector if necessary.
+     */
+    if (delta > v_capacity(v)) {
         v_resize(v, delta);
     }
 
-    /* move the finish pointer to the beginning of the vector */
-    v->impl.finish = v->impl.start;
-
-    if (ttbl_first->copy && ttbl_first->dtor) {
-        /**
-         *  If items were deep copied, existing memory
-         *  will be released before copying new data
-         */
+    if (ttbl_first->copy) {
         while ((curr = it_curr(first)) != sentinel)  {
-            ttbl_first->dtor(v->impl.finish);
             ttbl_first->copy(v->impl.finish, curr);
 
             v->impl.finish = (char *)(v->impl.finish) + (v->ttbl->width);
             it_incr(&first);
         }
     } else {
-        /**
-         *  If items were shallow copied,
-         *  blocks will be overwritten immediately
-         */
         while ((curr = it_curr(first)) != sentinel)  {
             memcpy(v->impl.finish, curr, v->ttbl->width);
 
             v->impl.finish = (char *)(v->impl.finish) + (v->ttbl->width);
             it_incr(&first);
         };
-    }
-
-    /* restoring finish pointer to appropriate location */
-    v->impl.finish = delta < old_size
-    ? (char *)(v->impl.start) + (old_size * v->ttbl->width) : v->impl.finish;
+    } 
 }
 
 /**
@@ -992,108 +974,42 @@ void v_assignrnge(vector *v, iterator first, iterator last) {
  *  @param[in]  v           pointer to vector
  *  @param[in]  n           amount of elements to assign
  *  @param[in]  valaddr     the element to assign
- *
- *  If v has dynamically allocated elements, and/or the elements
- *  have dynamically allocated fields, and there is no dtor function
- *  defined in v's ttbl, the management of v's memory will become
- *  the client's responsibility. This is especially important to note
- *  if n is less than v_size(v).
- *
- *  Likewise, if v does not have a copy function defined,
- *  assignfill will shallow-copy valaddr into v.
+ * 
+ *  Elements in this vector will be destroyed,
+ *  and replaced with n copies of valaddr.
+ * 
+ *  If n exceeds that of v_capacity(v),
+ *  the capacity of this vector will be increased to that of size n.
  */
 void v_assignfill(vector *v, size_t n, const void *valaddr) {
-    size_t old_size = v_size(v);
-    size_t old_capacity = v_capacity(v);
-
-    void *newstart = NULL;
     void *sentinel = NULL;
 
-    assert(valaddr);
+    /**
+     *  Clear the vector. 
+     */
+    v_clear(v);
 
-    if (n >= old_size || n >= old_capacity) {
-        /**
-         *  elements from [0, size) are completely overwritten and replaced with
-         *  valaddr. If elements were deep copied, their memory must be released first.
-         */
-        if (v->ttbl->dtor) {
-            v->impl.finish = (char *)(v->impl.finish) - (v->ttbl->width);
+    /**
+     *  Resize vector if necessary.
+     */
+    if (n > v_capacity(v)) {
+        v_resize(v, n);
+    }
 
-            while (v->impl.finish != v->impl.start) {
-                v->ttbl->dtor(v->impl.finish);
-                v->impl.finish = (char *)(v->impl.finish) - (v->ttbl->width);
-            }
+    sentinel = (char *)(v->impl.start) + (n * v->ttbl->width);
+    v->impl.finish = v->impl.start;
 
-            v->ttbl->dtor(v->impl.start);
-        }
-
-        free(v->impl.start);
-        v->impl.start = NULL;
-
-        newstart = calloc(n, v->ttbl->width);
-        assert(newstart);
-
-        v->impl.start = newstart;
-        v->impl.finish = v->impl.start;
-        v->impl.end_of_storage = (char *)(v->impl.start) + (n * v->ttbl->width);
-
-        if (v->ttbl->copy) {
-            /* deep copy */
-            while (v->impl.finish != v->impl.end_of_storage) {
-                v->ttbl->copy(v->impl.finish, valaddr);
-                v->impl.finish = (char *)(v->impl.finish) + (v->ttbl->width);
-            }
-        } else {
-            /* shallow copy */
-            while (v->impl.finish != v->impl.end_of_storage) {
-                memcpy(v->impl.finish, valaddr, v->ttbl->width);
-                v->impl.finish = (char *)(v->impl.finish) + (v->ttbl->width);
-            }
+    if (v->ttbl->copy) {
+        while (v->impl.finish != sentinel)  {
+            v->ttbl->copy(v->impl.finish, valaddr);
+            v->impl.finish = (char *)(v->impl.finish) + (v->ttbl->width);
         }
     } else {
-        if (v->ttbl->dtor) {
-            /**
-             *  Elements from [0, n) are completely overwritten and replaced with
-             *  valaddr. If elements were deep copied, their memory must be released first.
-             */
-            sentinel = (char *)(v->impl.start) + ((n + 1) * v->ttbl->width);
-            v->impl.finish = v->impl.start;
-
-            while (v->impl.finish != sentinel) {
-                v->ttbl->dtor(v->impl.finish);
-                v->impl.finish = (char *)(v->impl.finish) + (v->ttbl->width);
-            }
-
-            v->ttbl->dtor(v->impl.start);
-        } else {
-            /**
-             *  If elements are shallow copied,
-             *  we skip memory deallocation and move the finish pointer
-             *  to the address of the start pointer
-             */
-            v->impl.finish = v->impl.start;
-        }
-
-        v->impl.finish = v->impl.start;
-        sentinel = (char *)(v->impl.start) + ((n + 1) * v->ttbl->width);
-        
-        if (v->ttbl->copy) {
-            /* deep copy */
-            while (v->impl.finish != sentinel) {
-                v->ttbl->copy(v->impl.finish, valaddr);
-                v->impl.finish = (char *)(v->impl.finish) + (v->ttbl->width);
-            }
-        } else {
-            /* shallow copy */
-            while (v->impl.finish != sentinel) {
-                memcpy(v->impl.finish, valaddr, v->ttbl->width);
-                v->impl.finish = (char *)(v->impl.finish) + (v->ttbl->width);
-            }
-        }
-
-        /* restoring the finish pointer to its former address */
-        v->impl.finish = (char *)(v->impl.start) + (old_size * v->ttbl->width);
-    }
+        while (v->impl.finish != sentinel)  {
+            memcpy(v->impl.finish, valaddr, v->ttbl->width);
+            v->impl.finish = (char *)(v->impl.finish) + (v->ttbl->width);
+        };
+    } 
 }
 
 /**

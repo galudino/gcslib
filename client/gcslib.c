@@ -48,6 +48,10 @@ void test_vectorvp_vec2D(void);
 void test_vectortmpl_int(void);
 void test_vectortmpl_str(void);
 
+void test_vectorvp_str_assign(void);
+
+void test_vectortmpl_str_assign(void);
+
 void test_listvp_int(void);
 void test_listvp_str(void);
 void test_listvp_vec2D(void);
@@ -71,14 +75,17 @@ int main(int argc, const char *argv[]) {
 
     test_vectortmpl_int();
     test_vectortmpl_str();
-    */
 
+    test_vectorvp_str_assign();
+    test_vectortmpl_str_assign();
+    
     test_listvp_int();
     test_listvp_str();
     test_listvp_vec2D();
 
     test_listtmpl_int();
     test_listtmpl_str();
+    */
 
     return EXIT_SUCCESS;
 }
@@ -264,6 +271,83 @@ void test_vectortmpl_str() {
     vdelete(str)(&vs);
 }
 
+void test_vectorvp_str_assign() {
+    vector *v1 = v_new(_str_);
+    const char *arr1[] = { "alpha", "beta", "charlie", "delta", "echo", "foxtrot", "kilo" };
+    
+    vector *v2 = v_new(_str_);
+    const char *arr2[] = { "j", "k", "l", "m", "n", "o", "p", "q", "r" };
+    
+    int i = 0;
+    for (i = 0; i < sizeof(arr1) / sizeof(char *); i++) {
+        v_pushb(v1, &arr1[i]);
+    }
+
+    for (i = 0; i < sizeof(arr2) / sizeof(char *); i++) {
+        v_pushb(v2, &arr2[i]);
+    }
+
+    v_puts(v1);
+    v_puts(v2);
+
+    {
+        iterator it = { NULL, NULL, NULL };
+        iterator pos = { NULL, NULL, NULL };
+        iterator beg = { NULL, NULL, NULL };
+        iterator end = { NULL, NULL, NULL };
+        char *filler = "filler";
+
+        pos = it_next_n(v_begin(v1), 3);
+        beg = it_next_n(v_begin(v2), 2);
+        end = it_next_n(v_begin(v2), 6);
+
+        v_assignrnge(v1, beg, end);
+        v_puts(v1);
+
+        v_assignfill(v1, 16, &filler);
+        v_puts(v1);
+    }
+
+    v_delete(&v1);
+    v_delete(&v2);
+}
+
+void test_vectortmpl_str_assign() {
+    vector(str) *v1 = vnew(str)();
+    char *arr1[] = { "alpha", "beta", "charlie", "delta", "echo", "foxtrot", "kilo" };
+    
+    vector(str) *v2 = vnew(str)();  
+    char *arr2[] = { "j", "k", "l", "m", "n", "o", "p", "q", "r" };
+    
+    int i = 0;
+
+    iterator it;
+    iterator pos;
+    iterator beg;
+    iterator end;
+
+    for (i = 0 ; i < sizeof(arr1) / sizeof(char *); i++) {
+        vpushb(str)(v1, arr1[i]);
+    }
+
+    for (i = 0; i < sizeof(arr2) / sizeof(char *); i++) {
+        vpushb(str)(v2, arr2[i]);
+    }
+
+    vputs(str)(v1);
+    vputs(str)(v2);
+
+    beg = it_next_n(vbegin(str)(v2), 2);
+    end = it_next_n(vbegin(str)(v2), 6);
+
+    vassignfill(str)(v1, 3, arr2[4]);
+    vassignrnge(str)(v1, beg, end);
+    vputs(str)(v1);
+
+    vdelete(str)(&v1);
+    vdelete(str)(&v2);
+}
+
 void test_listvp_int() {
     list *l = l_new(_int_);
     int i = 0;
@@ -388,6 +472,10 @@ void test_listvp_str() {
     printf("it: %s\n", *(char **)(it_curr(it)));
 
     it = l_erasernge(l, it_next_n(l_begin(l), 3), it_next_n(l_begin(l), 11));
+    l_puts(l);
+
+    LOG(__FILE__, "l_assignrnge:");
+    l_assignrnge(l, l_begin(lmove), l_end(lmove));
     l_puts(l);
 }
 
