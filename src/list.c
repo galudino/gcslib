@@ -729,7 +729,7 @@ iterator l_splicelist(list *l, iterator pos, list *other) {
         if (l->ttbl != other->ttbl) {
             ERROR(__FILE__, "Cannot splice lists using different typetables.");
         } else {
-            list_node_base *beg = it_next_n(l_begin(other)).curr;
+            list_node_base *beg = l_begin(other).curr;
             list_node_base *end = l_end(other).curr;
 
             lnb_transfer(pos.curr, beg, end);
