@@ -201,4 +201,76 @@ void v_assignfill(vector *v, size_t n, const void *valaddr) {
     }
 }
 
+
+static void v_initialize_dispatch_fill(vector *v, size_t n, const void *valaddr);
+static void v_initialize_dispatch_rnge(vector *v, iterator first, iterator last);
+static void v_range_initialize(vector *v, iterator first, iterator last);
+
+static void v_range_check(vector *v, size_t n);
+
+static void v_assign_aux(vector *v, iterator first, iterator last);
+static void v_assign_dispatch_fill(vector *v, size_t n, const void *valaddr);
+static void v_assign_dispatch_rnge(vector *v, iterator first, iterator last);
+
+static void v_insert_aux(vector *v, iterator pos, const void *valaddr);
+static void v_insert_dispatch_fill(vector *v, iterator pos, size_t n, const void *valaddr);
+static void v_insert_dispatch_rnge(vector *v, iterator first, iterator last);
+
+static void v_fill_assign(vector *v, size_t n, const void *valaddr);
+static void v_fill_insert(vector *v, iterator pos, size_t n, const void *valaddr);
+
+static void v_range_insert(vector *v, iterator first, iterator last);
+
+static void v_erase_at_end(vector *v, void *pos);
+
+    /*
+    ALTERNATE CODE for v_assignrnge
+    int delta = it_distance(&first, &last);
+    struct typetable *ttbl_first = it_get_ttbl(first);
+
+    if (first.itbl != last.itbl) {
+        ERROR(__FILE__, "first and last must match container types and refer to the same container.");
+        return;
+    }
+
+    v_clear(v);
+    free(v->impl.start);
+    v->impl.start = NULL;
+
+    v->impl.start = allocate_and_copy(v->ttbl, delta, first.curr, last.curr);
+    v->impl.finish = (char *)(v->impl.start) + (delta + v->ttbl->width);
+    v->impl.end_of_storage = v->impl.finish;
+    */
+
+
+   /*
+    ALTERNATE CODE for v_assignrnge
+    vector *tmp = v_newrnge(first, last);
+    v_swap(&v, &tmp);
+    v_delete(&tmp);
+   */
+
+
+
+    /*
+    ALTERNATE CODE for v_assignfill
+    just make a new vector tmp, filled with n elements,
+    swap with v, and delete tmp.
+    vector *tmp = v_newfill(ttbl, n, valaddr);
+    v_swap(&v, &tmp);
+    v_delete(&tmp);
+    */
+
+   static void v_range_check(vector *v, size_t n) {
+    assert(v);
+    size_t size = v_size(v);
+    if (n >= v_size(v)) {
+        char str[256];
+        sprintf(str, "Index out of bounds - %lu is greater than or equal to %lu.", n, size);
+        ERROR(__FILE__, str);
+    }
+}
+
+
+
 // end scratch

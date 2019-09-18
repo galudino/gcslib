@@ -1309,6 +1309,92 @@ ptrdiff_t ptr_distance(const void *beg, const void *end, size_t width) {
     return ((finish - start) / width);
 }
 
+/**
+ *  Returns a pointer to a deep-copied block of memory defined by [first, last)
+ *  
+ *  @param[in]  ttbl    typetable, used to determine sizeof(T)
+ *  @param[in]  n       block count (allocated capacity)
+ *  @param[in]  first   base address of memory to copy
+ *  @param[in]  last    if non-null, sentinel address that ends copying
+ *                      if null, 
+ *                          n determines the quantity of copies that are made
+ *                          of the element pointed to by first
+ * 
+ *  @return     address to copied memory
+ */
+void *allocate_and_copy(struct typetable *ttbl, size_t n, void *first, void *last) {
+    void *result = NULL;
+    void *pos = NULL;
+    void *curr = NULL;
+
+    assert(ttbl);       /**< must have a typetable */
+    assert(n > 0);      /**< n must be nonzero - something must be allocated */
+    assert(first);      /**< base address cannot be NULL */
+
+    result = calloc(n, ttbl->width);
+    assert(result);
+    pos = result;
+    curr = first;
+
+    if (last) {
+        /**
+         *  If last is non-null,
+         *  function will copy range of elements
+         *  from [first, last), starting at base address result.
+         */
+        if (ttbl->copy) {
+            /**
+             *  If typetable has a deep copy function,
+             *  elements from [first, last) will be deep-copied.
+             */
+            while (curr != last) {
+                ttbl->copy(pos, curr);
+                pos = (char *)(pos) + (ttbl->width);
+                curr = (char *)(curr) + (ttbl->width);
+            }
+        } else {
+            /**
+             *  If typetable has no deep copy function,
+             *  elements from [first, last) will be shallow-copied.
+             */
+            while (curr != last) {
+                memcpy(pos, curr, ttbl->width);
+                pos = (char *)(pos) + (ttbl->width);
+                curr = (char *)(curr) + (ttbl->width);
+            }
+        }
+    } else {
+        /**
+         *  If last is NULL,
+         *  function will create n copies of first,
+         *  starting at base address result.
+         */
+        size_t i = 0;
+
+        if (ttbl->copy) {
+            /**
+             *  If typetable has a deep copy function,
+             *  elements from [first, last) will be deep-copied.
+             */
+            for (i = 0; i < n; i++) {
+                ttbl->copy(pos, curr);
+                pos = (char *)(pos) + (ttbl->width);
+            }    
+        } else {
+            /**
+             *  If typetable has no deep copy function,
+             *  elements from [first, last) will be shallow-copied.
+             */
+            for (i = 0; i < n; i++) {
+                memcpy(pos, curr, ttbl->width);
+                pos = (char *)(pos) + (ttbl->width);
+            }
+        }
+    }
+
+    return result;
+}
+
 void lnb_swap(list_node_base *x, list_node_base *y) {
     if (x->next != x) {
         if (y->next != y) {

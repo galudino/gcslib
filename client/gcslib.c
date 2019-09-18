@@ -28,8 +28,8 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "gcslib.h"             /**< Entire gcslib_c library */
-#include "vec2D.h"              /**< vec2D API, a test "object" */
+#include "gcslib.h" /**< Entire gcslib_c library */
+#include "vec2D.h"  /**< vec2D API, a test "object" */
 
 #include <dirent.h>
 #include <fcntl.h>
@@ -108,7 +108,6 @@ int main(int argc, const char *argv[]) {
  *  @brief  Space to test container functionality for integral types
  */
 void test_vectorvp_int() {
-
 }
 
 /**
@@ -120,7 +119,7 @@ void test_vectorvp_str() {
 
     iterator first;
     iterator last;
-    
+
     char *temp = NULL;
 
     vstr = v_newr(_str_, 1);
@@ -163,7 +162,7 @@ void test_vectorvp_str() {
     v_assignfill(vs, 1, &temp);
 
     v_puts(vs);
-    
+
     v_delete(&vstr);
     v_delete(&vs);
 }
@@ -172,9 +171,7 @@ void test_vectorvp_str() {
  *  @brief  Space to test container functionality for "object" types
  */
 void test_vectorvp_vec2D() {
-
 }
-
 
 void test_vectortmpl_int() {
     vector(int) *v = NULL;
@@ -234,7 +231,6 @@ void test_vectortmpl_int() {
 
     vdelete(int)(&vmove);
 
-
     vr = vnewr(int)(1);
 
     for (i = 0; i < 32; i++) {
@@ -265,7 +261,7 @@ void test_vectortmpl_str() {
     }
 
     vputs(str)(vstr);
-    
+
     vsort(str)(vstr);
     vshrinktofit(str)(vstr);
     vputs(str)(vstr);
@@ -287,11 +283,12 @@ void test_vectortmpl_str() {
 
 void test_vectorvp_str_assign() {
     vector *v1 = v_new(_str_);
-    const char *arr1[] = { "alpha", "beta", "charlie", "delta", "echo", "foxtrot", "kilo" };
-    
+    const char *arr1[] = {"alpha", "beta",    "charlie", "delta",
+                          "echo",  "foxtrot", "kilo"};
+
     vector *v2 = v_new(_str_);
-    const char *arr2[] = { "j", "k", "l", "m", "n", "o", "p", "q", "r" };
-    
+    const char *arr2[] = {"j", "k", "l", "m", "n", "o", "p", "q", "r"};
+
     int i = 0;
     for (i = 0; i < sizeof(arr1) / sizeof(char *); i++) {
         v_pushb(v1, &arr1[i]);
@@ -305,10 +302,10 @@ void test_vectorvp_str_assign() {
     v_puts(v2);
 
     {
-        iterator it = { NULL, NULL, NULL };
-        iterator pos = { NULL, NULL, NULL };
-        iterator beg = { NULL, NULL, NULL };
-        iterator end = { NULL, NULL, NULL };
+        iterator it = {NULL, NULL, NULL};
+        iterator pos = {NULL, NULL, NULL};
+        iterator beg = {NULL, NULL, NULL};
+        iterator end = {NULL, NULL, NULL};
         char *filler = "filler";
 
         pos = it_next_n(v_begin(v1), 3);
@@ -328,11 +325,12 @@ void test_vectorvp_str_assign() {
 
 void test_vectortmpl_str_assign() {
     vector(str) *v1 = vnew(str)();
-    char *arr1[] = { "alpha", "beta", "charlie", "delta", "echo", "foxtrot", "kilo" };
-    
-    vector(str) *v2 = vnew(str)();  
-    char *arr2[] = { "j", "k", "l", "m", "n", "o", "p", "q", "r" };
-    
+    char *arr1[] = {"alpha", "beta",    "charlie", "delta",
+                    "echo",  "foxtrot", "kilo"};
+
+    vector(str) *v2 = vnew(str)();
+    char *arr2[] = {"j", "k", "l", "m", "n", "o", "p", "q", "r"};
+
     int i = 0;
 
     iterator it;
@@ -340,7 +338,7 @@ void test_vectortmpl_str_assign() {
     iterator beg;
     iterator end;
 
-    for (i = 0 ; i < sizeof(arr1) / sizeof(char *); i++) {
+    for (i = 0; i < sizeof(arr1) / sizeof(char *); i++) {
         vpushb(str)(v1, arr1[i]);
     }
 
@@ -368,7 +366,7 @@ void test_listvp_int() {
     int *curr = NULL;
     iterator it;
     void *sentinel = NULL;
-    
+
     for (i = 0; i < 16; i++) {
         l_pushb(l, &i);
     }
@@ -380,7 +378,7 @@ void test_listvp_int() {
         printf("iterator: %d\n", (*curr));
         it_incr(&it);
     }
-    
+
     it = l_erase(l, it_next_n(l_begin(l), 5));
     it = l_erase(l, it);
 
@@ -423,7 +421,7 @@ void test_listvp_int_at() {
 
 void test_listvp_str() {
     list *l = l_new(_str_);
-    
+
     list *lfill = NULL;
     list *lrnge = NULL;
     list *lcopy = NULL;
@@ -432,9 +430,9 @@ void test_listvp_str() {
 
     char *curr = NULL;
 
-    iterator it = { NULL, NULL, NULL };
-    iterator end = { NULL, NULL, NULL };
-    iterator pos = { NULL, NULL, NULL };
+    iterator it = {NULL, NULL, NULL};
+    iterator end = {NULL, NULL, NULL};
+    iterator pos = {NULL, NULL, NULL};
 
     int i = -1;
     void *sentinel = NULL;
@@ -459,7 +457,7 @@ void test_listvp_str() {
 
     curr = "georgia";
     l_pushb(l, &curr);
-    
+
     l_puts(l);
 
     dummy = l_new(_str_);
@@ -512,7 +510,7 @@ void test_listvp_str() {
     }
 
     l_puts(lmove);
-    
+
     curr = " -- insertion -- ";
     it = l_insert(l, it, &curr);
     l_puts(l);
@@ -630,17 +628,13 @@ void test_listvp_int_splice() {
 }
 
 void test_listvp_str_splice() {
-
 }
 
 void test_listvp_vec2D() {
-
 }
 
 void test_listtmpl_int() {
-
 }
 
 void test_listtmpl_str() {
-
 }

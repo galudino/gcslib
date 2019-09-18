@@ -904,6 +904,7 @@ enum node_traversal { INORDER, PREORDER, POSTORDER, LEVELORDER };
  *  Pointer utility functions
  */
 ptrdiff_t ptr_distance(const void *beg, const void *end, size_t width);
+void *allocate_and_copy(struct typetable *ttbl, size_t n, void *first, void *last);
 
 typedef struct list_node_base list_node_base;
 struct list_node_base {

@@ -935,7 +935,7 @@ void v_assignrnge(vector *v, iterator first, iterator last) {
          *  different container types (this is determiend by what itbls
          *  they each point to)
          */
-        ERROR(__FILE__, "first and last must matching container types and refer to the same container.");
+        ERROR(__FILE__, "first and last must match container types and refer to the same container.");
         return;
     }
 
