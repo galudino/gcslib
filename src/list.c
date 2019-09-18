@@ -877,10 +877,10 @@ list *l_merge(list *l, list *other) {
     iterator last2 = l_end(other);
 
     int (*compare)(const void *, const void *) = 
-    l->ttbl->compare ? l->ttbl->comapre : void_ptr_compare;
+    l->ttbl->compare ? l->ttbl->compare : void_ptr_compare;
 
     while (first1.curr != last1.curr  && first2.curr != last2.curr) {
-        if (compare(it_curr(first2), it_curr(last2) < 0) {
+        if (compare(it_curr(first2), it_curr(last2)) < 0) {
             iterator next = first2;
 
             it_incr(&next);
@@ -889,9 +889,11 @@ list *l_merge(list *l, list *other) {
             it_incr(&first1);
         }
     }
-
-
     */
+
+    
+
+
 
     return l;
 }

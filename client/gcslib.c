@@ -54,6 +54,7 @@ void test_vectortmpl_str_assign(void);
 void test_listvp_int(void);
 void test_listvp_int_at(void);
 void test_listvp_int_splice(void);
+void test_listvp_int_merge(void);
 void test_listvp_str(void);
 void test_listvp_str_splice(void);
 void test_listvp_vec2D(void);
@@ -87,8 +88,12 @@ int main(int argc, const char *argv[]) {
     test_vectortmpl_str_assign();
     */
 
+    /*
     test_listvp_int_splice();
     test_listvp_str_splice();
+    */
+
+    test_listvp_int_merge();
 
     /*
     test_listvp_int();
@@ -627,14 +632,55 @@ void test_listvp_int_splice() {
     l_delete(&l2);
 }
 
+#define assert_msg(CONDITION, MESSAGE)\
+if ((!CONDITION)) {\
+    fprintf(stderr, "Assertion failed:\n");\
+    ERROR(__FILE__, (MESSAGE));\
+    abort();\
+}\
+
+void test_listvp_int_merge() {
+    list *l1 = NULL;
+    list *l2 = NULL;
+    int i = 0;
+    int j = 0;
+
+    l1 = l_new(_int_);
+    for (i = 0; i < 16; i++) {
+        l_pushb(l1, &i);
+    }
+
+    l2 = l_new(_int_);
+    for (j = i; j < 32; j++) {
+        l_pushb(l2, &j);
+    }
+
+    l_merge(l1, l2);
+
+    l_puts(l1);
+    l_puts(l2);
+
+    l_delete(&l1);
+    l_delete(&l2);
+
+    {
+        char *mystr = strdup("duplicated");
+        printf("%s\n", mystr);
+    }
+}
+
 void test_listvp_str_splice() {
+
 }
 
 void test_listvp_vec2D() {
+
 }
 
 void test_listtmpl_int() {
+
 }
 
 void test_listtmpl_str() {
+
 }

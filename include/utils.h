@@ -454,13 +454,18 @@ char *uint32_parse(const void *arg);
 char *uint64_parse(const void *arg);
 #endif
 
-/**< C-String trim functions */
+/**< C-String functions/macros */
 char *str_trim_left(char *to_trim, const char *charset);
 char *str_trim_right(char *to_trim, const char *charset);
 char *str_trim(char *to_trim, const char *charset);
 
 #define streql(s1, s2) strcmp(s1, s2) == 0
 #define strneql(s1, s2, n) strncmp(s1, s2, n) == 0
+
+#if __linux__ && !__POSIX__
+#define strdup(str)         strcpy(malloc(strlen(str) + 1), str)
+#define strndup(str, n)     strcpy(malloc(strlen(str + n) + 1), (str + n));
+#endif
 
 /**< void ptr swappage */
 void void_ptr_swap(void **n1, void **n2);
@@ -901,7 +906,7 @@ enum node_color { RED, BLACK };
 enum node_traversal { INORDER, PREORDER, POSTORDER, LEVELORDER };
 
 /**
- *  Pointer utility functions
+ *  Pointer utilities
  */
 ptrdiff_t ptr_distance(const void *beg, const void *end, size_t width);
 void *allocate_and_copy(struct typetable *ttbl, size_t n, void *first, void *last);
