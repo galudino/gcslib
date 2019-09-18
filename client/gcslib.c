@@ -90,17 +90,6 @@ int main(int argc, const char *argv[]) {
     test_listvp_int_splice();
     test_listvp_str_splice();
     */
-    char *arr[] = { "alpha", "beta", "charlie", "delta" };
-    list *l = l_arrtol(_str_, arr, sizeof(arr) / sizeof(char *));
-
-    vector *v = NULL;
-
-    LOG(__FILE__, "original list");
-    l_puts(l);
-    
-    LOG(__FILE__, "vector from ptr");
-    v = v_arrtov(_str_, l_ltoarr(l), l_size(l));
-    v_puts(v);
 
     test_listvp_int_merge();
 

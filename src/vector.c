@@ -2271,6 +2271,58 @@ vector *v_arrtov(struct typetable *ttbl, void *base, size_t length) {
 }
 
 /**
+ *  @brief  Takes an existing pointer, base, and adapts it for use with vector
+ * 
+ *  @param[in]  ttbl        typetable matching that of bases's element type
+ *  @param[in]  base        base address of an array to copy, dynamically allocated
+ *  @param[in]  length      logical length of base
+ *  @param[in]  capacity    memory capacity of base
+ *
+ *  @return     pointer to vector with contents of base
+ *  
+ *  Precondition: base points to a valid address of dynamically allocated memory.
+ *  No allocation/copying of any kind is done within this function --
+ *  this simply assigns the pointer base to be used by vector --
+ *  it acts as a "wrapper" for base. 
+ *  
+ *  An appropriate typetable must be chosen for this instantiation, as always.
+ * 
+ *  Since this vector will be using a pre-existing pointer,
+ *  be careful and pay special attention to the management of its memory.
+ */
+vector *v_ptrtov(struct typetable *ttbl, void *base, size_t length, size_t capacity) {
+    struct typetable *table = NULL;
+    vector *v = NULL;
+
+    massert_ptr(base);
+
+    v = v_allocate();
+
+    /**
+     *  An appropriate typetable must be chosen that matches
+     *  that of the type T for base.
+     */
+    v->ttbl = ttbl ? ttbl : _void_ptr_;
+
+    if (v->ttbl != _void_ptr_) {
+        v->ttbl->compare = v->ttbl->compare ? v->ttbl->compare : NULL;
+        v->ttbl->copy = v->ttbl->copy ? v->ttbl->copy : NULL;
+        v->ttbl->print = v->ttbl->print ? v->ttbl->print : NULL;
+        v->ttbl->dtor = v->ttbl->dtor ? v->ttbl->dtor : NULL;
+    }
+
+    if (capacity <= 0) {
+        WARNING(__FILE__, "Provided input capacity was less than or equal to 0. This may result in undefined behavior.");
+    }
+
+    v->impl.start = base;
+    v->impl.finish = (char *)(v->impl.start) + (length * v->ttbl->width);
+    v->impl.end_of_storage = (char *)(v->impl.start) + (capacity * v->ttbl->width);
+
+    return v;
+}
+
+/**
  *  @brief  Performs a linear search to find valaddr using the ttbl->compare function
  *
  *  @param[in]  v       pointer to vector

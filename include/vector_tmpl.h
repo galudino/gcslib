@@ -268,6 +268,7 @@
 #define vreverse(T) tmpl(vreverse, T)
 
 #define varrtov(T) tmpl(varrtov, T)
+#define vptrtov(T) tmpl(vptrtov, T)
 
 #define vsearch(T) tmpl(vsearch, T)
 #define vsort(T) tmpl(vsort, T)
@@ -421,8 +422,9 @@ void vremoveif(T)(vector(T) *v, bool (*unary_predicate)(const void *));
 vector(T) *vmerge(T)(vector(T) *v, vector(T) * other);
 void vreverse(T)(vector(T) *v);
 
-/**< vector(T): custom utility functions - array to vector */
+/**< vector(T): custom utility functions - array to vector/pointer to vector */
 vector(T) *varrtov(T)(T *base, size_t length);
+vector(T) *vptrtov(T)(T *base, size_t length, size_t capacity);
 
 /**< vector(T): custom utility functions - search/sort by default comparator */
 int vsearch(T)(vector(T) *v, T val);

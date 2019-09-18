@@ -179,8 +179,9 @@ void v_remove_if(vector *v, bool (*unary_predicate)(const void *));
 vector *v_merge(vector *v, vector *other);
 void v_reverse(vector *v);
 
-/**< vector: custom utility functions - arrtov */
+/**< vector: custom utility functions - arrtov / ptrtov */
 vector *v_arrtov(struct typetable *ttbl, void *base, size_t length);
+vector *v_ptrtov(struct typetable *ttbl, void *base, size_t length, size_t capacity);
 
 /**< vector: custom utility functions - search / sort by default comparator */
 int v_search(vector *v, const void *valaddr);
