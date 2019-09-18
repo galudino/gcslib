@@ -2670,7 +2670,6 @@ vector(T) *varrtov(T)(T *base, size_t length) {
 /**
  *  @brief  Takes an existing pointer, base, and adapts it for use with vector
  * 
- *  @param[in]  ttbl        typetable matching that of bases's element type
  *  @param[in]  base        base address of an array to copy, dynamically allocated
  *  @param[in]  length      logical length of base
  *  @param[in]  capacity    memory capacity of base
