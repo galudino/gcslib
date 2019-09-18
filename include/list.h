@@ -43,10 +43,8 @@
  */
 #include "iterator.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 typedef struct list_node            list_node;
 typedef struct list_node *          list_node_ptr;

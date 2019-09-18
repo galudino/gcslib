@@ -32,11 +32,6 @@
 
 #include <assert.h>
 #include <ctype.h>
-#include <errno.h>
-#include <limits.h>
-#include <stdarg.h>
-#include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -139,7 +134,9 @@ void str_dtor(void *arg) {
     (*target) = NULL;
 }
 
-void cstr_dtor(void *arg) { str_dtor(arg); }
+void cstr_dtor(void *arg) {
+    str_dtor(arg);
+}
 
 void void_ptr_dtor(void *arg) { /* DO NOT CHANGE - empty body */
 }
@@ -392,7 +389,9 @@ int str_compare_ignore_case(const void *c1, const void *c2) {
     return i;
 }
 
-int cstr_compare(const void *c1, const void *c2) { return str_compare(c1, c2); }
+int cstr_compare(const void *c1, const void *c2) {
+    return str_compare(c1, c2);
+}
 
 int cstr_compare_ignore_case(const void *c1, const void *c2) {
     return str_compare_ignore_case(c1, c2);
@@ -474,7 +473,9 @@ void int_print(const void *arg, FILE *dest) {
     fprintf(dest, "%d", *(int *)arg);
 }
 
-void signed_int_print(const void *arg, FILE *dest) { int_print(arg, dest); }
+void signed_int_print(const void *arg, FILE *dest) {
+    int_print(arg, dest);
+}
 
 void unsigned_int_print(const void *arg, FILE *dest) {
     fprintf(dest, "%u", *(unsigned int *)arg);
@@ -522,21 +523,33 @@ void bool_print(const void *arg, FILE *dest) {
     fprintf(dest, "%s", *((bool *)arg) ? "true" : "false");
 }
 
-void char_ptr_print(const void *arg, FILE *dest) { str_print(arg, dest); }
+void char_ptr_print(const void *arg, FILE *dest) {
+    str_print(arg, dest);
+}
 
 void str_print(const void *arg, FILE *dest) {
     fprintf(dest, "%s", *(char **)arg);
 }
 
-void cstr_print(const void *arg, FILE *dest) { str_print(arg, dest); }
+void cstr_print(const void *arg, FILE *dest) {
+    str_print(arg, dest);
+}
 
-void void_ptr_print(const void *arg, FILE *dest) { fprintf(dest, "%p", arg); }
+void void_ptr_print(const void *arg, FILE *dest) {
+    fprintf(dest, "%p", arg);
+}
 
-void int8_print(const void *arg, FILE *dest) { char_print(arg, dest); }
+void int8_print(const void *arg, FILE *dest) {
+    char_print(arg, dest);
+}
 
-void int16_print(const void *arg, FILE *dest) { short_int_print(arg, dest); }
+void int16_print(const void *arg, FILE *dest) {
+    short_int_print(arg, dest);
+}
 
-void int32_print(const void *arg, FILE *dest) { int_print(arg, dest); }
+void int32_print(const void *arg, FILE *dest) {
+    int_print(arg, dest);
+}
 
 #if __STD_VERSION__ >= 199901L
 void int64_print(const void *arg, FILE *dest) {
@@ -617,7 +630,9 @@ char *short_int_parse(const void *arg) {
     return parsed;
 }
 
-char *signed_short_int_parse(const void *arg) { return short_int_parse(arg); }
+char *signed_short_int_parse(const void *arg) {
+    return short_int_parse(arg);
+}
 
 char *unsigned_short_int_parse(const void *arg) {
     const char value = *(unsigned short int *)arg;
@@ -647,7 +662,9 @@ char *int_parse(const void *arg) {
     return parsed;
 }
 
-char *signed_int_parse(const void *arg) { return int_parse(arg); }
+char *signed_int_parse(const void *arg) {
+    return int_parse(arg);
+}
 
 char *unsigned_int_parse(const void *arg) {
     const char value = *(unsigned int *)arg;
@@ -677,7 +694,9 @@ char *long_int_parse(const void *arg) {
     return parsed;
 }
 
-char *signed_long_int_parse(const void *arg) { return long_int_parse(arg); }
+char *signed_long_int_parse(const void *arg) {
+    return long_int_parse(arg);
+}
 
 char *unsigned_long_int_parse(const void *arg) {
     const char value = *(unsigned long int *)arg;
@@ -781,7 +800,9 @@ char *bool_parse(const void *arg) {
     return parsed;
 }
 
-char *char_ptr_parse(const void *arg) { return str_parse(arg); }
+char *char_ptr_parse(const void *arg) {
+    return str_parse(arg);
+}
 
 char *str_parse(const void *arg) {
     const char *value = *(char **)arg;
@@ -797,7 +818,9 @@ char *str_parse(const void *arg) {
     return parsed;
 }
 
-char *cstr_parse(const void *arg) { return str_parse(arg); }
+char *cstr_parse(const void *arg) {
+    return str_parse(arg);
+}
 
 char *void_ptr_parse(const void *arg) {
     const char *format = "%p";
@@ -812,21 +835,35 @@ char *void_ptr_parse(const void *arg) {
     return parsed;
 }
 
-char *int8_parse(const void *arg) { return char_parse(arg); }
+char *int8_parse(const void *arg) {
+    return char_parse(arg);
+}
 
-char *int16_parse(const void *arg) { return short_int_parse(arg); }
+char *int16_parse(const void *arg) {
+    return short_int_parse(arg);
+}
 
-char *int32_parse(const void *arg) { return int_parse(arg); }
+char *int32_parse(const void *arg) {
+    return int_parse(arg);
+}
 
 #if __STD_VERSION__ >= 199901L
-char *int64_parse(const void *arg) { return long_long_int_parse(arg); }
+char *int64_parse(const void *arg) {
+    return long_long_int_parse(arg);
+}
 #endif
 
-char *uint8_parse(const void *arg) { return unsigned_char_parse(arg); }
+char *uint8_parse(const void *arg) {
+    return unsigned_char_parse(arg);
+}
 
-char *uint16_parse(const void *arg) { return unsigned_short_int_parse(arg); }
+char *uint16_parse(const void *arg) {
+    return unsigned_short_int_parse(arg);
+}
 
-char *uint32_parse(const void *arg) { return unsigned_int_parse(arg); }
+char *uint32_parse(const void *arg) {
+    return unsigned_int_parse(arg);
+}
 
 #if __STD_VERSION__ >= 199901L
 char *uint64_parse(const void *arg) {
@@ -1272,7 +1309,7 @@ int ulog(FILE *dest, const char *level, const char *file, const char *func,
 
     if (ulog_attrs_disable[FUNCTION] == false &&
         ulog_attrs_disable[MESSAGE] == false) {
-        j += sprintf(buffer + j, "%s", ": ");
+        j += sprintf(buffer + j, "%s", " ");
     }
 
     if (ulog_attrs_disable[MESSAGE] == false) {
@@ -1311,25 +1348,26 @@ ptrdiff_t ptr_distance(const void *beg, const void *end, size_t width) {
 
 /**
  *  Returns a pointer to a deep-copied block of memory defined by [first, last)
- *  
+ *
  *  @param[in]  ttbl    typetable, used to determine sizeof(T)
  *  @param[in]  n       block count (allocated capacity)
  *  @param[in]  first   base address of memory to copy
  *  @param[in]  last    if non-null, sentinel address that ends copying
- *                      if null, 
+ *                      if null,
  *                          n determines the quantity of copies that are made
  *                          of the element pointed to by first
- * 
+ *
  *  @return     address to copied memory
  */
-void *allocate_and_copy(struct typetable *ttbl, size_t n, void *first, void *last) {
+void *allocate_and_copy(struct typetable *ttbl, size_t n, void *first,
+                        void *last) {
     void *result = NULL;
     void *pos = NULL;
     void *curr = NULL;
 
-    assert(ttbl);       /**< must have a typetable */
-    assert(n > 0);      /**< n must be nonzero - something must be allocated */
-    assert(first);      /**< base address cannot be NULL */
+    assert(ttbl);  /**< must have a typetable */
+    assert(n > 0); /**< n must be nonzero - something must be allocated */
+    assert(first); /**< base address cannot be NULL */
 
     result = calloc(n, ttbl->width);
     assert(result);
@@ -1379,7 +1417,7 @@ void *allocate_and_copy(struct typetable *ttbl, size_t n, void *first, void *las
             for (i = 0; i < n; i++) {
                 ttbl->copy(pos, curr);
                 pos = (char *)(pos) + (ttbl->width);
-            }    
+            }
         } else {
             /**
              *  If typetable has no deep copy function,
@@ -1429,7 +1467,8 @@ void lnb_swap(list_node_base *x, list_node_base *y) {
     }
 }
 
-void lnb_transfer(list_node_base *n, list_node_base *first, list_node_base *last) {
+void lnb_transfer(list_node_base *n, list_node_base *first,
+                  list_node_base *last) {
     if (n != last) {
         /* Remove [first, last) from its old position. */
         last->prev->next = n;
@@ -1448,7 +1487,7 @@ void lnb_transfer(list_node_base *n, list_node_base *first, list_node_base *last
 
 void lnb_reverse(list_node_base *n) {
     list_node_base *tmp = n;
-    
+
     do {
         /* swap(tmp->next, tmp->prev) */
         list_node_base *tmp_next = tmp->next;

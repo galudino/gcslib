@@ -35,6 +35,7 @@
 
 #if __STD_VERSION__ >= 199901L
 #include <stdbool.h>
+#include <stdint.h>
 #else
 typedef unsigned char bool;
 # define false '\0'
@@ -42,7 +43,6 @@ typedef unsigned char bool;
 #endif
 
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 /**
  *  Any header/source file associated with gcslib must include utils.h.
@@ -879,6 +879,31 @@ ULOG_TOGGLE_ATTR(MESSAGE);
 */
 
 /**
+ *  Custom assert function with message string -
+ *  message prints to stderr, just like the assert macro in assert.h,
+ *  and the message string is printed using the ulog function --
+ *  wrapped with the ERROR macro defined in this header file.
+ *  Then, just like the assert macro, abort() is invoked
+ *  and the program ends.
+ * 
+ *  Unlike the original assert macro,
+ *  NDEBUG will not disable massert - massert
+ *  will persist whether you are in debug mode, or release mode.
+ * 
+ *  massert is most useful when a program is no longer fit
+ *  to continue, given a particular condition --
+ *  a description message of your choice can be provided.
+ * 
+ *  If no message is preferred, you may provide an empty string.
+ */
+#define massert(CONDITION, MESSAGE)\
+if (((CONDITION) == (false))) {\
+    fprintf(stderr, "Assertion failed: (%s)\n", #CONDITION);\
+    ERROR(__FILE__, (MESSAGE));\
+    abort();\
+}
+
+/**
  *  Token-pasting utilities for "templates" (tmpl)
  */
 
@@ -892,8 +917,8 @@ ULOG_TOGGLE_ATTR(MESSAGE);
 #define tmpl3t(ARG, TYPE1, TYPE2, TYPE3) TCAT(ARG, TYPE1, TYPE2, TYPE3)
 
 #define QCAT(W, X, Y, Z, ZZ) WW##_##X##_##Y##_##Z##_##ZZ
-#define tmpl4t(ARG, TYPE1, TYPE2, TYPE3, TYPE4)                                \
-    QCAT(ARG, TYPE1, TYPE2, TYPE3, TYPE4)
+#define tmpl4t(ARG, TYPE1, TYPE2, TYPE3, TYPE4)\
+        QCAT(ARG, TYPE1, TYPE2, TYPE3, TYPE4)
 
 #define table_id(TBL_TYPE, T) tmpl(TBL_TYPE, T)
 #define table_ptr_id(TYPE, T) _##TYPE##_##T##_

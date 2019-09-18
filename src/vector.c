@@ -35,8 +35,6 @@
 
 #include <assert.h>
 #include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #define VECTOR_MAXIMUM_STACK_BUFFER_SIZE 16384

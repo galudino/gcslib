@@ -31,6 +31,7 @@
 #include "gcslib.h" /**< Entire gcslib_c library */
 #include "vec2D.h"  /**< vec2D API, a test "object" */
 
+#include <assert.h>
 #include <dirent.h>
 #include <fcntl.h>
 #include <stdarg.h>
@@ -62,10 +63,7 @@ void test_listvp_vec2D(void);
 void test_listtmpl_int(void);
 void test_listtmpl_str(void);
 
-bool remove_if_even(const void *arg) {
-    assert(arg);
-    return (*(int *)(arg)) % 2 == 0;
-}
+bool remove_if_even(const void *arg);
 
 /**
  *  @brief  Program execution begins here
@@ -107,6 +105,11 @@ int main(int argc, const char *argv[]) {
     */
 
     return EXIT_SUCCESS;
+}
+
+bool remove_if_even(const void *arg) {
+    assert(arg);
+    return (*(int *)(arg)) % 2 == 0;
 }
 
 /**
@@ -632,13 +635,6 @@ void test_listvp_int_splice() {
     l_delete(&l2);
 }
 
-#define assert_msg(CONDITION, MESSAGE)\
-if ((!CONDITION)) {\
-    fprintf(stderr, "Assertion failed:\n");\
-    ERROR(__FILE__, (MESSAGE));\
-    abort();\
-}\
-
 void test_listvp_int_merge() {
     list *l1 = NULL;
     list *l2 = NULL;
@@ -663,9 +659,11 @@ void test_listvp_int_merge() {
     l_delete(&l1);
     l_delete(&l2);
 
+
     {
-        char *mystr = strdup("duplicated");
-        printf("%s\n", mystr);
+        void *ptr = NULL;
+        massert(ptr != NULL, "[Memory allocation (malloc) failed.]");
+        assert(ptr != NULL);
     }
 }
 
