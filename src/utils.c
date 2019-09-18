@@ -322,8 +322,8 @@ int str_compare(const void *c1, const void *c2) {
 #else
     char *cfirst = malloc(strlen(first) + 1);
     char *csecond = malloc(strlen(second) + 1);
-    assert(cfirst);
-    assert(csecond);
+    massert_malloc(cfirst);
+    massert_malloc(second);
 #endif
 
     strcpy(cfirst, first);
@@ -357,8 +357,8 @@ int str_compare_ignore_case(const void *c1, const void *c2) {
 #else
     char *cfirst = malloc(strlen(first) + 1);
     char *csecond = malloc(strlen(second) + 1);
-    assert(cfirst);
-    assert(csecond);
+    massert_malloc(cfirst);
+    massert_malloc(csecond);
 #endif
 
     strcpy(cfirst, first);
@@ -585,7 +585,7 @@ char *char_parse(const void *arg) {
     sprintf(buffer, format, value);
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -599,7 +599,7 @@ char *signed_char_parse(const void *arg) {
     sprintf(buffer, format, value);
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -613,7 +613,7 @@ char *unsigned_char_parse(const void *arg) {
     sprintf(buffer, format, value);
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -626,7 +626,7 @@ char *short_int_parse(const void *arg) {
 
     sprintf(buffer, format, value);
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -644,7 +644,7 @@ char *unsigned_short_int_parse(const void *arg) {
     sprintf(buffer, format, value);
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -658,7 +658,7 @@ char *int_parse(const void *arg) {
     sprintf(buffer, format, value);
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -676,7 +676,7 @@ char *unsigned_int_parse(const void *arg) {
     sprintf(buffer, format, value);
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -690,7 +690,7 @@ char *long_int_parse(const void *arg) {
     sprintf(buffer, format, value);
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -708,7 +708,7 @@ char *unsigned_long_int_parse(const void *arg) {
     sprintf(buffer, format, value);
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -722,7 +722,7 @@ char *long_long_int_parse(const void *arg) {
     sprintf(buffer, format, value);
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -739,7 +739,7 @@ char *unsigned_long_long_int_parse(const void *arg) {
     sprintf(buffer, format, value);
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 #endif
@@ -754,7 +754,7 @@ char *float_parse(const void *arg) {
     sprintf(buffer, format, value);
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -768,7 +768,7 @@ char *double_parse(const void *arg) {
     sprintf(buffer, format, value);
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -782,7 +782,7 @@ char *long_double_parse(const void *arg) {
     sprintf(buffer, format, value);
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -796,7 +796,7 @@ char *bool_parse(const void *arg) {
     sprintf(buffer, format, value ? "true" : "false");
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -814,7 +814,7 @@ char *str_parse(const void *arg) {
     sprintf(buffer, format, value);
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -831,7 +831,7 @@ char *void_ptr_parse(const void *arg) {
     sprintf(buffer, format, arg);
 
     parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
-    assert(parsed);
+    massert_malloc(parsed);
     return parsed;
 }
 
@@ -1364,13 +1364,13 @@ void *allocate_and_copy(struct typetable *ttbl, size_t n, void *first,
     void *result = NULL;
     void *pos = NULL;
     void *curr = NULL;
-
-    assert(ttbl);  /**< must have a typetable */
-    assert(n > 0); /**< n must be nonzero - something must be allocated */
-    assert(first); /**< base address cannot be NULL */
+    
+    massert_ttbl(ttbl);
+    massert(n > 0, "[n must be greater than 0]");
+    massert_ptr(first);
 
     result = calloc(n, ttbl->width);
-    assert(result);
+    massert_calloc(result);
     pos = result;
     curr = first;
 

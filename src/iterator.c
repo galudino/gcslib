@@ -41,6 +41,7 @@
 #include "utils.h"
 
 #include <assert.h>
+#include <stdlib.h>
 
 /**
  *  @brief  Returns an iterator to the beginning of a container
@@ -51,7 +52,7 @@
  *  @return     iterator at the beginning of a container
  */
 iterator it_begin(iterator it) {
-    assert(it.itbl->begin);
+    massert_ptr(it.itbl->begin);
     return it.itbl->begin(it.container);
 }
 
@@ -64,7 +65,7 @@ iterator it_begin(iterator it) {
  *  @return     iterator at the end of a container
  */
 iterator it_end(iterator it) {
-    assert(it.itbl->end);
+    massert_ptr(it.itbl->end);
     return it.itbl->end(it.container);
 }
 
@@ -136,8 +137,8 @@ iterator *it_advance(iterator *it, int n) {
  *  @return     same pointer to iterator, but advanced one block
  */
 iterator *it_incr(iterator *it) {
-    assert(it);
-    assert(it->itbl->incr);
+    massert_iterator(it);
+    massert_pfunc(it->itbl->incr);
     return it->itbl->incr(it);
 }
 
@@ -149,8 +150,8 @@ iterator *it_incr(iterator *it) {
  *  @return     same pointer to iterator, but advanced one block
  */
 iterator *it_decr(iterator *it) {
-    assert(it);
-    assert(it->itbl->decr);
+    massert_iterator(it);
+    massert_pfunc(it->itbl->decr);
     return it->itbl->decr(it);
 }
 
@@ -228,6 +229,7 @@ int it_distance(iterator *first, iterator *last) {
  *              false otherwise
  */
 bool it_has_next(iterator it) {
+    massert_pfunc(it.itbl->has_next);
     return it.itbl->has_next(it);
 }
 
@@ -240,7 +242,7 @@ bool it_has_next(iterator it) {
  *              false otherwise
  */
 bool it_has_prev(iterator it) {
-    assert(it.itbl->has_prev);
+    massert_pfunc(it.itbl->has_prev);
     return it.itbl->has_prev(it);
 }
 

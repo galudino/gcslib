@@ -119,7 +119,7 @@ list *l_newfill(struct typetable *ttbl, size_t n, void *valaddr) {
     list *l = NULL;
     size_t i = 0;
 
-    assert(valaddr);
+    massert_ptr(valaddr);
 
     l = l_new(ttbl);
 
@@ -156,14 +156,14 @@ list *l_newrnge(iterator first, iterator last) {
 }
 
 list *l_newcopy(list *l) { 
-    assert(l);
+    massert_container(l);
     return l_newrnge(l_begin(l), l_end(l));
 }
 
 list *l_newmove(list **l) { 
     list *move = NULL;
 
-    assert((*l));
+    massert_ptr((*l));
 
     move = l_new((*l)->ttbl);
 
@@ -174,7 +174,7 @@ list *l_newmove(list **l) {
 }
 
 void l_delete(list **l) { 
-    assert((*l));
+    massert_ptr((*l));
 
     l_deinit((*l));
 
@@ -191,7 +191,7 @@ iterator l_end(list *l) {
 }
 
 size_t l_size(list *l) { 
-    assert(l);
+    massert_container(l);
 
     if (l->impl.node.next == NULL) {
         return 0;
@@ -245,12 +245,12 @@ void l_resizefill(list *l, size_t n, const void *valaddr) {
 }
 
 bool l_empty(list *l) { 
-    assert(l);
+    massert_container(l);
     return l->impl.node.next == &(l->impl.node);
 }
 
 void *l_front(list *l) { 
-    assert(l);
+    massert_container(l);
     /**
      *  Note that the address of an object
      *  (instance of a struct)
@@ -287,7 +287,7 @@ void *l_front(list *l) {
 }
 
 void *l_back(list *l) { 
-    assert(l);
+    massert_container(l);
     /**
      *  Note that the address of an object
      *  (instance of a struct)
@@ -324,7 +324,7 @@ void *l_back(list *l) {
 }
 
 const void *l_front_const(list *l) { 
-    assert(l);
+    massert_container(l);
     /**
      *  Note that the address of an object
      *  (instance of a struct)
@@ -361,7 +361,7 @@ const void *l_front_const(list *l) {
 }
 
 const void *l_back_const(list *l) { 
-    assert(l);
+    massert_container(l);
     /**
      *  Note that the address of an object
      *  (instance of a struct)
@@ -401,7 +401,7 @@ void l_assignrnge(list *l, iterator first, iterator last) {
     void *curr = NULL;
     void *sentinel = NULL;
 
-    assert(l);
+    massert_container(l);
     l_clear(l);
 
     sentinel = it_curr(last);
@@ -416,7 +416,7 @@ void l_assignrnge(list *l, iterator first, iterator last) {
 
 void l_assignfill(list *l, size_t n, const void *valaddr) { 
     size_t i = 0;
-    assert(l);
+    massert_container(l);
     
     l_clear(l);
 
@@ -429,7 +429,7 @@ void l_assignfill(list *l, size_t n, const void *valaddr) {
 void l_pushf(list *l, const void *valaddr) { 
     list_node *new_node = NULL;
 
-    assert(l);
+    massert_container(l);
 
     new_node = ln_new(l->ttbl, valaddr);
     /* l->impl.node.next is the head pointer. */
@@ -438,7 +438,7 @@ void l_pushf(list *l, const void *valaddr) {
 
 void l_popf(list *l) { 
     list_node *node = NULL;
-    assert(l);
+    massert_container(l);
 
     node = *(list_node **)(&l->impl.node.next);
     
@@ -449,7 +449,7 @@ void l_popf(list *l) {
 void l_pushb(list *l, const void *valaddr) { 
     list_node *new_node = NULL;
 
-    assert(l);
+    massert_container(l);
     
     new_node = ln_new(l->ttbl, valaddr);
     /* &(l->impl.node) is one node past the last elem. */
@@ -458,7 +458,7 @@ void l_pushb(list *l, const void *valaddr) {
 
 void l_popb(list *l) { 
     list_node *node = NULL;
-    assert(l);
+    massert_container(l);
 
     node = *(list_node **)(&l->impl.node.prev);
 
@@ -469,7 +469,7 @@ void l_popb(list *l) {
 iterator l_insert(list *l, iterator pos, const void *valaddr) {
     list_node *new_node = NULL;
 
-    assert(l);
+    massert_container(l);
 
     new_node = ln_new(l->ttbl, valaddr);
     lnb_hook(*(list_node_base **)(&new_node), pos.curr);
@@ -481,7 +481,7 @@ iterator l_insertfill(list *l, iterator pos, size_t n,
                       const void *valaddr) {
     size_t i = 0;
 
-    assert(l);
+    massert_container(l);
     
     for (i = 0; i < n; i++) {
         list_node *new_node = ln_new(l->ttbl, valaddr);
@@ -496,7 +496,7 @@ iterator l_insertrnge(list *l, iterator pos, iterator first,
     void *curr = NULL;
     void *sentinel = NULL;
     
-    assert(l);
+    massert_container(l);
     sentinel = it_curr(last);
 
     while ((curr = it_curr(first)) != sentinel) {
@@ -511,7 +511,7 @@ iterator l_insertrnge(list *l, iterator pos, iterator first,
 
 iterator l_erase(list *l, iterator pos) { 
     list_node *n = NULL;
-    assert(l);
+    massert_container(l);
     
     n = *(list_node **)(&pos.curr);
 
@@ -526,7 +526,7 @@ iterator l_erasernge(list *l, iterator pos, iterator last) {
     void *curr = NULL;
     void *sentinel = NULL;
 
-    assert(l);
+    massert_container(l);
     sentinel = it_curr(last);
 
     while ((curr = it_curr(pos)) != sentinel) {
@@ -543,8 +543,8 @@ iterator l_erasernge(list *l, iterator pos, iterator last) {
 void l_swap(list **l, list **other) { 
     list *temp = NULL;
 
-    assert((*l));
-    assert((*other));
+    massert_ptr((*l));
+    massert_ptr((*other));
 
     temp = (*l);
 
@@ -573,7 +573,7 @@ void l_insert_at(list *l, size_t index, const void *valaddr) {
     list_node *new_node = NULL;
     list_node *pos = NULL;
 
-    assert(l);
+    massert_container(l);
 
     if (index >= l_size(l)) {
         ERROR(__FILE__, "Index out of bounds.");
@@ -593,7 +593,7 @@ void l_insert_at(list *l, size_t index, const void *valaddr) {
 void l_erase_at(list *l, size_t index) { 
     list_node *n = NULL;
 
-    assert(l);
+    massert_container(l);
 
     if (index >= l_size(l)) {
         ERROR(__FILE__, "Index out of bounds.");
@@ -612,7 +612,7 @@ void l_erase_at(list *l, size_t index) {
 void l_replace_at(list *l, size_t index, const void *valaddr) { 
     list_node *n = NULL;
 
-    assert(l);
+    massert_container(l);
 
     if (index >= l_size(l)) {
         ERROR(__FILE__, "Index out of bounds.");
@@ -653,7 +653,7 @@ void l_swap_elem(list *l, size_t n1, size_t n2) {
     void *data_1 = NULL;
     void *data_2 = NULL;
 
-    assert(l);
+    massert_container(l);
 
     size = l_size(l);
 
@@ -670,7 +670,7 @@ void l_swap_elem(list *l, size_t n1, size_t n2) {
             l->ttbl->swap(data_1, data_2);
         } else {
             temp = malloc(l->ttbl->width);
-            assert(temp);
+            massert_malloc(temp);
             memcpy(temp, data_1, l->ttbl->width);
 
             memcpy(data_1, data_2, l->ttbl->width);
@@ -692,7 +692,7 @@ iterator l_splice(list *l, iterator pos, list *other,
     iterator j = opos;
     it_incr(&j);
 
-    assert(l);
+    massert_container(l);
 
     if (pos.itbl != _list_iterator_ || opos.itbl != _list_iterator_) {
         ERROR(__FILE__, "iterator pos and iterator opos must refer to unique instances of (struct list *).");
@@ -716,7 +716,7 @@ iterator l_splice(list *l, iterator pos, list *other,
 }
 
 iterator l_splicelist(list *l, iterator pos, list *other) { 
-    assert(l);
+    massert_container(l);
 
     if (pos.itbl != _list_iterator_) {
         ERROR(__FILE__, "iterator pos and iterator opos must refer to unique instances of (struct list *).");
@@ -744,7 +744,7 @@ iterator l_splicelist(list *l, iterator pos, list *other) {
 
 iterator l_splicernge(list *l, iterator pos, list *other, iterator first,
                        iterator last) { 
-    assert(l);
+    massert_container(l);
 
     if (pos.itbl != _list_iterator_ || first.itbl != _list_iterator_ || last.itbl != _list_iterator_) {
         ERROR(__FILE__, "Each iterator (pos, first, and last) must refer to unique instances of (struct list *).");
@@ -776,7 +776,7 @@ void l_remove(list *l, const void *valaddr) {
 
     int (*compare)(const void *, const void *) = NULL;
 
-    assert(l);
+    massert_container(l);
 
     first = l_begin(l);
     last = l_end(l);
@@ -801,7 +801,7 @@ void l_remove_if(list *l, bool (*unary_predicate)(const void *)) {
 
     int (*compare)(const void *, const void *) = NULL;
 
-    assert(l);
+    massert_container(l);
 
     first = l_begin(l);
     last = l_end(l);
@@ -851,7 +851,7 @@ void l_unique(list *l) {
 
     int (*compare)(const void *, const void *) = NULL;
 
-    assert(l);
+    massert_container(l);
 
     first = l_begin(l);
     last = l_end(l);
@@ -905,7 +905,7 @@ list *l_merge_custom(list *l, list *other,
 }
 
 void l_reverse(list *l) { 
-    assert(l);
+    massert_container(l);
     lnb_reverse(l->impl.node.next);
 }
 
@@ -913,7 +913,7 @@ void l_sort(list *l) {
     size_t size = 0;
     int (*comparator)(const void *, const void *) = NULL; 
 
-    assert(l);
+    massert_container(l);
 
     size = l_size(l);
 
@@ -975,7 +975,7 @@ int l_search(list *l, const void *valaddr) {
 
     int (*compare)(const void *, const void *) = NULL;
 
-    assert(l);
+    massert_container(l);
 
     first = l_begin(l);
     last = l_end(l);
@@ -1026,8 +1026,8 @@ void l_fputs(list *l, FILE *dest) {
 
     const size_t breaklim = 1;
 
-    assert(l);
-    assert(dest);
+    massert_container(l);
+    massert_ptr(dest);
 
     sprintf(buffer1, "\n%s\n%s\n%s\n", link, "Elements", link);
 
@@ -1050,8 +1050,8 @@ void l_fputsf(list *l, FILE *dest, const char *before, const char *after,
     list_node *n = NULL;
     void *target = NULL;
 
-    assert(l);
-    assert(dest);
+    massert_container(l);
+    massert_ptr(dest);
 
     fprintf(dest, "%s", before ? before : "");
 
@@ -1092,7 +1092,7 @@ void *list_copy(void *arg, const void *other) {
     list **dest = NULL;
     list **source = NULL;
 
-    assert(other);
+    massert_ptr(other);
 
     dest = (list **)(arg);
     source = (list **)(other);
@@ -1105,7 +1105,7 @@ void *list_copy(void *arg, const void *other) {
 void list_dtor(void *arg) {
     list **l = NULL;
 
-    assert(arg);
+    massert_ptr(arg);
 
     l = (list **)(arg);
     l_delete(l);
@@ -1142,8 +1142,8 @@ int list_compare(const void *c1, const void *c2) {
     int delta = 0;
     int i = 0;
 
-    assert(c1);
-    assert(c2);
+    massert_ptr(c1);
+    massert_ptr(c2);
 
     l1 = *(list **)(c1);
     l2 = *(list **)(c2);
@@ -1189,57 +1189,57 @@ int list_compare(const void *c1, const void *c2) {
 void list_print(const void *arg, FILE *dest) {
     list *l = NULL;
 
-    assert(arg);
-    assert(dest);
+    massert_ptr(arg);
+    massert_ptr(dest);
 
     l = *(list **)(arg);
     l_fputs(l, dest);
 }
 
 void l_set_ttbl(list *l, struct typetable *ttbl) {
-    assert(l);
+    massert_container(l);
     l->ttbl = ttbl ? ttbl : _void_ptr_;
 }
 
 size_t l_get_width(list *l) {
-    assert(l);
+    massert_container(l);
     return l->ttbl->width;
 }
 
 copy_fn l_get_copy(list *l) {
-    assert(l);
+    massert_container(l);
     return l->ttbl->copy;
 }
 
 dtor_fn l_get_dtor(list *l) {
-    assert(l);
+    massert_container(l);
     return l->ttbl->dtor;
 }
 
 swap_fn l_get_swap(list *l) {
-    assert(l);
+    massert_container(l);
     return l->ttbl->swap;
 }
 
 compare_fn l_get_compare(list *l) {
-    assert(l);
+    massert_container(l);
     return l->ttbl->compare;
 }
 
 print_fn l_get_print(list *l) {
-    assert(l);
+    massert_container(l);
     return l->ttbl->print;
 }
 
 struct typetable *l_get_ttbl(list *l) {
-    assert(l);
+    massert_container(l);
     return l->ttbl;
 }
 
 static list_node *ln_allocate(void) {
     list_node *n = NULL;
     n = malloc(sizeof *n);
-    assert(n);
+    massert_ptr(n);
     return n;
 }
 
@@ -1253,8 +1253,8 @@ static void ln_init(list_node *n, struct typetable *ttbl, const void *valaddr) {
     void *data = NULL;
     struct typetable *table = NULL;
 
-    assert(n);
-    assert(valaddr);
+    massert_ptr(n);
+    massert_ptr(valaddr);
 
     n->node.next = NULL;
     n->node.prev = NULL;
@@ -1263,7 +1263,7 @@ static void ln_init(list_node *n, struct typetable *ttbl, const void *valaddr) {
     table = ttbl ? ttbl : _void_ptr_;
 
     data = malloc(table->width);
-    assert(data);
+    massert_malloc(data);
     n->data = data;
 
     if (table->copy) {
@@ -1276,7 +1276,7 @@ static void ln_init(list_node *n, struct typetable *ttbl, const void *valaddr) {
 static void ln_deinit(list_node *n, struct typetable *ttbl) {
     struct typetable *table = NULL;
 
-    assert(n);
+    massert_ptr(n);
    
     table = ttbl ? ttbl : _void_ptr_;
 
@@ -1294,7 +1294,7 @@ static void ln_deinit(list_node *n, struct typetable *ttbl) {
 static void ln_delete(list_node **n, struct typetable *ttbl) {
     struct typetable *table = NULL;
 
-    assert((*n));
+    massert_ptr((*n));
 
     table = ttbl ? ttbl : _void_ptr_;
     ln_deinit((*n), table);
@@ -1306,12 +1306,12 @@ static void ln_delete(list_node **n, struct typetable *ttbl) {
 static list *l_allocate(void) {
     list *l = NULL;
     l = malloc(sizeof *l);
-    assert(l);
+    massert_malloc(l);
     return l;
 }
 
 static void l_init(list *l, struct typetable *ttbl) {
-    assert(l);
+    massert_container(l);
 
     l->impl.node.next = &(l->impl.node);
     l->impl.node.prev = &(l->impl.node);
@@ -1328,7 +1328,7 @@ static void l_init(list *l, struct typetable *ttbl) {
 }
 
 static void l_deinit(list *l) {
-    assert(l);
+    massert_container(l);
 
     l_clear(l);
     l->ttbl = NULL;
@@ -1338,7 +1338,7 @@ static list_node *l_node_at(list *l, int index) {
     list_node *n = NULL;
     size_t size = 0;
 
-    assert(l);
+    massert_container(l);
     size = l_size(l);
 
     if (index < size) {
@@ -1357,7 +1357,7 @@ static list_node *l_traverse_h(list *l, int index) {
     list_node_base *n = NULL;
     int i = -1;
 
-    assert(l);
+    massert_container(l);
 
     for (i = 0, n = l->impl.node.next; 
          i < index; i++, 
@@ -1373,7 +1373,7 @@ static list_node *l_traverse_t(list *l, int index) {
     int i = -1;
     int delta = -1;
 
-    assert(l);
+    massert_container(l);
 
     delta = (l_size(l) - 1) - index;
     for (i = 0, n = l->impl.node.prev; 
@@ -1389,7 +1389,7 @@ static iterator li_begin(void *arg) {
     list *l = NULL;
     iterator it;
 
-    assert(arg);
+    massert_ptr(arg);
 
     l = (list *)(arg);
 
@@ -1404,7 +1404,7 @@ static iterator li_end(void *arg) {
     list *l = NULL;
     iterator it;
 
-    assert(arg);
+    massert_ptr(arg);
 
     l = (list *)(arg);
 
@@ -1529,7 +1529,7 @@ static iterator *li_advance(iterator *it, int n) {
     list *l = NULL;
     int pos = 0;
 
-    assert(it);
+    massert_iterator(it);
 
     pos = lnb_distance(l->impl.node.next, it->curr);
 
@@ -1557,7 +1557,7 @@ static iterator *li_advance(iterator *it, int n) {
 static iterator *li_incr(iterator *it) {
     list *l = NULL;
 
-    assert(it);
+    massert_iterator(it);
 
     if (it->curr == &(l->impl.node)) {
         ERROR(__FILE__, "Cannot decrement - already at end.");
@@ -1571,7 +1571,7 @@ static iterator *li_incr(iterator *it) {
 static iterator *li_decr(iterator *it) {
     list *l = NULL;
 
-    assert(it);
+    massert_iterator(it);
 
     l = (list *)(it->container);
 

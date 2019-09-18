@@ -129,4 +129,7 @@ for (TYPE *ID = NULL,                                                          \
     ((ID = it_curr(IT)) != finish);                                            \
     it_incr(&IT))                                                              \
 
+#define massert_iterator(ITER)\
+massert(ITER, "['"#ITER"' was found to be NULL - '"#ITER"' must point to an initialized iterator, such that it refers to a non-null pointer-to-container.]");
+
 #endif /* ITERATOR_H */

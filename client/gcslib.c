@@ -658,13 +658,6 @@ void test_listvp_int_merge() {
 
     l_delete(&l1);
     l_delete(&l2);
-
-
-    {
-        void *ptr = NULL;
-        massert(ptr != NULL, "[Memory allocation (malloc) failed.]");
-        assert(ptr != NULL);
-    }
 }
 
 void test_listvp_str_splice() {

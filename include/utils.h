@@ -44,6 +44,7 @@ typedef unsigned char bool;
 
 #include <stddef.h>
 #include <stdio.h>
+
 /**
  *  Any header/source file associated with gcslib must include utils.h.
  *  (Note that most container headers already include utils.h, so a client
@@ -902,6 +903,27 @@ if (((CONDITION) == (false))) {\
     ERROR(__FILE__, (MESSAGE));\
     abort();\
 }
+
+#define massert_ptr(PTR);\
+massert(PTR, "['"#PTR"' was found to be NULL - '"#PTR"' must be nonnull to continue.]");
+
+#define massert_ttbl(TTBL);\
+massert(TTBL, "['"#TTBL"' was found to be NULL -- '"#TTBL"' is mandatory for data type information]");
+
+#define massert_malloc(PTR);\
+massert(PTR, "[Request for heap storage allocation failed (malloc returned NULL and was assigned to '"#PTR"')]");
+
+#define massert_calloc(PTR);\
+massert(PTR, "[Request for heap storage allocation failed (calloc returned NULL and was assigned to '"#PTR"')]");
+
+#define massert_realloc(PTR);\
+massert(PTR, "[Request for heap storage reallocation failed (realloc returned NULL and was assigned to '"#PTR"')]");
+
+#define massert_pfunc(PFUNC);\
+massert(PFUNC, "['"#PFUNC"' was found to be NULL - '"#PFUNC"' must be assigned to a function with a matching prototype.]");
+
+#define massert_container(PTR);\
+massert(PTR, "['"#PTR"' was found to be NULL - '"#PTR"' must be assigned to the return value of a container initializer function prior to use.]");
 
 /**
  *  Token-pasting utilities for "templates" (tmpl)
