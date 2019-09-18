@@ -460,3 +460,4 @@ struct typetable *vector_typetable_ptr_id(T);
 struct iterator_table *vector_iterator_table_ptr_id(T);
 
 #endif /* T */
+

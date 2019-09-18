@@ -34,14 +34,14 @@
 #include <stdarg.h>
 
 #if __STD_VERSION__ >= 199901L
-#include <stdbool.h>
-#include <stdint.h>
+# include <stdbool.h>
 #else
 typedef unsigned char bool;
 # define false '\0'
 # define true '0'
 #endif
 
+#include <stdint.h>
 #include <stddef.h>
 #include <stdio.h>
 
