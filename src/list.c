@@ -124,7 +124,8 @@ list *l_newfill(struct typetable *ttbl, size_t n, void *valaddr) {
     l = l_new(ttbl);
 
     for (i = 0; i < n; i++) {
-        l_pushb(l, valaddr);
+        list_node *new_node = ln_new(l->ttbl, valaddr);
+        lnb_hook(*(list_node_base **)(&new_node), &(l->impl.node));
     }
 
     return l;
@@ -148,7 +149,9 @@ list *l_newrnge(iterator first, iterator last) {
     sentinel = it_curr(last);
 
     while ((curr = it_curr(first)) != sentinel) {
-        l_pushb(l, curr);
+        list_node *new_node = ln_new(l->ttbl, curr);
+        lnb_hook(*(list_node_base **)(&new_node), &(l->impl.node));
+
         it_incr(&first);
     }
 
@@ -239,7 +242,8 @@ void l_resizefill(list *l, size_t n, const void *valaddr) {
         l->impl.node.prev = &(l->impl.node);
 
         for (i = 0; i < n; i++) {
-            l_pushb(l, valaddr);
+            list_node *new_node = ln_new(l->ttbl, valaddr);
+            lnb_hook(*(list_node_base **)(&new_node), &(l->impl.node));
         }
     }
 }
@@ -784,11 +788,16 @@ void l_remove(list *l, const void *valaddr) {
     compare = l->ttbl->compare ? l->ttbl->compare : void_ptr_compare;
 
     while (first.curr != last.curr) {
+        list_node *n = NULL;
+
         iterator next = first;
         it_incr(&next);
 
         if (compare(it_curr(first), valaddr) == 0) {
-            l_erase(l, first);
+            n = *(list_node **)(&first.curr);
+
+            lnb_unhook(*(list_node_base **)(&n));
+            ln_delete(&n, l->ttbl);
         }
 
         first = next;
@@ -809,11 +818,16 @@ void l_remove_if(list *l, bool (*unary_predicate)(const void *)) {
     compare = l->ttbl->compare ? l->ttbl->compare : void_ptr_compare;
 
     while (first.curr != last.curr) {
+        list_node *n = NULL;
+
         iterator next = first;
         it_incr(&next);
 
         if (unary_predicate(it_curr(first))) {
-            l_erase(l, first);
+            n = *(list_node **)(&first.curr);
+
+            lnb_unhook(*(list_node_base **)(&n));
+            ln_delete(&n, l->ttbl);
         }
 
         first = next;
@@ -971,7 +985,9 @@ void l_sort(list *l) {
 int l_search(list *l, const void *valaddr) { 
     iterator first = { NULL, NULL, NULL };
     iterator last = { NULL, NULL, NULL };
-    int result = -1;
+
+    int result = 0;
+    bool found = false;
 
     int (*compare)(const void *, const void *) = NULL;
 
@@ -983,26 +999,78 @@ int l_search(list *l, const void *valaddr) {
     compare = l->ttbl->compare ? l->ttbl->compare : void_ptr_compare;
 
     while (first.curr != last.curr) {
-        ++result;
         if (compare(it_curr(first), valaddr) == 0) {
-            printf("found: %d\n", *(int *)(it_curr(first)));
+            found = true;
             break;
+        } else {
+            ++result;
         }
 
         it_incr(&first);
     }
 
-    return result;
+    return found ? result : -1;
 }
 
 list *l_arrtol(struct typetable *ttbl, void *base, size_t n) { 
-    /* TODO */
-    return 0;
+    list *l = NULL;
+    size_t i = 0;
+    void *curr = NULL;
+
+    massert_ptr(base);
+    massert(n > 0, "['n' must be greater than 0 - it should correspond to the element count, starting at address 'base'.");
+
+    l = l_new(ttbl);
+    curr = base;
+
+    for (i = 0; i < n; i++) {
+        list_node *new_node = ln_new(ttbl, curr);
+        lnb_hook(*(list_node_base **)(&new_node), &(l->impl.node));
+
+        curr = (char *)(curr) + (ttbl->width);
+    }
+
+    return l;
 }
 
 void *l_ltoarr(list *l) { 
-    /* TODO */
-    return 0;
+    void *arr = NULL;
+    void *pos = NULL;
+    void *curr = NULL;
+    void *sentinel = NULL;
+    iterator it = { NULL, NULL, NULL };
+
+    massert_container(l);
+
+    arr = calloc(l_size(l), l->ttbl->width);
+    massert_ptr(arr);
+
+    it = l_begin(l);
+    curr = it.curr;
+    sentinel = l_end(l).curr;
+    pos = arr;
+
+    if (l->ttbl->copy) {
+        while (it.curr != sentinel) {
+            list_node *n = (*(list_node **)(&it.curr));
+
+            l->ttbl->copy(pos, n->data);
+
+            pos = (char *)(pos) + (l->ttbl->width);
+            it_incr(&it);
+        }
+    } else {
+        while (it.curr != sentinel) {
+            list_node *n = (*(list_node **)(&it.curr));
+
+            memcpy(pos, n->data, l->ttbl->width);
+
+            pos = (char *)(pos) + (l->ttbl->width);
+            it_incr(&it);
+        }
+    }
+    
+    return arr;
 }
 
 void l_puts(list *l) { 
