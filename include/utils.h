@@ -778,98 +778,32 @@ int ulog(
 #define ULOG_STREAM_WARNING stderr
 
 /**
- *  @def        BUG
- *  @brief      Shorthand macro for ulog to note bugs in a program
- */
-#if __STDC_VERSION__ >= 199901L
-#define BUG(FILEMACRO, ...)                                                    \
-    ulog(ULOG_STREAM_BUG, "[BUG]", FILEMACRO, __func__, (long int)__LINE__,    \
-         __VA_ARGS__)
-#else
-#define BUG(FILEMACRO, MSG)                                                    \
-    ulog(ULOG_STREAM_BUG, "[BUG]", FILEMACRO, __func__, (long int)__LINE__, MSG)
-#endif
-
-/**
- *  @def        LOG
- *  @brief      Shorthand macro for ulog to create messages for a program
- */
-#if __STDC_VERSION__ >= 199901L
-#define LOG(FILEMACRO, ...)                                                    \
-    ulog(ULOG_STREAM_LOG, "[LOG]", FILEMACRO, __func__, (long int)__LINE__,    \
-         __VA_ARGS__)
-#else
-#define LOG(FILEMACRO, MSG)                                                    \
-    ulog(ULOG_STREAM_LOG, "[LOG]", FILEMACRO, __func__, (long int)__LINE__, MSG)
-#endif
-
-/**
- *  @def        ERROR
- *  @brief      Shorthand macro for ulog to display errors for a program
- */
-#if __STDC_VERSION__ >= 199901L
-#define ERROR(FILEMACRO, ...)                                                  \
-    ulog(ULOG_STREAM_ERROR, "[ERROR]", FILEMACRO, __func__,                    \
-         (long int)__LINE__, __VA_ARGS__)
-#else
-#define ERROR(FILEMACRO, MSG)                                                  \
-    ulog(ULOG_STREAM_ERROR, "[ERROR]", FILEMACRO, __func__,                    \
-         (long int)__LINE__, MSG)
-#endif
-
-/**
- *  @def        WARNING
- *  @brief      Shorthand macro for ulog to display warning for a program
- */
-#if __STDC_VERSION__ >= 199901L
-#define WARNING(FILEMACRO, ...)                                                \
-    ulog(ULOG_STREAM_WARNING, "[WARNING]", FILEMACRO, __func__,                \
-         (long int)__LINE__, __VA_ARGS__)
-#else
-#define WARNING(FILEMACRO, MSG)                                                \
-    ulog(ULOG_STREAM_WARNING, "[WARNING]", FILEMACRO, __func__,                \
-         (long int)__LINE__, MSG)
-#endif
-
-#define UTILS_LOG_COUNT 5
-extern bool ulog_disable[UTILS_LOG_COUNT];
-enum ULOG_TYPE { ALL, BUG, LOG, ERROR, WARNING };
-
-#define ULOG_TOGGLE_TYPE(ULOG_TYPE)                                            \
-    (ulog_disable[ULOG_TYPE]) = (ulog_disable[ULOG_TYPE]) ? (false) : (true)
-
-#define UTILS_LOG_ATTRS_COUNT 7
-enum ULOG_ATTRS { DATE, TIME, LEVEL, FILENAME, LINE, FUNCTION, MESSAGE };
-extern bool ulog_attrs_disable[UTILS_LOG_ATTRS_COUNT];
-
-#define ULOG_TOGGLE_ATTR(ULOG_ATTR)                                            \
-    ulog_attrs_disable[ULOG_ATTR] =                                            \
-        (ulog_attrs_disable[ULOG_ATTR]) ? (false) : (true);
-
-/**
- *  When using the ULOG toggle macros below:
+ *  @def        ULOG_DISABLE_ALL
+ *  @brief      Shorthand macro to disable the following preprocessor macros:
+ *              BUG, LOG, ERROR, WARNING
  *
- *  Copy and paste these directives into a function (like main(), or in a
- *  function where you would like the toggle to occur, for example)
- *  and uncomment to toggle any of the ulog types and/or attributes on/off.
+ *  Use the preprocessor directive
+ *      #define ULOG_DISABLE_ALL
+ *  before the inclusion of utils.h (or before any of the directives below)
+ *  to disable the macros BUG, LOG, ERROR, and WARNING all at once.
  *
- *  (Tip: instead of toggling all of these off to turn off
- *        all utils_log appearances, use the
- *              ULOG_TOGGLE_TYPE(ALL)
- *         directive instead, to disable all utils_log appearances.)
+ *  You may also use any combination of these macros to keep some
+ *  of the ulog macro types active.
  *
- *  All toggles are OFF (false) by default.
- *  Uncommenting the macro will set the respective type/attribute to true.
- *  Invoking the directive again will undo the previous action.
+ *  ulog has the following format:
+ *  (level is what appears in LEVEL, usually [BUG], [LOG], [ERROR], or [WARNING]
+ *  if using the ulog macros. Using the ulog function allows you to customize
+ *  your own error message)
+ *  MMM dd yyyy HH:mm:ss LEVEL [filepath/filename:linenumber] function_name message
  */
+#ifdef ULOG_DISABLE_ALL
+# define ULOG_DISABLE_BUG
+# define ULOG_DISABLE_LOG
+# define ULOG_DISABLE_ERROR
+# define ULOG_DISABLE_WARNING
+#endif
 
-/**
-ULOG_TOGGLE_TYPE(ALL);
-ULOG_TOGGLE_TYPE(BUG);
-ULOG_TOGGLE_TYPE(LOG);
-ULOG_TOGGLE_TYPE(ERROR);
-ULOG_TOGGLE_TYPE(WARNING);
-
+/** Turn off ulog attributes by invoking one or more of these in a function.
 ULOG_TOGGLE_ATTR(DATE);
 ULOG_TOGGLE_ATTR(TIME);
 ULOG_TOGGLE_ATTR(LEVEL);
@@ -878,6 +812,111 @@ ULOG_TOGGLE_ATTR(LINE);
 ULOG_TOGGLE_ATTR(FUNCTION);
 ULOG_TOGGLE_ATTR(MESSAGE);
 */
+
+/**
+ *  @def        BUG
+ *  @brief      Shorthand macro for ulog to note bugs in a program
+ *
+ *  Use the preprocessor directive
+ *      #define ULOG_DISABLE_BUG 
+ *  before the inclusion of utils.h (or before these directives)
+ *  to disable the BUG macro.
+ */
+#if __STDC_VERSION__ >= 199901L
+# ifndef ULOG_DISABLE_BUG
+#  define BUG(FILEMACRO, ...)                                                    \
+          ulog(ULOG_STREAM_BUG, "[BUG]", FILEMACRO, __func__, (long int)__LINE__,    \
+              __VA_ARGS__)
+# else
+#  define BUG(FILEMACRO, ...)
+# endif
+#else
+# ifndef ULOG_DISABLE_BUG
+#  define BUG(FILEMACRO, MSG)                                                    \
+          ulog(ULOG_STREAM_BUG, "[BUG]", FILEMACRO, __func__, (long int)__LINE__, MSG)
+# else
+#  define BUG(FILEMACRO, MSG)
+# endif
+#endif
+
+/**
+ *  @def        LOG
+ *  @brief      Shorthand macro for ulog to create messages for a program
+ *
+ *  Use the preprocessor directive
+ *      #define ULOG_DISABLE_BUG
+ *  before the inclusion of utils.h (or before these directives)
+ *  to disable the LOG macro.
+ */
+#if __STDC_VERSION__ >= 199901L
+# ifndef ULOG_DISABLE_LOG
+#  define LOG(FILEMACRO, ...)                                                    \
+          ulog(ULOG_STREAM_LOG, "[LOG]", FILEMACRO, __func__, (long int)__LINE__,    \
+          __VA_ARGS__)
+# else
+#  define LOG(FILEMACRO, ...)
+# endif
+#else
+# ifndef ULOG_DISABLE_LOG
+#  define LOG(FILEMACRO, MSG)                                                    \
+          ulog(ULOG_STREAM_LOG, "[LOG]", FILEMACRO, __func__, (long int)__LINE__, MSG)
+# else
+#  define LOG(FILEMACRO, MSG)
+# endif
+#endif
+
+/**
+ *  @def        ERROR
+ *  @brief      Shorthand macro for ulog to display errors for a program
+ *
+ *  Use the preprocessor directive 
+ *      #define ULOG_DISABLE_ERROR
+ *  before the inclusion of utils.h (or before these directives)
+ *  to disable the ERROR macro.
+ */
+#if __STDC_VERSION__ >= 199901L
+# ifndef ULOG_DISABLE_ERROR
+#  define ERROR(FILEMACRO, ...)                                                  \
+          ulog(ULOG_STREAM_ERROR, "[ERROR]", FILEMACRO, __func__,                    \
+          (long int)__LINE__, __VA_ARGS__)
+# endif
+#else
+# ifndef ULOG_DISABLE_ERROR
+#  define ERROR(FILEMACRO, MSG)                                                  \
+          ulog(ULOG_STREAM_ERROR, "[ERROR]", FILEMACRO, __func__,                    \
+          (long int)__LINE__, MSG)
+# else
+#  define ERROR(FILEMACRO, MSG)
+# endif   
+#endif
+
+/**
+ *  @def        WARNING
+ *  @brief      Shorthand macro for ulog to display warning for a program
+ */
+#if __STDC_VERSION__ >= 199901L
+# ifndef ULOG_DISABLE_WARNING
+#  define WARNING(FILEMACRO, ...)                                                \
+          ulog(ULOG_STREAM_WARNING, "[WARNING]", FILEMACRO, __func__,                \
+          (long int)__LINE__, __VA_ARGS__)
+# endif
+#else
+# ifndef ULOG_DISABLE_WARNING
+#  define WARNING(FILEMACRO, MSG)                                                \
+          ulog(ULOG_STREAM_WARNING, "[WARNING]", FILEMACRO, __func__,                \
+          (long int)__LINE__, MSG)
+# else
+#  define WARNING(FILEMACRO, MSG)
+# endif
+#endif
+
+#define UTILS_LOG_ATTRS_COUNT 7
+enum ULOG_ATTRS { DATE, TIME, LEVEL, FILENAME, LINE, FUNCTION, MESSAGE };
+extern bool ulog_attrs_disable[UTILS_LOG_ATTRS_COUNT];
+
+#define ULOG_TOGGLE_ATTR(ULOG_ATTR)                                            \
+    ulog_attrs_disable[ULOG_ATTR] =                                            \
+        (ulog_attrs_disable[ULOG_ATTR]) ? (false) : (true)
 
 /**
  *  Custom assert function with message string -

@@ -29,7 +29,10 @@
  */
 
 #include "gcslib.h" /**< Entire gcslib_c library */
+
+
 #include "vec2D.h"  /**< vec2D API, a test "object" */
+
 
 #include <assert.h>
 #include <dirent.h>
@@ -91,8 +94,11 @@ int main(int argc, const char *argv[]) {
     test_listvp_str_splice();
     */
 
-    test_listvp_int_merge();
-
+    /* test_listvp_int_merge(); */
+    BUG(__FILE__, "test bug  message");
+    LOG(__FILE__, "test log  message");
+    ERROR(__FILE__, "test error  message");
+    WARNING(__FILE__, "test warning  message");
     /*
     test_listvp_int();
     test_listvp_int_at();

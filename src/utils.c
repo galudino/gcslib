@@ -1139,7 +1139,6 @@ struct typetable *_uint64_t_ = &ttbl_uint64;
 
 struct typetable *_pthread_t_ = NULL;
 
-bool ulog_disable[] = {false, false, false, false, false};
 bool ulog_attrs_disable[] = {false, false, false, false, false, false, false};
 
 /**
@@ -1169,31 +1168,13 @@ int ulog(FILE *dest, const char *level, const char *file, const char *func,
 
     int j = 0;
 
-    if (ulog_disable[ALL] ||
-        (ulog_attrs_disable[DATE] && ulog_attrs_disable[TIME] &&
-         ulog_attrs_disable[LEVEL] && ulog_attrs_disable[FILENAME] &&
-         ulog_attrs_disable[LINE] && ulog_attrs_disable[FUNCTION] &&
-         ulog_attrs_disable[MESSAGE]) ||
-        dest == NULL || level == NULL || file == NULL || func == NULL ||
-        line == -666 || fmt == NULL) {
-        return 0;
-    }
-
     if (streql(level, "[BUG]")) {
-        if (ulog_disable[BUG]) {
-            return 0;
-        }
-
         color = KYEL_b;
         found = true;
     }
 
     if (found == false) {
         if (streql(level, "[LOG]")) {
-            if (ulog_disable[LOG]) {
-                return 0;
-            }
-
             color = KCYN_b;
             found = true;
         }
@@ -1201,10 +1182,6 @@ int ulog(FILE *dest, const char *level, const char *file, const char *func,
 
     if (found == false) {
         if (streql(level, "[ERROR]")) {
-            if (ulog_disable[ERROR]) {
-                return 0;
-            }
-
             color = KRED_b;
             blink = KBNK;
             found = true;
@@ -1213,10 +1190,6 @@ int ulog(FILE *dest, const char *level, const char *file, const char *func,
 
     if (found == false) {
         if (streql(level, "[WARNING]")) {
-            if (ulog_disable[WARNING]) {
-                return 0;
-            }
-
             color = KMAG_b;
             blink = KBNK;
         }
@@ -1265,11 +1238,11 @@ int ulog(FILE *dest, const char *level, const char *file, const char *func,
         char linenumber[1024];
 
         if (is_integer) {
-#if __STD_VERSION__ >= 199901L
+            #if __STD_VERSION__ >= 199901L
             sprintf(linenumber, "[%lli] ", (long long int)(line));
-#else
+            #else
             sprintf(linenumber, "[%li] ", (long int)(line));
-#endif
+            #endif
         } else {
             if (is_currency) {
                 sprintf(linenumber, "[%0.2Lf] ", line);
@@ -1284,11 +1257,11 @@ int ulog(FILE *dest, const char *level, const char *file, const char *func,
         char fileline[1024];
 
         if (is_integer) {
-#if __STD_VERSION__ >= 199901L
+            #if __STD_VERSION__ >= 199901L
             sprintf(fileline, "[%s:%lli] ", file, (long long int)(line));
-#else
+            #else
             sprintf(fileline, "[%s:%li] ", file, (long int)(line));
-#endif
+            #endif
         } else {
             if (is_currency) {
                 sprintf(fileline, "[%s%0.2Lf] ", file, line);
