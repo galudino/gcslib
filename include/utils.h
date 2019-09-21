@@ -172,11 +172,9 @@ extern struct typetable *_long_int_;
 extern struct typetable *_signed_long_int_;
 extern struct typetable *_unsigned_long_int_;
 
-#if __STD_VERSION__ >= 199901L
 extern struct typetable *_long_long_int_;
 extern struct typetable *_signed_long_long_int_;
 extern struct typetable *_unsigned_long_long_int_;
-#endif
 
 extern struct typetable *_float_;
 extern struct typetable *_double_;
@@ -212,10 +210,8 @@ extern struct typetable *_uint16_t_;
 extern struct typetable *_uint32_;
 extern struct typetable *_uint32_t_;
 
-#if __STD_VERSION__ >= 199901L
 extern struct typetable *_uint64_;
 extern struct typetable *_uint64_t_;
-#endif
 
 extern struct typetable *_pthread_t_;
 

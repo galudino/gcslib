@@ -28,6 +28,9 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#define TESTING_VECTOR_CSTRING
+#include "vector_cstring.h"
+#include "vector_int32.h"
 #include "gcslib.h" /**< Entire gcslib_c library */
 
 
@@ -95,10 +98,41 @@ int main(int argc, const char *argv[]) {
     */
 
     /* test_listvp_int_merge(); */
-    BUG(__FILE__, "test bug  message");
-    LOG(__FILE__, "test log  message");
-    ERROR(__FILE__, "test error  message");
-    WARNING(__FILE__, "test warning  message");
+    
+    /* populate 1,000,000,000 ints and delete them, vector with void *start - 6.074s */
+    /*
+    vector *v = v_new(_int_);
+    int i = 0;
+    for (i = 0; i < 1000000000; i++) {
+        v_pushb(v, &i);
+    }
+
+    v_delete(&v);
+    */
+
+    /* populate 1,000,000,000 ints and delete them, vector with ints - 5.133s */
+    vector_int *v = vnew_int();
+    int i = 0;
+    for (i = 0; i < 1000000000; i++) {
+        vpushb_int(v, i);
+    }
+
+    vdelete_int(&v);
+
+    /* conclusion - even though (vector)'s void *start field really stores ints -- 
+      (char *)(v->impl.start) + (element * sizeof(int)) is the equivalent of (v->impl.start + element)
+       there is indirection involved...and there is no match for a natively-typed data structure.
+       we can achieve genericity through full use of macros (hideous),
+       or partial use of macros by parametrizing the type information, and the rest being "real" code.
+       the net effect ends up being the same either way -- the "templated" method is easier to write/maintain,
+       whereas the full macro version is easier to instantiate overall.
+
+       A happy medium is to write "templated" code, and use the header/source file pairing
+       to do a little bit of find-and-replace, manually (this is what the preprocessor is doing anyway, on the fly)
+       You'll end up with a natively-typed data structure that is ready to use at your whim.
+       This is a good strategy for types you are going to be using all the time for a project,
+       or just...ever (like ints, doubles, and (char *)).  */
+
     /*
     test_listvp_int();
     test_listvp_int_at();
@@ -113,6 +147,7 @@ int main(int argc, const char *argv[]) {
     return EXIT_SUCCESS;
 }
 
+#ifndef TESTING_VECTOR_CSTRING
 bool remove_if_even(const void *arg) {
     assert(arg);
     return (*(int *)(arg)) % 2 == 0;
@@ -681,3 +716,4 @@ void test_listtmpl_int() {
 void test_listtmpl_str() {
 
 }
+#endif

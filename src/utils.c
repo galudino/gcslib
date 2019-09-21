@@ -1093,6 +1093,10 @@ struct typetable *_unsigned_long_int_ = &ttbl_unsigned_long_int;
 struct typetable *_long_long_int_ = &ttbl_long_long_int;
 struct typetable *_signed_long_long_int_ = &ttbl_signed_long_long_int;
 struct typetable *_unsigned_long_long_int_ = &ttbl_unsigned_long_long_int;
+#else
+struct typetable *_long_long_int_ = NULL;
+struct typetable *_signed_long_long_int_ = NULL;
+struct typetable *_unsigned_long_long_int_ = NULL;
 #endif
 
 struct typetable *_float_ = &ttbl_float;
@@ -1123,6 +1127,9 @@ struct typetable *_int32_t_ = &ttbl_int32;
 #if __STD_VERSION__ >= 199901L
 struct typetable *_int64_ = &ttbl_int64;
 struct typetable *_int64_t_ = &ttbl_int64;
+#else
+struct typetable *_int64_ = NULL;
+struct typetable *_int64_t = NULL;
 #endif
 
 struct typetable *_uint8_ = &ttbl_uint8;
@@ -1135,6 +1142,9 @@ struct typetable *_uint32_t_ = &ttbl_uint32;
 #if __STD_VERSION__ >= 199901L
 struct typetable *_uint64_ = &ttbl_uint64;
 struct typetable *_uint64_t_ = &ttbl_uint64;
+#else
+struct typetable *_uint64_ = NULL;
+struct typetable *_uint64_t_ = NULL;
 #endif
 
 struct typetable *_pthread_t_ = NULL;

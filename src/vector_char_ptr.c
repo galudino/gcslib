@@ -1,6 +1,6 @@
 /**
- *  @file       vector_float.c
- *  @brief      Source for preprocessed template instantiation of vector(float)
+ *  @file       vector_char_ptr.c
+ *  @brief      Source for preprocessed template instantiation of vector(char_ptr)
  *
  *  @author     Gemuele Aludino
  *  @date       21 Sep 2019
@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "vector_float.h"
+#include "vector_char_ptr.h"
 
 /**
  *  @file       utils.h
@@ -67,128 +67,128 @@
 #define END(VEC)        (VEC->impl.end_of_storage)
 
 /**
- *  @struct     vector_float
+ *  @struct     vector_char_ptr
  *  @brief      Represents a type-safe dynamic array ADT
  *
- *  Note that struct vector_float and struct vector_base_float are
+ *  Note that struct vector_char_ptr and struct vector_base_char_ptr are
  *  opaque -- their fields cannot be accessed directly,
- *  nor can instances of struct vector_float/struct vector_base_float
+ *  nor can instances of struct vector_char_ptr/struct vector_base_char_ptr
  *  be created on the stack. This is done to enforce encapsulation.
  */
-struct vector_float {
-    struct vector_base_float {
-        float *start;           /**< address of array base (first element) */
-        float *finish;          /**< address reserved for next rear element */
-        float *end_of_storage;  /**< addresses last allocated block of storage */
+struct vector_char_ptr {
+    struct vector_base_char_ptr {
+        char_ptr *start;           /**< address of array base (first element) */
+        char_ptr *finish;          /**< address reserved for next rear element */
+        char_ptr *end_of_storage;  /**< addresses last allocated block of storage */
     } impl;
 
     struct typetable *ttbl; /*<< data width, cpy, dtor, swap, compare, print */
 };
 
-struct typetable table_id(ttbl_vector, float) = {
-    sizeof(struct vector_float),
-    tmpl_vector_copy_float,
-    tmpl_vector_dtor_float,
-    tmpl_vector_swap_float,
-    tmpl_vector_compare_float,
-    tmpl_vector_print_float
+struct typetable table_id(ttbl_vector, char_ptr) = {
+    sizeof(struct vector_char_ptr),
+    tmpl_vector_copy_char_ptr,
+    tmpl_vector_dtor_char_ptr,
+    tmpl_vector_swap_char_ptr,
+    tmpl_vector_compare_char_ptr,
+    tmpl_vector_print_char_ptr
 };
 
-struct typetable *vector_typetable_ptr_id_float = &table_id(ttbl_vector, float);
+struct typetable *vector_typetable_ptr_id_char_ptr = &table_id(ttbl_vector, char_ptr);
 
-static vector_float *vallocate_float(void);
-static void vinit_float(vector_float *v, size_t capacity);
-static void vdeinit_float(vector_float *v);
-static void vswapaddr_float(vector_float *v, float *first, float *second);
+static vector_char_ptr *vallocate_char_ptr(void);
+static void vinit_char_ptr(vector_char_ptr *v, size_t capacity);
+static void vdeinit_char_ptr(vector_char_ptr *v);
+static void vswapaddr_char_ptr(vector_char_ptr *v, char_ptr *first, char_ptr *second);
 
-static iterator vibegin_float(void *arg);
-static iterator viend_float(void *arg);
+static iterator vibegin_char_ptr(void *arg);
+static iterator viend_char_ptr(void *arg);
 
-static iterator vinext_float(iterator it);
-static iterator vinextn_float(iterator it, int n);
+static iterator vinext_char_ptr(iterator it);
+static iterator vinextn_char_ptr(iterator it, int n);
 
-static iterator viprev_float(iterator it);
-static iterator viprevn_float(iterator it, int n);
+static iterator viprev_char_ptr(iterator it);
+static iterator viprevn_char_ptr(iterator it, int n);
 
-static int vidistance_float(iterator *first, iterator *last);
+static int vidistance_char_ptr(iterator *first, iterator *last);
 
-static iterator *viadvance_float(iterator *it, int n);
-static iterator *viincr_float(iterator *it);
-static iterator *videcr_float(iterator *it);
+static iterator *viadvance_char_ptr(iterator *it, int n);
+static iterator *viincr_char_ptr(iterator *it);
+static iterator *videcr_char_ptr(iterator *it);
 
-static void *vicurr_float(iterator it);
-static void *vistart_float(iterator it);
-static void *vifinish_float(iterator it);
+static void *vicurr_char_ptr(iterator it);
+static void *vistart_char_ptr(iterator it);
+static void *vifinish_char_ptr(iterator it);
 
-static bool vihasnext_float(iterator it);
-static bool vihasprev_float(iterator it);
+static bool vihasnext_char_ptr(iterator it);
+static bool vihasprev_char_ptr(iterator it);
 
-static struct typetable *vigetttbl_float(void *arg);
+static struct typetable *vigetttbl_char_ptr(void *arg);
 
-struct iterator_table table_id(itbl_vector, float) = {
-    vibegin_float,
-    viend_float,
-    vinext_float,
-    vinextn_float,
-    viprev_float,
-    viprevn_float,
-    viadvance_float,
-    viincr_float,
-    videcr_float,
-    vicurr_float,
-    vistart_float,
-    vifinish_float,
-    vidistance_float,
-    vihasnext_float,
-    vihasprev_float,
-    vigetttbl_float
+struct iterator_table table_id(itbl_vector, char_ptr) = {
+    vibegin_char_ptr,
+    viend_char_ptr,
+    vinext_char_ptr,
+    vinextn_char_ptr,
+    viprev_char_ptr,
+    viprevn_char_ptr,
+    viadvance_char_ptr,
+    viincr_char_ptr,
+    videcr_char_ptr,
+    vicurr_char_ptr,
+    vistart_char_ptr,
+    vifinish_char_ptr,
+    vidistance_char_ptr,
+    vihasnext_char_ptr,
+    vihasprev_char_ptr,
+    vigetttbl_char_ptr
 };
 
-struct iterator_table *vector_iterator_table_ptr_id_float = &table_id(itbl_vector, float);
+struct iterator_table *vector_iterator_table_ptr_id_char_ptr = &table_id(itbl_vector, char_ptr);
 
 /**
- *  @brief  Allocates, constructs, and returns a pointer to vector_float,
+ *  @brief  Allocates, constructs, and returns a pointer to vector_char_ptr,
  *          size VECTOR_DEFAULT_CAPACITY (16)
  *
- *  @return     pointer to vector_float
+ *  @return     pointer to vector_char_ptr
  */
-vector_float *vnew_float(void) {
-    vector_float *v = vallocate_float();  /* allocate */
-    vinit_float(v, VECTOR_DEFAULT_CAPACITY); /* construct */
+vector_char_ptr *vnew_char_ptr(void) {
+    vector_char_ptr *v = vallocate_char_ptr();  /* allocate */
+    vinit_char_ptr(v, VECTOR_DEFAULT_CAPACITY); /* construct */
     return v;                                   /* return */
 }
 
 /**
- *  @brief  Allocates, constructs, and returns a pointer to vector_float,
+ *  @brief  Allocates, constructs, and returns a pointer to vector_char_ptr,
  *          size n
  *
- *  @return     pointer to vector_float
+ *  @return     pointer to vector_char_ptr
  */
-vector_float *vnewr_float(size_t n) {
-    vector_float *v = vallocate_float();/* allocate */
-    vinit_float(v, n);                     /* construct */
+vector_char_ptr *vnewr_char_ptr(size_t n) {
+    vector_char_ptr *v = vallocate_char_ptr();/* allocate */
+    vinit_char_ptr(v, n);                     /* construct */
     return v;                                 /* return */
 }
 
 /**
- *  @brief  Calls vnewr and returns a pointer to vector_float,
+ *  @brief  Calls vnewr and returns a pointer to vector_char_ptr,
  *          filled with n copies of val
  *
  *  @param[in]  n       number of elements to copy
  *  @param[in]  val     element to copy
  *
- *  @return     pointer to vector_float
+ *  @return     pointer to vector_char_ptr
  *
  *  If ttbl has a copy function defined,
  *  n copies of val will be inserted into the returned vector
  *  using the copy function - this copy function is intended for
  *  deep copies. Otherwise, val will be shallow-copied using memcpy.
  */
-vector_float *vnewfill_float(size_t n, float val) {
-    vector_float *v = NULL;
-    float *sentinel = NULL;
+vector_char_ptr *vnewfill_char_ptr(size_t n, char_ptr val) {
+    vector_char_ptr *v = NULL;
+    char_ptr *sentinel = NULL;
 
-    v = vnewr_float(n);
+    v = vnewr_char_ptr(n);
     sentinel = v->impl.start + n;
 
     if (v->ttbl->copy) {
@@ -213,24 +213,24 @@ vector_float *vnewfill_float(size_t n, float val) {
 }
 
 /**
- *  @brief  Calls vnewr and returns a pointer to vector_float,
+ *  @brief  Calls vnewr and returns a pointer to vector_char_ptr,
  *          filled with n copies of valaddr
  *
  *  @param[in]  n       number of elements to copy
  *  @param[in]  valaddr address of element to copy
  *
- *  @return     pointer to vector_float
+ *  @return     pointer to vector_char_ptr
  *
  *  If ttbl has a copy function defined,
  *  n copies of valaddr will be inserted into the returned vector
  *  using the copy function - this copy function is intended for
  *  deep copies. Otherwise, valaddr will be shallow-copied using memcpy.
  */
-vector_float *vnewfillptr_float(size_t n, float *valaddr) {
-    vector_float *v = NULL;
-    float *sentinel = NULL;
+vector_char_ptr *vnewfillptr_char_ptr(size_t n, char_ptr *valaddr) {
+    vector_char_ptr *v = NULL;
+    char_ptr *sentinel = NULL;
 
-    v = vnewr_float(n);
+    v = vnewr_char_ptr(n);
     sentinel = v->impl.start + n;
 
     if (v->ttbl->copy) {
@@ -262,7 +262,7 @@ vector_float *vnewfillptr_float(size_t n, float *valaddr) {
  *  @param[in]  first   represents the beginning of the range (inclusive)
  *  @param[in]  last    represents the end of the range (exclusive)
  *
- *  @return     pointer to vector_float
+ *  @return     pointer to vector_char_ptr
  *
  *  iterators first and last must refer to the same struct iterator_table,
  *  and would ideally refer to the same container -- but there are no mechanisms
@@ -278,14 +278,14 @@ vector_float *vnewfillptr_float(size_t n, float *valaddr) {
  *  using the copy function -- this function meant for deep copying.
  *  Otherwise, [first, last) will be shallow-copied using memcpy.
  */
-vector_float *vnewrnge_float(iterator first, iterator last) {
+vector_char_ptr *vnewrnge_char_ptr(iterator first, iterator last) {
     int delta = 0;
 
     struct typetable *ttbl_first = NULL;
-    vector_float *v = NULL;
+    vector_char_ptr *v = NULL;
 
-    float *sentinel = NULL;
-    float *curr = NULL;
+    char_ptr *sentinel = NULL;
+    char_ptr *curr = NULL;
 
     if (first.itbl != last.itbl) {
         /**
@@ -304,7 +304,7 @@ vector_float *vnewrnge_float(iterator first, iterator last) {
     delta = it_distance(&first, &last);
     ttbl_first = it_get_ttbl(first);
 
-    v = vnewr_float(delta);
+    v = vnewr_char_ptr(delta);
 
     sentinel = it_curr(last);         /* iteration range is [first, last) */
 
@@ -326,10 +326,10 @@ vector_float *vnewrnge_float(iterator first, iterator last) {
 }
 
 /**
- *  @brief  Calls vnewr and returns a pointer to vector_float,
- *          filled with elements from an existing vector_float v.
+ *  @brief  Calls vnewr and returns a pointer to vector_char_ptr,
+ *          filled with elements from an existing vector_char_ptr v.
  *
- *  @param[in]  v   pointer to vector_float, containing the desired source elements
+ *  @param[in]  v   pointer to vector_char_ptr, containing the desired source elements
  *
  *  @return     pointer to vector, with copies of v's elements
  *
@@ -338,17 +338,17 @@ vector_float *vnewrnge_float(iterator first, iterator last) {
  *  copy function -- this function is meant for deep copying.
  *  Otherwise, the contents of v will be shallow-copied using memcpy.
  */
-vector_float *vnewcopy_float(vector_float *v) {
-    vector_float *copy = NULL;
+vector_char_ptr *vnewcopy_char_ptr(vector_char_ptr *v) {
+    vector_char_ptr *copy = NULL;
 
-    float *sentinel = NULL;
-    float *curr = NULL;
+    char_ptr *sentinel = NULL;
+    char_ptr *curr = NULL;
 
     massert_container(v);
 
-    copy = vnewr_float(vcapacity_float(v));
+    copy = vnewr_char_ptr(vcapacity_char_ptr(v));
 
-    sentinel = copy->impl.finish + vsize_float(v);
+    sentinel = copy->impl.finish + vsize_char_ptr(v);
     curr = v->impl.start;
 
     if (v->ttbl->copy) {
@@ -365,22 +365,22 @@ vector_float *vnewcopy_float(vector_float *v) {
 }
 
 /**
- *  @brief  Calls vallocate_float to allocate a new vector_float, named move,
- *          and transfers ownership of v's fields to vector_float move.
+ *  @brief  Calls vallocate_char_ptr to allocate a new vector_char_ptr, named move,
+ *          and transfers ownership of v's fields to vector_char_ptr move.
  *
- *  @param[out] v   Address of a pointer to vector_float
+ *  @param[out] v   Address of a pointer to vector_char_ptr
  *
- *  @return     pointer to vector_float, initialized with v's fields
+ *  @return     pointer to vector_char_ptr, initialized with v's fields
  *
  *  vector v is reinitialized with the same ttbl, with size 1.
  *  v may be deleted by the client, or reused.
  */
-vector_float *vnewmove_float(vector_float **v) {
-    vector_float *move = NULL;
+vector_char_ptr *vnewmove_char_ptr(vector_char_ptr **v) {
+    vector_char_ptr *move = NULL;
 
     massert_ptr((*v));
 
-    move = vallocate_float();
+    move = vallocate_char_ptr();
 
     /**
      *  A new vector, move, is constructed from the contents of an existing vector,
@@ -393,28 +393,28 @@ vector_float *vnewmove_float(vector_float **v) {
     move->impl.end_of_storage = (*v)->impl.end_of_storage;
     move->ttbl = (*v)->ttbl;
 
-    vinit_float((*v), 1);
+    vinit_char_ptr((*v), 1);
 
     return move;
 }
 
 /**
- *  @brief  Calls vdeinit_float (vector_float's destructor) and deallocates the pointer v.
+ *  @brief  Calls vdeinit_char_ptr (vector_char_ptr's destructor) and deallocates the pointer v.
  *
- *  @param[out] v   Address of a pointer to vector_float
+ *  @param[out] v   Address of a pointer to vector_char_ptr
  *
- *  Every call to any of vector_float's "new" functions should be accompanied
- *  by a call to vdelete_float when a pointer to vector_float is no longer needed.
+ *  Every call to any of vector_char_ptr's "new" functions should be accompanied
+ *  by a call to vdelete_char_ptr when a pointer to vector_char_ptr is no longer needed.
  *
- *  If the vector_float has a ttbl with a dtor function defined,
- *  the elements within the vector_float will be destroyed using the dtor function.
+ *  If the vector_char_ptr has a ttbl with a dtor function defined,
+ *  the elements within the vector_char_ptr will be destroyed using the dtor function.
  *
  *  Note that if the elements from within v are dynamically allocated,
  *  and/or the elements have dynamically allocated fields --
  *  and there is no dtor function defined, memory management
  *  will become the client's responsibility.
  */
-void vdelete_float(vector_float **v) {
+void vdelete_char_ptr(vector_char_ptr **v) {
     massert_ptr((*v));
 
     /**
@@ -425,7 +425,7 @@ void vdelete_float(vector_float **v) {
      *  (*v)->impl.start has its memory freed, and the remainder of (*v)'s fields
      *  are set NULL.
      */
-    vdeinit_float((*v));
+    vdeinit_char_ptr((*v));
 
     /* finally, the memory (*v) points to will be freed. */
     free((*v));
@@ -433,51 +433,51 @@ void vdelete_float(vector_float **v) {
 }
 
 /**
- *  @brief  Returns an iterator that points to the first element in vector_float
+ *  @brief  Returns an iterator that points to the first element in vector_char_ptr
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     iterator that refers to v
  */
-iterator vbegin_float(vector_float *v) {
+iterator vbegin_char_ptr(vector_char_ptr *v) {
     massert_container(v);
-    return vibegin_float(v);
+    return vibegin_char_ptr(v);
 }
 
 /**
  *  @brief  Returns an iterator that pointers to an element that is one block
  *          past the last element in v
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     iterator that refers to v
  */
-iterator vend_float(vector_float *v) {
+iterator vend_char_ptr(vector_char_ptr *v) {
     massert_container(v);
-    return viend_float(v);
+    return viend_char_ptr(v);
 }
 
 /**
  *  @brief  Returns the logical length of v
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     logical length of v
  */
-size_t vsize_float(vector_float *v) {
+size_t vsize_char_ptr(vector_char_ptr *v) {
     massert_container(v);
     return v->impl.finish - v->impl.start;
 }
 
 /**
  *  @brief  Returns the theoretical maximum amount of elements that
- *          can be stored by vector_float
+ *          can be stored by vector_char_ptr
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     theoretical maximum logical length of v
  */
-size_t vmaxsize_float(vector_float *v) {
+size_t vmaxsize_char_ptr(vector_char_ptr *v) {
     size_t ptr_sz = 0;
 
     massert_container(v);
@@ -488,21 +488,21 @@ size_t vmaxsize_float(vector_float *v) {
 }
 
 /**
- *  @brief  Resizes the vector_float to size n
+ *  @brief  Resizes the vector_char_ptr to size n
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *  @param[in]  n   desired size for v
  *
- *  If n is less than the current logical length (vsize_float(v)),
+ *  If n is less than the current logical length (vsize_char_ptr(v)),
  *  v will be truncated (excess elements are destroyed),
  *  otherwise, v's capacity will be extended.
  */
-void vresize_float(vector_float *v, size_t n) {
+void vresize_char_ptr(vector_char_ptr *v, size_t n) {
     size_t old_size = 0;
     size_t old_capacity = 0;
 
-    float *target = NULL;
-    float *newstart = NULL;
+    char_ptr *target = NULL;
+    char_ptr *newstart = NULL;
 
     int back_index = 0;
     int i = 0;
@@ -512,8 +512,8 @@ void vresize_float(vector_float *v, size_t n) {
     
     massert_container(v);
 
-    old_size = vsize_float(v);
-    old_capacity = vcapacity_float(v);
+    old_size = vsize_char_ptr(v);
+    old_capacity = vcapacity_char_ptr(v);
 
     if (old_capacity == n) {
         return;
@@ -548,9 +548,9 @@ void vresize_float(vector_float *v, size_t n) {
 }
 
 /**
- *  @brief  Resizes the vector_float to size n elements.
+ *  @brief  Resizes the vector_char_ptr to size n elements.
  *
- *  @param[in]  v           pointer to vector_float
+ *  @param[in]  v           pointer to vector_char_ptr
  *  @param[in]  n           desired size for v
  *  @param[in]  val         element to fill new blocks with
  *
@@ -558,18 +558,18 @@ void vresize_float(vector_float *v, size_t n) {
  *  to the new blocks for the resize.
  *
  *  If n is less than or equal to the size of v,
- *  the vector_float will be cleared and new memory of size n will be
+ *  the vector_char_ptr will be cleared and new memory of size n will be
  *  initialized, with each block consisting of copies of val.
  */
-void vresizefill_float(vector_float *v, size_t n, float val) {
+void vresizefill_char_ptr(vector_char_ptr *v, size_t n, char_ptr val) {
     size_t old_capacity = 0;
 
-    float *sentinel = NULL;
-    float *newstart = NULL;
+    char_ptr *sentinel = NULL;
+    char_ptr *newstart = NULL;
 
     massert_container(v);
 
-    old_capacity = vcapacity_float(v);
+    old_capacity = vcapacity_char_ptr(v);
 
     sentinel = v->impl.start + n;
 
@@ -578,7 +578,7 @@ void vresizefill_float(vector_float *v, size_t n, float val) {
          *  If n is greater than the old size, multiple instances of valaddr are
          *  appended to the rear of the vector following a resize.
          */
-        vresize_float(v, n);
+        vresize_char_ptr(v, n);
 
         /* sentinel must be updated to reflect the resize. */
         sentinel = v->impl.start + n;
@@ -643,9 +643,9 @@ void vresizefill_float(vector_float *v, size_t n, float val) {
 }
 
 /**
- *  @brief  Resizes the vector_float to size n elements.
+ *  @brief  Resizes the vector_char_ptr to size n elements.
  *
- *  @param[in]  v           pointer to vector_float
+ *  @param[in]  v           pointer to vector_char_ptr
  *  @param[in]  n           desired size for v
  *  @param[in]  valaddr     address of element to fill new blocks with
  *
@@ -653,18 +653,18 @@ void vresizefill_float(vector_float *v, size_t n, float val) {
  *  to the new blocks for the resize.
  *
  *  If n is less than or equal to the size of v,
- *  the vector_float will be cleared and new memory of size n will be
+ *  the vector_char_ptr will be cleared and new memory of size n will be
  *  initialized, with each block consisting of copies of valaddr.
  */
-void vresizefillptr_float(vector_float *v, size_t n, float *valaddr) {
+void vresizefillptr_char_ptr(vector_char_ptr *v, size_t n, char_ptr *valaddr) {
     size_t old_capacity = 0;
 
-    float *sentinel = NULL;
-    float *newstart = NULL;
+    char_ptr *sentinel = NULL;
+    char_ptr *newstart = NULL;
 
     massert_container(v);
 
-    old_capacity = vcapacity_float(v);
+    old_capacity = vcapacity_char_ptr(v);
 
     sentinel = v->impl.start + n;
 
@@ -673,7 +673,7 @@ void vresizefillptr_float(vector_float *v, size_t n, float *valaddr) {
          *  If n is greater than the old size, multiple instances of valaddr are
          *  appended to the rear of the vector following a resize.
          */
-        vresize_float(v, n);
+        vresize_char_ptr(v, n);
 
         /* sentinel must be updated to reflect the resize. */
         sentinel = v->impl.start + n;
@@ -740,11 +740,11 @@ void vresizefillptr_float(vector_float *v, size_t n, float *valaddr) {
 /**
  *  @brief  Returns the capacity of v
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return         capacity of v
  */
-size_t vcapacity_float(vector_float *v) {
+size_t vcapacity_char_ptr(vector_char_ptr *v) {
     massert_container(v);
     return v->impl.end_of_storage - v->impl.start;
 }
@@ -752,11 +752,11 @@ size_t vcapacity_float(vector_float *v) {
 /**
  *  @brief  Determines if v is an empty vector, or not
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     true if v->impl.start == v->impl.finish, false otherwise
  */
-bool vempty_float(vector_float *v) {
+bool vempty_char_ptr(vector_char_ptr *v) {
     massert_container(v);
     /**
      *  Since v->impl.finish is always one address ahead of vector's back element,
@@ -765,15 +765,15 @@ bool vempty_float(vector_float *v) {
     return v->impl.start == v->impl.finish;
 }
 
-void vreserve_float(vector_float *v, size_t n) {
+void vreserve_char_ptr(vector_char_ptr *v, size_t n) {
     massert_container(v);
 
     /**
      *  Reserve is effectively a resize,
      *  but verifies that the value of n meets the requirements for a reservation.
      */
-    if (n > vcapacity_float(v)) {
-        vresize_float(v, n);
+    if (n > vcapacity_char_ptr(v)) {
+        vresize_char_ptr(v, n);
     } else {
         /* no-op */
         ERROR(__FILE__, "n must be greater than vector's buffer capacity.");
@@ -782,40 +782,40 @@ void vreserve_float(vector_float *v, size_t n) {
 }
 
 /**
- *  @brief  Shrinks vector_float's buffer to that of its logical length
+ *  @brief  Shrinks vector_char_ptr's buffer to that of its logical length
  *
- *  @param[in] v    pointer to vector_float
+ *  @param[in] v    pointer to vector_char_ptr
  *
  *  This function is effectively a conditional resize --
  *  but verifies that:
  *      - vector is not empty
  *      - vector's finish pointer is not equal to end_of_storage pointer
  */
-void vshrinktofit_float(vector_float *v) {
+void vshrinktofit_char_ptr(vector_char_ptr *v) {
     massert_container(v);
 
     if ((v->impl.start != v->impl.finish) && (v->impl.finish != v->impl.end_of_storage)) {
-        vresize_float(v, vsize_float(v));
+        vresize_char_ptr(v, vsize_char_ptr(v));
     }
 }
 
 /**
  *  @brief  Retrieves the address of an element from vector at index n
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *  @param[in]  n   index of desired element
  *
  *  @return     address of element at n
  *
  *  A bounds check is performed to ensure that n is a valid index.
  */
-float *vat_float(vector_float *v, size_t n) {
+char_ptr *vat_char_ptr(vector_char_ptr *v, size_t n) {
     size_t size = 0;
-    float *target = NULL;
+    char_ptr *target = NULL;
 
     massert_container(v);
 
-    size = vsize_float(v);
+    size = vsize_char_ptr(v);
     target = NULL;
 
     if (n >= size) {
@@ -838,37 +838,37 @@ float *vat_float(vector_float *v, size_t n) {
 }
 
 /**
- *  @brief  Retrieves the address of the front element from vector_float
+ *  @brief  Retrieves the address of the front element from vector_char_ptr
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     address of front element
  */
-float *vfront_float(vector_float *v) {
+char_ptr *vfront_char_ptr(vector_char_ptr *v) {
     massert_container(v);
     return v->impl.start;
 }
 
 /**
- *  @brief  Retrieves the address of the rear element from vector_float
+ *  @brief  Retrieves the address of the rear element from vector_char_ptr
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     address of rear element
  */
-float *vback_float(vector_float *v) {
+char_ptr *vback_char_ptr(vector_char_ptr *v) {
     massert_container(v);
     return v->impl.finish - 1;
 }
 
 /**
- *  @brief  Retrieves the address of vector_float's buffer
+ *  @brief  Retrieves the address of vector_char_ptr's buffer
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     address of v->impl.start
  */
-float **vdata_float(vector_float *v) {
+char_ptr **vdata_char_ptr(vector_char_ptr *v) {
     massert_container(v);
     return &(v->impl.start);
 }
@@ -876,21 +876,21 @@ float **vdata_float(vector_float *v) {
 /**
  *  @brief  Retrieves the address of an element from vector at index n
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *  @param[in]  n   index of desired element
  *
  *  @return     address of element at n
  *
  *  A bounds check is performed to ensure that n is a valid index.
  */
-const float *vatconst_float(vector_float *v, size_t n) {
-    float *target = NULL;
+const char_ptr *vatconst_char_ptr(vector_char_ptr *v, size_t n) {
+    char_ptr *target = NULL;
 
     massert_container(v);
 
-    if (n >= vsize_float(v)) {
+    if (n >= vsize_char_ptr(v)) {
         char str[256];
-        sprintf(str, "Input %lu is greater than vector's logical length, %lu -- index out of bounds.", n, vsize_float(v));
+        sprintf(str, "Input %lu is greater than vector's logical length, %lu -- index out of bounds.", n, vsize_char_ptr(v));
         ERROR(__FILE__, str);
         return NULL;
     }
@@ -900,60 +900,60 @@ const float *vatconst_float(vector_float *v, size_t n) {
 }
 
 /**
- *  @brief  Retrieves the address of the front element from vector_float
+ *  @brief  Retrieves the address of the front element from vector_char_ptr
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     address of front element, const qualified
  */
-const float *vfrontconst_float(vector_float *v) {
-    const float *result = (const float *)(v->impl.start);
+const char_ptr *vfrontconst_char_ptr(vector_char_ptr *v) {
+    const char_ptr *result = (const char_ptr *)(v->impl.start);
     return result;
 }
 
 /**
- *  @brief  Retrieves the address of the rear element from vector_float
+ *  @brief  Retrieves the address of the rear element from vector_char_ptr
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     address of rear element, const qualified
  */
-const float *vbackconst_float(vector_float *v) {
-    const float *result = (const float *)(v->impl.finish - 1);
+const char_ptr *vbackconst_char_ptr(vector_char_ptr *v) {
+    const char_ptr *result = (const char_ptr *)(v->impl.finish - 1);
     return result;
 }
 
 /**
- *  @brief  Retrieves the address of vector_float's buffer
+ *  @brief  Retrieves the address of vector_char_ptr's buffer
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     address of v->impl.start, const qualified
  */
-const float **vdataconst_float(vector_float *v) {
-    const float **result = (const float **)(&v->impl.start);
+const char_ptr **vdataconst_char_ptr(vector_char_ptr *v) {
+    const char_ptr **result = (const char_ptr **)(&v->impl.start);
     return result;
 }
 
 /**
- *  @brief  Assigns a range of elements to vector_float, starting at its beginning
+ *  @brief  Assigns a range of elements to vector_char_ptr, starting at its beginning
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[in]  first   represents the beginning of the range (inc)
  *  @param[in]  last    represents the end of the range, (exc)
  *
  *  Elements in this vector will be destroyed, and replaced with
  *  contents from [first, last).
  *  
- *  If the range of [first, last) exceeds that of vcapacity_float(v),
+ *  If the range of [first, last) exceeds that of vcapacity_char_ptr(v),
  *  the capacity will be increased to that of size it_distance(&first, &last).
  */
-void vassignrnge_float(vector_float *v, iterator first, iterator last) {
+void vassignrnge_char_ptr(vector_char_ptr *v, iterator first, iterator last) {
     int delta = it_distance(&first, &last);
     struct typetable *ttbl_first = it_get_ttbl(first);
 
-    float *sentinel = it_curr(last);
-    float *curr = NULL;
+    char_ptr *sentinel = it_curr(last);
+    char_ptr *curr = NULL;
 
     if (first.itbl != last.itbl) {
         /**
@@ -972,13 +972,13 @@ void vassignrnge_float(vector_float *v, iterator first, iterator last) {
     /**
      *  Clear the vector. 
      */
-    vclear_float(v);
+    vclear_char_ptr(v);
 
     /**
      *  Resize vector if necessary.
      */
-    if (delta >= vcapacity_float(v)) {
-        vresize_float(v, delta);
+    if (delta >= vcapacity_char_ptr(v)) {
+        vresize_char_ptr(v, delta);
     }
 
     if (ttbl_first->copy) {
@@ -997,29 +997,29 @@ void vassignrnge_float(vector_float *v, iterator first, iterator last) {
 /**
  *  @brief  Assigns n copies of an element, starting at beginning of vector
  *
- *  @param[in]  v           pointer to vector_float
+ *  @param[in]  v           pointer to vector_char_ptr
  *  @param[in]  n           amount of elements to assign
  *  @param[in]  val         the element to assign
  * 
  *  Elements in this vector will be destroyed,
  *  and replaced with n copies of val.
  * 
- *  If n exceeds that of vcapacity_float(v),
+ *  If n exceeds that of vcapacity_char_ptr(v),
  *  the capacity of this vector will be increased to that of size n.
  */
-void vassignfill_float(vector_float *v, size_t n, float val) {
-    float *sentinel = NULL;
+void vassignfill_char_ptr(vector_char_ptr *v, size_t n, char_ptr val) {
+    char_ptr *sentinel = NULL;
 
     /**
      *  Clear the vector. 
      */
-    vclear_float(v);
+    vclear_char_ptr(v);
 
     /**
      *  Resize vector if necessary.
      */
-    if (n > vcapacity_float(v)) {
-        vresize_float(v, n);
+    if (n > vcapacity_char_ptr(v)) {
+        vresize_char_ptr(v, n);
     }
 
     sentinel = v->impl.start + n;
@@ -1046,22 +1046,22 @@ void vassignfill_float(vector_float *v, size_t n, float val) {
  *  Elements in this vector will be destroyed,
  *  and replaced with n copies of valaddr.
  * 
- *  If n exceeds that of vcapacity_float(v),
+ *  If n exceeds that of vcapacity_char_ptr(v),
  *  the capacity of this vector will be increased to that of size n.
  */
-void vassignfillptr_float(vector_float *v, size_t n, float *valaddr) {
-    float *sentinel = NULL;
+void vassignfillptr_char_ptr(vector_char_ptr *v, size_t n, char_ptr *valaddr) {
+    char_ptr *sentinel = NULL;
 
     /**
      *  Clear the vector. 
      */
-    vclear_float(v);
+    vclear_char_ptr(v);
 
     /**
      *  Resize vector if necessary.
      */
-    if (n > vcapacity_float(v)) {
-        vresize_float(v, n);
+    if (n > vcapacity_char_ptr(v)) {
+        vresize_char_ptr(v, n);
     }
 
     sentinel = v->impl.start + n;
@@ -1089,7 +1089,7 @@ void vassignfillptr_float(vector_float *v, size_t n, float *valaddr) {
  *  Otherwise, valaddr will be shallow-copied into v
  *  using memcpy.
  */
-void vpushb_float(vector_float *v, float val) {
+void vpushb_char_ptr(vector_char_ptr *v, char_ptr val) {
    massert_container(v);
 
     /**
@@ -1097,7 +1097,7 @@ void vpushb_float(vector_float *v, float val) {
      *  meets the end_of_storage pointer.
      */
     if (v->impl.finish == v->impl.end_of_storage) {
-        vresize_float(v, vcapacity_float(v) * 2);
+        vresize_char_ptr(v, vcapacity_char_ptr(v) * 2);
     }
 
     if (v->ttbl->copy) {
@@ -1114,7 +1114,7 @@ void vpushb_float(vector_float *v, float val) {
 /**
  *  @brief  Appends an element to the rear of the vector
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[in]  valaddr address of element to be copied
  *
  *  If a copy function is defined in v's ttbl,
@@ -1122,7 +1122,7 @@ void vpushb_float(vector_float *v, float val) {
  *  Otherwise, valaddr will be shallow-copied into v
  *  using memcpy.
  */
-void vpushbptr_float(vector_float *v, float *valaddr) {
+void vpushbptr_char_ptr(vector_char_ptr *v, char_ptr *valaddr) {
    massert_container(v);
    massert_ptr(valaddr);
 
@@ -1131,7 +1131,7 @@ void vpushbptr_float(vector_float *v, float *valaddr) {
      *  meets the end_of_storage pointer.
      */
     if (v->impl.finish == v->impl.end_of_storage) {
-        vresize_float(v, vcapacity_float(v) * 2);
+        vresize_char_ptr(v, vcapacity_char_ptr(v) * 2);
     }
 
     if (v->ttbl->copy) {
@@ -1148,7 +1148,7 @@ void vpushbptr_float(vector_float *v, float *valaddr) {
 /**
  *  @brief  Removes element at the rear of the vector
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  If a dtor function is defined in v's ttbl,
  *  the rear element will be destroyed using the dtor function
@@ -1161,7 +1161,7 @@ void vpushbptr_float(vector_float *v, float *valaddr) {
  *  dynamically allocated fields become the client's responsibility
  *  if a dtor function is NOT defined within v's ttbl.
  */
-void vpopb_float(vector_float *v) {
+void vpopb_char_ptr(vector_char_ptr *v) {
     massert_container(v);
 
     if (v->impl.finish == v->impl.start) {
@@ -1189,7 +1189,7 @@ void vpopb_float(vector_float *v) {
 /**
  *  @brief  Inserts a value into vector at position specified by pos
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[in]  pos     refers to an element within v
  *  @param[in]  valaddr element to insert
  *
@@ -1202,8 +1202,8 @@ void vpopb_float(vector_float *v) {
  *  Otherwise, valaddr will be shallow-copied into v
  *  using memcpy.
  */
-iterator vinsert_float(vector_float *v, iterator pos, float val) {
-    float *curr = NULL;
+iterator vinsert_char_ptr(vector_char_ptr *v, iterator pos, char_ptr val) {
+    char_ptr *curr = NULL;
     size_t ipos = 0;
 
     massert_container(v);
@@ -1213,11 +1213,11 @@ iterator vinsert_float(vector_float *v, iterator pos, float val) {
      *  meets the end_of_storage pointer.
      */
     if (v->impl.finish == v->impl.end_of_storage) {
-        vresize_float(v, vcapacity_float(v) * 2);
+        vresize_char_ptr(v, vcapacity_char_ptr(v) * 2);
     }
 
     /**
-     *  To insert within indices (0, vsize_float(v)),
+     *  To insert within indices (0, vsize_char_ptr(v)),
      *  begin by appending val to the rear of the vector.
      */
     if (v->ttbl->copy) {
@@ -1237,11 +1237,11 @@ iterator vinsert_float(vector_float *v, iterator pos, float val) {
     ipos = it_distance(NULL, &pos);
 
     /**
-     *  Use iterator pos to swap elements from [pos, vsize_float(v))
+     *  Use iterator pos to swap elements from [pos, vsize_char_ptr(v))
      *  val will resize at the index originally specified by pos
      */
     while ((curr = it_curr(pos)) != v->impl.finish) {
-        vswapaddr_float(v, curr, v->impl.finish);
+        vswapaddr_char_ptr(v, curr, v->impl.finish);
         it_incr(&pos);
     }
 
@@ -1249,13 +1249,13 @@ iterator vinsert_float(vector_float *v, iterator pos, float val) {
     ++v->impl.finish;
 
     /* returned is an iterator at refers to val's position in v */
-    return it_next_n(vbegin_float(v), ipos);
+    return it_next_n(vbegin_char_ptr(v), ipos);
 }
 
 /**
  *  @brief  Inserts a value into vector at position specified by pos
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[in]  pos     refers to an element within v
  *  @param[in]  valaddr address of element to insert
  *
@@ -1268,8 +1268,8 @@ iterator vinsert_float(vector_float *v, iterator pos, float val) {
  *  Otherwise, valaddr will be shallow-copied into v
  *  using memcpy.
  */
-iterator vinsertptr_float(vector_float *v, iterator pos, float *valaddr) {
-    float *curr = NULL;
+iterator vinsertptr_char_ptr(vector_char_ptr *v, iterator pos, char_ptr *valaddr) {
+    char_ptr *curr = NULL;
     size_t ipos = 0;
 
     massert_container(v);
@@ -1280,11 +1280,11 @@ iterator vinsertptr_float(vector_float *v, iterator pos, float *valaddr) {
      *  meets the end_of_storage pointer.
      */
     if (v->impl.finish == v->impl.end_of_storage) {
-        vresize_float(v, vcapacity_float(v) * 2);
+        vresize_char_ptr(v, vcapacity_char_ptr(v) * 2);
     }
 
     /**
-     *  To insert within indices (0, vsize_float(v)),
+     *  To insert within indices (0, vsize_char_ptr(v)),
      *  begin by appending valaddr to the rear of the vector.
      */
     if (v->ttbl->copy) {
@@ -1304,11 +1304,11 @@ iterator vinsertptr_float(vector_float *v, iterator pos, float *valaddr) {
     ipos = it_distance(NULL, &pos);
 
     /**
-     *  Use iterator pos to swap elements from [pos, vsize_float(v))
+     *  Use iterator pos to swap elements from [pos, vsize_char_ptr(v))
      *  val will resize at the index originally specified by pos
      */
     while ((curr = it_curr(pos)) != v->impl.finish) {
-        vswapaddr_float(v, curr, v->impl.finish);
+        vswapaddr_char_ptr(v, curr, v->impl.finish);
         it_incr(&pos);
     }
 
@@ -1316,13 +1316,13 @@ iterator vinsertptr_float(vector_float *v, iterator pos, float *valaddr) {
     ++v->impl.finish;
 
     /* returned is an iterator at refers to val's position in v */
-    return it_next_n(vbegin_float(v), ipos);
+    return it_next_n(vbegin_char_ptr(v), ipos);
 }
 
 /**
  *  @brief  Inserts n copies of val into vector at position specified by pos
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[in]  pos     refers to an element within v
  *  @param[in]  n       quantity of desired copies of valaddr to insert
  *  @param[in]  val     the desired element to fill vector with
@@ -1336,28 +1336,28 @@ iterator vinsertptr_float(vector_float *v, iterator pos, float *valaddr) {
  *  using the copy function - this copy function is intended for
  *  deep copies. Otherwise, val will be shallow-copied using memcpy.
  */
-iterator vinsertfill_float(vector_float *v, iterator pos, size_t n, float val) {
+iterator vinsertfill_char_ptr(vector_char_ptr *v, iterator pos, size_t n, char_ptr val) {
     size_t ipos = 0;
     size_t old_size = 0;
     size_t old_capacity = 0;
 
-    float *sentinel = NULL;
-    float *right_adj = NULL;
-    float *finish = NULL;
+    char_ptr *sentinel = NULL;
+    char_ptr *right_adj = NULL;
+    char_ptr *finish = NULL;
 
     massert_container(v);
 
     ipos = it_distance(NULL, &pos);      /**< pos's index position */
-    old_size = vsize_float(v);                /**< v's former size */
-    old_capacity = vcapacity_float(v);        /**< v's former capacity */
+    old_size = vsize_char_ptr(v);                /**< v's former size */
+    old_capacity = vcapacity_char_ptr(v);        /**< v's former capacity */
 
     if ((old_size + n) >= old_capacity) {
         /**
          *  If inserting n elements will equal or exceed that of old_capacity,
          *  vector will be resized to accomodate ((old_capacity + n) * 2) elements.
          */
-        vresize_float(v, (old_capacity + n) * 2);
-        pos = it_next_n(vbegin_float(v), ipos);
+        vresize_char_ptr(v, (old_capacity + n) * 2);
+        pos = it_next_n(vbegin_char_ptr(v), ipos);
     }
 
     if (n <= 0) {
@@ -1365,8 +1365,8 @@ iterator vinsertfill_float(vector_float *v, iterator pos, size_t n, float val) {
         return pos;
     } else if (n == 1) {
         /* if n is 1, redirect to vinsert and return early */
-        vinsert_float(v, pos, val);
-        return it_next_n(vbegin_float(v), ipos);
+        vinsert_char_ptr(v, pos, val);
+        return it_next_n(vbegin_char_ptr(v), ipos);
     }
 
     if (ipos == old_size - 1 || ipos == old_size) {
@@ -1384,13 +1384,13 @@ iterator vinsertfill_float(vector_float *v, iterator pos, size_t n, float val) {
         }
 
         /* since n == back index, return early */
-        return it_next_n(vbegin_float(v), n);
+        return it_next_n(vbegin_char_ptr(v), n);
     } else {
         /* decrement finish pointer so it refers to the rear element */
         --v->impl.finish;
 
         /**
-         *  Each element in the range [n, vsize_float(v)) will be moved n blocks over
+         *  Each element in the range [n, vsize_char_ptr(v)) will be moved n blocks over
          *  -- starting with the rear element.
          */
 
@@ -1398,7 +1398,7 @@ iterator vinsertfill_float(vector_float *v, iterator pos, size_t n, float val) {
          *  sentinel will be set one position behind pos.curr
          *  to account for the new element(s) being inserted
          */
-        sentinel = (float *)(pos.curr) - 1;
+        sentinel = (char_ptr *)(pos.curr) - 1;
 
         /* new destination address for finish pointer */
         right_adj = v->impl.finish + n;
@@ -1407,12 +1407,12 @@ iterator vinsertfill_float(vector_float *v, iterator pos, size_t n, float val) {
         finish = v->impl.finish + (n + 1);
 
         /**
-         *  Elements [n, vsize_float(v)) are moved over n blocks to the right,
+         *  Elements [n, vsize_char_ptr(v)) are moved over n blocks to the right,
          *  starting with v->impl.finish.
          *  Loop stops when finish pointer reach sentinel.
          */
         while (v->impl.finish != sentinel) {
-            vswapaddr_float(v, v->impl.finish--, right_adj--);
+            vswapaddr_char_ptr(v, v->impl.finish--, right_adj--);
         }
 
         /**
@@ -1445,13 +1445,13 @@ iterator vinsertfill_float(vector_float *v, iterator pos, size_t n, float val) {
         v->impl.finish = finish;
     }
 
-    return it_next_n(vbegin_float(v), ipos);
+    return it_next_n(vbegin_char_ptr(v), ipos);
 }
 
 /**
  *  @brief  Inserts n copies of valaddr into vector at position specified by pos
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[in]  pos     refers to an element within v
  *  @param[in]  n       quantity of desired copies of valaddr to insert
  *  @param[in]  valaddr address of the desired element to fill vector with
@@ -1465,28 +1465,28 @@ iterator vinsertfill_float(vector_float *v, iterator pos, size_t n, float val) {
  *  using the copy function - this copy function is intended for
  *  deep copies. Otherwise, valaddr will be shallow-copied using memcpy.
  */
-iterator vinsertfillptr_float(vector_float *v, iterator pos, size_t n, float *valaddr) {
+iterator vinsertfillptr_char_ptr(vector_char_ptr *v, iterator pos, size_t n, char_ptr *valaddr) {
     size_t ipos = 0;
     size_t old_size = 0;
     size_t old_capacity = 0;
 
-    float *sentinel = NULL;
-    float *right_adj = NULL;
-    float *finish = NULL;
+    char_ptr *sentinel = NULL;
+    char_ptr *right_adj = NULL;
+    char_ptr *finish = NULL;
 
     massert_container(v);
 
     ipos = it_distance(NULL, &pos);      /**< pos's index position */
-    old_size = vsize_float(v);                /**< v's former size */
-    old_capacity = vcapacity_float(v);        /**< v's former capacity */
+    old_size = vsize_char_ptr(v);                /**< v's former size */
+    old_capacity = vcapacity_char_ptr(v);        /**< v's former capacity */
 
     if ((old_size + n) >= old_capacity) {
         /**
          *  If inserting n elements will equal or exceed that of old_capacity,
          *  vector will be resized to accomodate ((old_capacity + n) * 2) elements.
          */
-        vresize_float(v, (old_capacity + n) * 2);
-        pos = it_next_n(vbegin_float(v), ipos);
+        vresize_char_ptr(v, (old_capacity + n) * 2);
+        pos = it_next_n(vbegin_char_ptr(v), ipos);
     }
 
     if (n <= 0) {
@@ -1494,8 +1494,8 @@ iterator vinsertfillptr_float(vector_float *v, iterator pos, size_t n, float *va
         return pos;
     } else if (n == 1) {
         /* if n is 1, redirect to vinsert and return early */
-        vinsertptr_float(v, pos, valaddr);
-        return it_next_n(vbegin_float(v), ipos);
+        vinsertptr_char_ptr(v, pos, valaddr);
+        return it_next_n(vbegin_char_ptr(v), ipos);
     }
 
     if (ipos == old_size - 1 || ipos == old_size) {
@@ -1513,13 +1513,13 @@ iterator vinsertfillptr_float(vector_float *v, iterator pos, size_t n, float *va
         }
 
         /* since n == back index, return early */
-        return it_next_n(vbegin_float(v), n);
+        return it_next_n(vbegin_char_ptr(v), n);
     } else {
         /* decrement finish pointer so it refers to the rear element */
         --v->impl.finish;
 
         /**
-         *  Each element in the range [n, vsize_float(v)) will be moved n blocks over
+         *  Each element in the range [n, vsize_char_ptr(v)) will be moved n blocks over
          *  -- starting with the rear element.
          */
 
@@ -1527,7 +1527,7 @@ iterator vinsertfillptr_float(vector_float *v, iterator pos, size_t n, float *va
          *  sentinel will be set one position behind pos.curr
          *  to account for the new element(s) being inserted
          */
-        sentinel = (float *)(pos.curr) - 1;
+        sentinel = (char_ptr *)(pos.curr) - 1;
 
         /* new destination address for finish pointer */
         right_adj = v->impl.finish + n;
@@ -1536,12 +1536,12 @@ iterator vinsertfillptr_float(vector_float *v, iterator pos, size_t n, float *va
         finish = v->impl.finish + (n + 1);
 
         /**
-         *  Elements [n, vsize_float(v)) are moved over n blocks to the right,
+         *  Elements [n, vsize_char_ptr(v)) are moved over n blocks to the right,
          *  starting with v->impl.finish.
          *  Loop stops when finish pointer reach sentinel.
          */
         while (v->impl.finish != sentinel) {
-            vswapaddr_float(v, v->impl.finish--, right_adj--);
+            vswapaddr_char_ptr(v, v->impl.finish--, right_adj--);
         }
 
         /**
@@ -1574,13 +1574,13 @@ iterator vinsertfillptr_float(vector_float *v, iterator pos, size_t n, float *va
         v->impl.finish = finish;
     }
 
-    return it_next_n(vbegin_float(v), ipos);
+    return it_next_n(vbegin_char_ptr(v), ipos);
 }
 
 /**
  *  @brief  Inserts elements from [first, last) into v, at position pos
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[in]  pos     refers to an element within v
  *  @param[in]  first   represents the beginning of the range (inclusive)
  *  @param[in]  last    represents the end of the range (exclusive)
@@ -1608,22 +1608,22 @@ iterator vinsertfillptr_float(vector_float *v, iterator pos, size_t n, float *va
  *  using the copy function -- this function meant for deep copying.
  *  Otherwise, [first, last) will be shallow-copied using memcpy.
  */
-iterator vinsertrnge_float(vector_float *v, iterator pos,
+iterator vinsertrnge_char_ptr(vector_char_ptr *v, iterator pos,
                         iterator first, iterator last) {
     size_t ipos = 0;
     size_t old_size = 0;
     size_t old_capacity = 0;
     size_t delta = 0;
 
-    float *sentinel = NULL;
-    float *right_adj = NULL;
-    float *finish = NULL;
+    char_ptr *sentinel = NULL;
+    char_ptr *right_adj = NULL;
+    char_ptr *finish = NULL;
 
     massert_container(v);
 
     ipos = it_distance(NULL, &pos);        /**< pos's index position */
-    old_size = vsize_float(v);                /**< v's former size */
-    old_capacity = vcapacity_float(v);        /**< v's former capacity */
+    old_size = vsize_char_ptr(v);                /**< v's former size */
+    old_capacity = vcapacity_char_ptr(v);        /**< v's former capacity */
     delta = it_distance(&first, &last);    /**< index(last) - index(first) */
 
     if ((old_size + delta) >= old_capacity) {
@@ -1632,8 +1632,8 @@ iterator vinsertrnge_float(vector_float *v, iterator pos,
          *  old_capacity, vector will be resized to
          *  accommodate ((old_capacity + delta) * 2) elements.
          */
-        vresize_float(v, (old_capacity + delta) * 2);
-        pos = it_next_n(vbegin_float(v), ipos);
+        vresize_char_ptr(v, (old_capacity + delta) * 2);
+        pos = it_next_n(vbegin_char_ptr(v), ipos);
     }
 
     if (delta <= 0) {
@@ -1641,8 +1641,8 @@ iterator vinsertrnge_float(vector_float *v, iterator pos,
         return pos;
     } else if (delta == 1) {
         /* if delta is 1, redirect to vinsert and return early */
-        vinsert_float(v, pos, *(float *)it_curr(first));
-        return it_next_n(vbegin_float(v), ipos);
+        vinsert_char_ptr(v, pos, *(char_ptr *)it_curr(first));
+        return it_next_n(vbegin_char_ptr(v), ipos);
     }
 
     if (ipos >= old_size - 1) {
@@ -1662,20 +1662,20 @@ iterator vinsertrnge_float(vector_float *v, iterator pos,
         }
 
         /* since n == back index, return early */
-        return it_next_n(vbegin_float(v), delta);
+        return it_next_n(vbegin_char_ptr(v), delta);
     } else {
         /* decrement finish pointer so it refers to the rear element */
         --v->impl.finish;
 
         /**
-         *  Each element in the range [n, vsize_float(v))
+         *  Each element in the range [n, vsize_char_ptr(v))
          *  will be moved delta blocks over
          *  -- starting with the rear element.
          * 
          *  sentinel will be set one position behind pos.curr
          *  to account for the new element(s) being inserted
          */
-        sentinel = (float *)(pos.curr) - 1;
+        sentinel = (char_ptr *)(pos.curr) - 1;
 
         /* new destination address for finish pointer */
         right_adj = v->impl.finish + delta;
@@ -1684,12 +1684,12 @@ iterator vinsertrnge_float(vector_float *v, iterator pos,
         finish = v->impl.finish + (delta + 1);
 
         /**
-         *  Elements [n, vsize_float(v)) are moved over delta blocks to the right,
+         *  Elements [n, vsize_char_ptr(v)) are moved over delta blocks to the right,
          *  starting with v->impl.finish.
          *  Loop stops when finish pointer reaches sentinel
          */
         while (v->impl.finish != sentinel) {
-            vswapaddr_float(v, v->impl.finish--, right_adj--);
+            vswapaddr_char_ptr(v, v->impl.finish--, right_adj--);
         }
 
         /**
@@ -1723,13 +1723,13 @@ iterator vinsertrnge_float(vector_float *v, iterator pos,
         v->impl.finish = finish;
     }
 
-    return it_next_n(vbegin_float(v), ipos);
+    return it_next_n(vbegin_char_ptr(v), ipos);
 }
 
 /**
  *  @brief  Moves valaddr into v, at position pos
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[in]  pos     refers to an element from within vector
  *  @param[out] valaddr address of element to move into v
  *
@@ -1743,8 +1743,8 @@ iterator vinsertrnge_float(vector_float *v, iterator pos,
  *  A swap function must be defined in v's typetable in order
  *  to run this function, otherwise a regular insert is performed.
  */
-iterator vinsertmove_float(vector_float *v, iterator pos, float *valaddr) {
-    float *dst = NULL;
+iterator vinsertmove_char_ptr(vector_char_ptr *v, iterator pos, char_ptr *valaddr) {
+    char_ptr *dst = NULL;
 
     massert_container(v);
     massert_ptr(valaddr);
@@ -1773,13 +1773,13 @@ iterator vinsertmove_float(vector_float *v, iterator pos, float *valaddr) {
         v->ttbl->swap(&dst, valaddr);
     }
 
-    return vinsertptr_float(v, pos, dst);
+    return vinsertptr_char_ptr(v, pos, dst);
 }
 
 /**
  *  @brief  Removes an element from v at position pos
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *  @param[in]  pos refers to an element from within vector
  *
  *  @return     iterator representing an element that has replaced the
@@ -1793,17 +1793,17 @@ iterator vinsertmove_float(vector_float *v, iterator pos, float *valaddr) {
  *  dynamically allocated fields become the client's responsibility
  *  if a dtor function is NOT defined within v's ttbl.
  */
-iterator verase_float(vector_float *v, iterator pos) {
+iterator verase_char_ptr(vector_char_ptr *v, iterator pos) {
     int ipos = 0;
     size_t back_index = 0;
 
-    float *curr = NULL;
-    float *sentinel = NULL;
+    char_ptr *curr = NULL;
+    char_ptr *sentinel = NULL;
 
     massert_container(v);
 
     ipos = it_distance(NULL, &pos);
-    back_index = vsize_float(v) - 1;
+    back_index = vsize_char_ptr(v) - 1;
 
     if ((ipos < 0) || (ipos >= back_index + 1)) {
         /**
@@ -1817,14 +1817,14 @@ iterator verase_float(vector_float *v, iterator pos) {
          *  or pos refers to rear vector element,
          *  redirect to popb and return early
          */
-        vpopb_float(v);
+        vpopb_char_ptr(v);
 
         /**
          *  pos will no longer refer to an existing element,
          *  so an iterator is returned referring to an element
          *  at the erased element's former index
          */
-        return it_next_n(vbegin_float(v), ipos);
+        return it_next_n(vbegin_char_ptr(v), ipos);
     } else if (ipos < back_index && ipos >= 0) {
         if (v->ttbl->dtor) {
             /* If elements were deep copied, release their memory */
@@ -1846,7 +1846,7 @@ iterator verase_float(vector_float *v, iterator pos) {
              *  to the left. this process continues until
              *  it_curr(pos) equals v->impl.finish.
              */
-            vswapaddr_float(v, curr, it_curr(it_next(pos)));
+            vswapaddr_char_ptr(v, curr, it_curr(it_next(pos)));
             it_incr(&pos);
         }
 
@@ -1859,13 +1859,13 @@ iterator verase_float(vector_float *v, iterator pos) {
      *  so an iterator is returned referring to an element
      *  at the erased element's former index
      */
-    return it_next_n(vbegin_float(v), ipos);
+    return it_next_n(vbegin_char_ptr(v), ipos);
 }
 
 /**
  *  @brief  Removes elements from v ranging from [pos, last)
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[in]  pos     refers to element from within vector
  *  @param[in]  last    refers to element from within vector
  *
@@ -1880,25 +1880,25 @@ iterator verase_float(vector_float *v, iterator pos) {
  *  dynamically allocated fields become the client's responsibility
  *  if a dtor function is NOT defined within v's ttbl.
  */
-iterator verasernge_float(vector_float *v, iterator pos, iterator last) {
+iterator verasernge_char_ptr(vector_char_ptr *v, iterator pos, iterator last) {
     int ipos = 0;
     int delta = 0;
 
     size_t back_index = 0;
 
-    float *curr = NULL;
-    float *sentinel = NULL;
+    char_ptr *curr = NULL;
+    char_ptr *sentinel = NULL;
 
     massert_container(v);
 
     ipos = it_distance(NULL, &pos);     /**< index of pos */
     delta = it_distance(&pos, &last);   /**< diff between pos/last */
 
-    back_index = vsize_float(v) - 1;
+    back_index = vsize_char_ptr(v) - 1;
 
     if ((ipos < 0) || (ipos >= back_index + 1)) {
         /**
-         *  If ipos is negative or ipos is greater than or equal to vsize_float(v),
+         *  If ipos is negative or ipos is greater than or equal to vsize_char_ptr(v),
          *  no-op
          */
         return pos;
@@ -1908,14 +1908,14 @@ iterator verasernge_float(vector_float *v, iterator pos, iterator last) {
          *  or pos refers to rear vector element,
          *  redirect to popb and return early
          */
-        vpopb_float(v);
+        vpopb_char_ptr(v);
 
         /**
          *  pos will no longer refer to an existing element,
          *  so an iterator is returned referring to an element
          *  at the erased element's former index
          */
-        return it_next_n(vbegin_float(v), ipos);
+        return it_next_n(vbegin_char_ptr(v), ipos);
     } else if (ipos < back_index && ipos >= 0) {
         curr = NULL;
         sentinel = it_curr(last);
@@ -1929,7 +1929,7 @@ iterator verasernge_float(vector_float *v, iterator pos, iterator last) {
         }
 
         /* restoring pos to its original index */
-        pos = it_next_n(vbegin_float(v), ipos);
+        pos = it_next_n(vbegin_char_ptr(v), ipos);
 
         /* reassigning sentinel to one block past the last elem */
         sentinel = v->impl.finish;
@@ -1940,7 +1940,7 @@ iterator verasernge_float(vector_float *v, iterator pos, iterator last) {
          *  until last reaches the end of the vector.
          */
         while ((curr = it_curr(last)) != sentinel) {
-            vswapaddr_float(v, curr, it_curr(pos));
+            vswapaddr_char_ptr(v, curr, it_curr(pos));
 
             it_incr(&pos);
             it_incr(&last);
@@ -1958,7 +1958,7 @@ iterator verasernge_float(vector_float *v, iterator pos, iterator last) {
      *  so an iterator is returned referring to an element
      *  at the beginning of the erased element's former range
      */
-    return it_next_n(vbegin_float(v), ipos);
+    return it_next_n(vbegin_char_ptr(v), ipos);
 }
 
 /**
@@ -1967,8 +1967,8 @@ iterator verasernge_float(vector_float *v, iterator pos, iterator last) {
  *  @param[out] v       address of pointer to vector
  *  @param[out] other   address of pointer to vector
  */
-void vswap_float(vector_float **v, vector_float * *other) {
-    vector_float *temp = NULL;
+void vswap_char_ptr(vector_char_ptr **v, vector_char_ptr * *other) {
+    vector_char_ptr *temp = NULL;
 
     massert_container((*v));
     massert_container((*other));
@@ -1993,14 +1993,14 @@ void vswap_float(vector_float **v, vector_float * *other) {
 /**
  *  @brief  Destroys elements from within v
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  Memory management of dynamically allocated elements
  *  and/or elements with dynamically allocated fields
  *  become the client's responsibility if a dtor function
  *  is NOT defined within v's ttbl.
  */
-void vclear_float(vector_float *v) {
+void vclear_char_ptr(vector_char_ptr *v) {
     massert_container(v);
 
     if (v->impl.finish == v->impl.start) {
@@ -2027,7 +2027,7 @@ void vclear_float(vector_float *v) {
         }
 
         v->ttbl->dtor(v->impl.finish);
-        bzero(v->impl.start, vsize_float(v));
+        bzero(v->impl.start, vsize_char_ptr(v));
         /* v->impl.finish is already at v->impl.start. */
     } else {
         /**
@@ -2035,7 +2035,7 @@ void vclear_float(vector_float *v) {
          *  (no dtor function specified in ttbl) --
          *  we just memset and reset the finish pointer.
          */
-        bzero(v->impl.start, vsize_float(v));
+        bzero(v->impl.start, vsize_char_ptr(v));
         v->impl.finish = v->impl.start;
     }
 }
@@ -2043,7 +2043,7 @@ void vclear_float(vector_float *v) {
 /**
  *  @brief  Inserts a value into vector at position specified by index
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[in]  index   numerical index of element from within v
  *  @param[in]  val     element to insert
  *
@@ -2052,14 +2052,14 @@ void vclear_float(vector_float *v) {
  *  Otherwise, val will be shallow-copied into v
  *  using memcpy.
  */
-void vinsertat_float(vector_float *v, size_t index, float val) {
+void vinsertat_char_ptr(vector_char_ptr *v, size_t index, char_ptr val) {
     size_t size = 0;
 
-    float *curr = NULL;
+    char_ptr *curr = NULL;
 
     massert_container(v);
 
-    size = vsize_float(v);
+    size = vsize_char_ptr(v);
 
     if (index >= size) {
         char str[256];
@@ -2073,11 +2073,11 @@ void vinsertat_float(vector_float *v, size_t index, float val) {
      *  meets the end_of_storage pointer.
      */
     if (v->impl.finish == v->impl.end_of_storage) {
-        vresize_float(v, vcapacity_float(v) * 2);
+        vresize_char_ptr(v, vcapacity_char_ptr(v) * 2);
     }
 
     /**
-     *  To insert within indices (0, vsize_float(v)),
+     *  To insert within indices (0, vsize_char_ptr(v)),
      *  begin by appending val to the rear of the vector.
      */
 
@@ -2093,13 +2093,13 @@ void vinsertat_float(vector_float *v, size_t index, float val) {
      *  All of the above was code for pushb,
      *  but incrementing the finish pointer was omitted.
      * 
-     *  Use index to swap elements from [index, vsize_float(v))
+     *  Use index to swap elements from [index, vsize_char_ptr(v))
      *  val will reside at the index originally specified by
      *  index.
      */
     curr = v->impl.start + index;
     while (curr != v->impl.finish) {
-        vswapaddr_float(v, curr++, v->impl.finish);
+        vswapaddr_char_ptr(v, curr++, v->impl.finish);
     }
 
     /* restore finish pointer to address of rear element */
@@ -2109,7 +2109,7 @@ void vinsertat_float(vector_float *v, size_t index, float val) {
 /**
  *  @brief  Inserts a value into vector at position specified by index
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[in]  index   numerical index of element from within v
  *  @param[in]  valaddr address of element to insert
  *
@@ -2118,15 +2118,15 @@ void vinsertat_float(vector_float *v, size_t index, float val) {
  *  Otherwise, valaddr will be shallow-copied into v
  *  using memcpy.
  */
-void vinsertatptr_float(vector_float *v, size_t index, float *valaddr) {
+void vinsertatptr_char_ptr(vector_char_ptr *v, size_t index, char_ptr *valaddr) {
     size_t size = 0;
 
-    float *curr = NULL;
+    char_ptr *curr = NULL;
 
     massert_container(v);
     massert_ptr(valaddr);
 
-    size = vsize_float(v);
+    size = vsize_char_ptr(v);
 
     if (index >= size) {
         char str[256];
@@ -2140,11 +2140,11 @@ void vinsertatptr_float(vector_float *v, size_t index, float *valaddr) {
      *  meets the end_of_storage pointer.
      */
     if (v->impl.finish == v->impl.end_of_storage) {
-        vresize_float(v, vcapacity_float(v) * 2);
+        vresize_char_ptr(v, vcapacity_char_ptr(v) * 2);
     }
 
     /**
-     *  To insert within indices (0, vsize_float(v)),
+     *  To insert within indices (0, vsize_char_ptr(v)),
      *  begin by appending valaddr to the rear of the vector.
      */
 
@@ -2160,13 +2160,13 @@ void vinsertatptr_float(vector_float *v, size_t index, float *valaddr) {
      *  All of the above was code for pushb,
      *  but incrementing the finish pointer was omitted.
      * 
-     *  Use index to swap elements from [index, vsize_float(v))
+     *  Use index to swap elements from [index, vsize_char_ptr(v))
      *  val will reside at the index originally specified by
      *  index.
      */
     curr = v->impl.start + index;
     while (curr != v->impl.finish) {
-        vswapaddr_float(v, curr++, v->impl.finish);
+        vswapaddr_char_ptr(v, curr++, v->impl.finish);
     }
 
     /* restore finish pointer to address of rear element */
@@ -2176,7 +2176,7 @@ void vinsertatptr_float(vector_float *v, size_t index, float *valaddr) {
 /**
  *  @brief  Removes an element from v at position pos
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[in]  index   numerical index of element from within v
  *
  *  If a dtor function is defined in v's ttbl,
@@ -2187,17 +2187,17 @@ void vinsertatptr_float(vector_float *v, size_t index, float *valaddr) {
  *  dynamically allocated fields become the client's responsibility
  *  if a dtor function is NOT defined within v's ttbl.
  */
-void veraseat_float(vector_float *v, size_t index) {
+void veraseat_char_ptr(vector_char_ptr *v, size_t index) {
     size_t size = 0;
     size_t back_index = 0;
 
-    float *curr = NULL;
-    float *next = NULL;
-    float *sentinel = NULL;
+    char_ptr *curr = NULL;
+    char_ptr *next = NULL;
+    char_ptr *sentinel = NULL;
 
     massert_container(v);
 
-    size = vsize_float(v);
+    size = vsize_char_ptr(v);
 
     if (index >= size) {
         char str[256];
@@ -2209,7 +2209,7 @@ void veraseat_float(vector_float *v, size_t index) {
     back_index = size - 1;
 
     curr = v->impl.start + index;   /* element at index */
-    next = index <= vcapacity_float(v) ? (curr + 1) : NULL;    /* elem adj to curr */
+    next = index <= vcapacity_char_ptr(v) ? (curr + 1) : NULL;    /* elem adj to curr */
     sentinel = v->impl.finish;                                    /* one block after last elem */
 
     if (index == back_index || curr == (v->impl.finish - 1)) {
@@ -2218,7 +2218,7 @@ void veraseat_float(vector_float *v, size_t index) {
          *  or pos refers to rear vector element,
          *  redirect to popb and return early
          */
-        vpopb_float(v);
+        vpopb_char_ptr(v);
         return;
     } else if (index < back_index && index >= 0) {
         if (v->ttbl->dtor) {
@@ -2232,7 +2232,7 @@ void veraseat_float(vector_float *v, size_t index) {
              *  one element to the left. This process continues
              *  until next equals v->impl.finish.
              */
-            vswapaddr_float(v, curr++, next++);
+            vswapaddr_char_ptr(v, curr++, next++);
         }
 
         /* decrementing the finish pointer 1 block to the left */
@@ -2262,14 +2262,14 @@ void veraseat_float(vector_float *v, size_t index) {
  *  Otherwise, val will be shallow-copied into v
  *  using memcpy.
  */
-void vreplaceat_float(vector_float *v, size_t index, float val) {
+void vreplaceat_char_ptr(vector_char_ptr *v, size_t index, char_ptr val) {
     size_t size = 0;
 
-    float *curr = NULL;
+    char_ptr *curr = NULL;
 
     massert_container(v);
 
-    size = vsize_float(v);
+    size = vsize_char_ptr(v);
 
     if (index >= size) {
         char str[256];
@@ -2316,14 +2316,14 @@ void vreplaceat_float(vector_float *v, size_t index, float val) {
  *  Otherwise, valaddr will be shallow-copied into v
  *  using memcpy.
  */
-void vreplaceatptr_float(vector_float *v, size_t index, float *valaddr) {
+void vreplaceatptr_char_ptr(vector_char_ptr *v, size_t index, char_ptr *valaddr) {
     size_t size = 0;
 
-    float *curr = NULL;
+    char_ptr *curr = NULL;
 
     massert_container(v);
 
-    size = vsize_float(v);
+    size = vsize_char_ptr(v);
 
     if (index >= size) {
         char str[256];
@@ -2351,11 +2351,11 @@ void vreplaceatptr_float(vector_float *v, size_t index, float *valaddr) {
 /**
  *  @brief  Swap two elements from within v
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *  @param[in]  n1  index of first element
  *  @param[in]  n2  index of second element
  */
-void vswapelem_float(vector_float *v, size_t n1, size_t n2) {
+void vswapelem_char_ptr(vector_char_ptr *v, size_t n1, size_t n2) {
     size_t size = 0;
     size_t capacity = 0;
 
@@ -2363,14 +2363,14 @@ void vswapelem_float(vector_float *v, size_t n1, size_t n2) {
     bool n2_bad = false;
     bool good_indices = false;
 
-    float *temp = NULL;
-    float *data_1 = NULL;
-    float *data_2 = NULL;
+    char_ptr *temp = NULL;
+    char_ptr *data_1 = NULL;
+    char_ptr *data_2 = NULL;
 
     massert_container(v);
 
-    size = vsize_float(v);
-    capacity = vcapacity_float(v);
+    size = vsize_char_ptr(v);
+    capacity = vcapacity_char_ptr(v);
 
     n1_bad = n1 >= size || n1 >= capacity;
     n2_bad = n2 >= size || n2 >= capacity;
@@ -2419,11 +2419,11 @@ void vswapelem_float(vector_float *v, size_t n1, size_t n2) {
  *  dynamically allocated fields become the client's responsibility
  *  if a dtor function is NOT defined within v's ttbl.
  */
-void vremove_float(vector_float *v, float val) {
+void vremove_char_ptr(vector_char_ptr *v, char_ptr val) {
     size_t i = 0;
     size_t size = 0;
 
-    float *curr = NULL;
+    char_ptr *curr = NULL;
 
     massert_container(v);
 
@@ -2432,11 +2432,11 @@ void vremove_float(vector_float *v, float val) {
     }
 
     i = 0;
-    size = vsize_float(v);
+    size = vsize_char_ptr(v);
     curr = v->impl.start;
 
     if (v->ttbl->compare(curr, &val) == 0) {
-        veraseat_float(v, i);
+        veraseat_char_ptr(v, i);
         --size;
         ++curr;
     }
@@ -2444,7 +2444,7 @@ void vremove_float(vector_float *v, float val) {
     for (i = 1; i < size; i++) {
         if (v->ttbl->compare(curr, &val) == 0) {
             --curr;
-            veraseat_float(v, i--);
+            veraseat_char_ptr(v, i--);
             --size;
         }
 
@@ -2461,11 +2461,11 @@ void vremove_float(vector_float *v, float val) {
  *  For all elements e in v, if unary_predicate(e) == true,
  *  it will be removed.
  */
-void vremoveif_float(vector_float *v, bool (*unary_predicate)(const void *)) {
+void vremoveif_char_ptr(vector_char_ptr *v, bool (*unary_predicate)(const void *)) {
     size_t i = 0;
     size_t size = 0;
 
-    float *curr = NULL;
+    char_ptr *curr = NULL;
 
     massert_container(v);
     massert_pfunc(unary_predicate);
@@ -2475,11 +2475,11 @@ void vremoveif_float(vector_float *v, bool (*unary_predicate)(const void *)) {
     }
 
     i = 0;
-    size = vsize_float(v);
+    size = vsize_char_ptr(v);
     curr = v->impl.start;
 
     if (unary_predicate(curr) == true) {
-        veraseat_float(v, i);
+        veraseat_char_ptr(v, i);
         --size;
         ++curr;
     }
@@ -2498,24 +2498,24 @@ void vremoveif_float(vector_float *v, bool (*unary_predicate)(const void *)) {
 /**
  *  @brief  Append the contents of other to the rear of v
  *
- *  @param[in]  v       pointer to vector_float
- *  @param[in]  other   pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
+ *  @param[in]  other   pointer to vector_char_ptr
  *
- *  @return     pointer to vector_float with other's elements appended
+ *  @return     pointer to vector_char_ptr with other's elements appended
  *
- *  The merging of vector_float v and vector_float other does not mutate other.
+ *  The merging of vector_char_ptr v and vector_char_ptr other does not mutate other.
  */
-vector_float *vmerge_float(vector_float *v, vector_float * other) {
+vector_char_ptr *vmerge_char_ptr(vector_char_ptr *v, vector_char_ptr * other) {
     size_t size_other = 0;
     size_t capacity_v = 0;
 
-    float *sentinel = NULL;
+    char_ptr *sentinel = NULL;
 
     massert_container(v);
     massert_ptr(other);
 
-    size_other = vsize_float(v);
-    capacity_v = vcapacity_float(v);
+    size_other = vsize_char_ptr(v);
+    capacity_v = vcapacity_char_ptr(v);
 
     if (size_other >= capacity_v) {
         /**
@@ -2523,7 +2523,7 @@ vector_float *vmerge_float(vector_float *v, vector_float * other) {
          *  will exceed that of v's capacity,
          *  resize v
          */
-        vresize_float(v, capacity_v * 2);
+        vresize_char_ptr(v, capacity_v * 2);
     }
 
     sentinel = other->impl.finish;
@@ -2569,9 +2569,9 @@ vector_float *vmerge_float(vector_float *v, vector_float * other) {
  *
  *  @param[in]  v   pointer to vector
  */
-void vreverse_float(vector_float *v) {
-    float *back = NULL;
-    float *restore = NULL;
+void vreverse_char_ptr(vector_char_ptr *v) {
+    char_ptr *back = NULL;
+    char_ptr *restore = NULL;
 
     massert_container(v);
 
@@ -2586,7 +2586,7 @@ void vreverse_float(vector_float *v) {
 
     while (v->impl.finish != back) {
         /* swap addresses at finish and back */
-        vswapaddr_float(v, v->impl.finish++, back--);
+        vswapaddr_char_ptr(v, v->impl.finish++, back--);
 
         /**
          *  Increment finish, decrement back --
@@ -2602,22 +2602,22 @@ void vreverse_float(vector_float *v) {
 }
 
 /**
- *  @brief  Returns a new vector_float with the contents of base
+ *  @brief  Returns a new vector_char_ptr with the contents of base
  *
  *  @param[in]  ttbl    typetable matching that of bases's element type
  *  @param[in]  base    base address of an array to copy
  *  @param[in]  length  logical length of base
  *
- *  @return     pointer to vector_float with contents of base
+ *  @return     pointer to vector_char_ptr with contents of base
  */
-vector_float *varrtov_float(float *base, size_t length) {
-    vector_float *v = NULL;
+vector_char_ptr *varrtov_char_ptr(char_ptr *base, size_t length) {
+    vector_char_ptr *v = NULL;
 
-    float *target = NULL;
+    char_ptr *target = NULL;
 
     massert_ptr(base);
 
-    v = vnewr_float(length);
+    v = vnewr_char_ptr(length);
 
     target = base;
 
@@ -2655,18 +2655,18 @@ vector_float *varrtov_float(float *base, size_t length) {
  *  Since this vector will be using a pre-existing pointer,
  *  be careful and pay special attention to the management of its memory.
  */
-vector_float *vptrtov_float(float *base, size_t length, size_t capacity) {
-    vector_float *v = NULL;
+vector_char_ptr *vptrtov_char_ptr(char_ptr *base, size_t length, size_t capacity) {
+    vector_char_ptr *v = NULL;
 
     massert_ptr(base);
 
-    v = vallocate_float();
+    v = vallocate_char_ptr();
 
     /**
      *  An appropriate typetable will be chosen that matches
-     *  that of the type float for base.
+     *  that of the type char_ptr for base.
      */
-    v->ttbl = _float_ ? _float_ : _void_ptr_;
+    v->ttbl = _char_ptr_ ? _char_ptr_ : _void_ptr_;
 
     if (v->ttbl != _void_ptr_) {
         v->ttbl->compare = v->ttbl->compare ? v->ttbl->compare : NULL;
@@ -2689,13 +2689,13 @@ vector_float *vptrtov_float(float *base, size_t length, size_t capacity) {
 /**
  *  @brief  Performs a linear search to find val using the ttbl->compare function
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[in]  val     a copy of an element to find
  */
-int vsearch_float(vector_float *v, float val) {
+int vsearch_char_ptr(vector_char_ptr *v, char_ptr val) {
     int (*comparator)(const void *, const void *) = NULL;
 
-    float *curr = NULL;
+    char_ptr *curr = NULL;
     bool found = false;
     int result = 0;
 
@@ -2722,15 +2722,15 @@ int vsearch_float(vector_float *v, float val) {
 /**
  *  @brief  Sorts the contents of v using ttbl->compare
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  */
-void vsort_float(vector_float *v) {
+void vsort_char_ptr(vector_char_ptr *v) {
     size_t size = 0;
     int (*comparator)(const void *, const void *) = NULL;
 
     massert_container(v);
 
-    size = vsize_float(v);
+    size = vsize_char_ptr(v);
 
     if (size < 2) {
         /* why sort a data structure if size < 2? */
@@ -2751,38 +2751,38 @@ void vsort_float(vector_float *v) {
 }
 
 /**
- *  @brief  Prints a diagnostic of vector_float to stdout
+ *  @brief  Prints a diagnostic of vector_char_ptr to stdout
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  */
-void vputs_float(vector_float *v) {
+void vputs_char_ptr(vector_char_ptr *v) {
     /* redirect to vfputs with stream stdout */
-    vfputs_float(v, stdout);
+    vfputs_char_ptr(v, stdout);
 }
 
 /**
- *  @brief  Prints the contents of vector_float with user-defined formatting
+ *  @brief  Prints the contents of vector_char_ptr with user-defined formatting
  *
- *  @param[in]  v           pointer to vector_float
+ *  @param[in]  v           pointer to vector_char_ptr
  *  @param[in]  before      string that appears before any elements appear
  *  @param[in]  after       string that appears after all the elements have appeared
  *  @param[in]  postelem    string that appears after each element, except the last one
  *  @param[in]  breaklim    amount of elements that print before a line break occurs.
  *                          0 means no line breaks
  */
-void vputsf_float(vector_float *v, const char *before, const char *after,
+void vputsf_char_ptr(vector_char_ptr *v, const char *before, const char *after,
                const char *postelem, const char *empty, size_t breaklim) {
     /* redirect to vfputsf with stream stdout */
-    vfputsf_float(v, stdout, before, after, postelem, empty, breaklim);
+    vfputsf_char_ptr(v, stdout, before, after, postelem, empty, breaklim);
 }
 
 /**
- *  @brief  Prints a diagnostic of vector_float to file stream dest
+ *  @brief  Prints a diagnostic of vector_char_ptr to file stream dest
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[in]  dest    file stream (e.g stdout, stderr, a file)
  */
-void vfputs_float(vector_float *v, FILE *dest) {
+void vfputs_char_ptr(vector_char_ptr *v, FILE *dest) {
     char buffer1[MAXIMUM_STACK_BUFFER_SIZE];
     char buffer2[MAXIMUM_STACK_BUFFER_SIZE];
 
@@ -2801,17 +2801,17 @@ void vfputs_float(vector_float *v, FILE *dest) {
     bytes_label = v->ttbl->width == 1 ? "byte" : "bytes";
 
     sprintf(buffer2, "%s\n%s\t\t%lu\n%s\t%lu\n%s\t%lu %s\n%s\n", link, "Size",
-            vsize_float(v), "Capacity", vcapacity_float(v), "Element size", v->ttbl->width,
+            vsize_char_ptr(v), "Capacity", vcapacity_char_ptr(v), "Element size", v->ttbl->width,
             bytes_label, link);
 
-    vfputsf_float(v, dest, buffer1, buffer2, postelem, empty, breaklim);
+    vfputsf_char_ptr(v, dest, buffer1, buffer2, postelem, empty, breaklim);
 }
 
 /**
- *  @brief  Prints the contents of vector_float with user-defined formatting,
+ *  @brief  Prints the contents of vector_char_ptr with user-defined formatting,
  *          to file stream dest
  *
- *  @param[in]  v           pointer to vector_float
+ *  @param[in]  v           pointer to vector_char_ptr
  *  @param[in]  dest        file stream (e.g. stdout, stderr, a file)
  *  @param[in]  before      string that appears before any elements appear
  *  @param[in]  after       string that appears after all the elements have appeared
@@ -2819,7 +2819,7 @@ void vfputs_float(vector_float *v, FILE *dest) {
  *  @param[in]  breaklim    amount of elements that print before a line break occurs.
  *                          0 means no line breaks
  */
-void vfputsf_float(vector_float *v, FILE *dest, const char *before,
+void vfputsf_char_ptr(vector_char_ptr *v, FILE *dest, const char *before,
                 const char *after, const char *postelem, const char *empty,
                 size_t breaklim) {
     void (*print)(const void *, FILE *dest) = NULL;
@@ -2828,7 +2828,7 @@ void vfputsf_float(vector_float *v, FILE *dest, const char *before,
     size_t i = 0;
     size_t curr = 0;
 
-    float *target = NULL;
+    char_ptr *target = NULL;
 
     massert_container(v);
     massert_ptr(dest);
@@ -2837,7 +2837,7 @@ void vfputsf_float(vector_float *v, FILE *dest, const char *before,
 
     print = v->ttbl->print ? v->ttbl->print : void_ptr_print;
 
-    size = vsize_float(v);
+    size = vsize_char_ptr(v);
 
     if (size == 0) {
         fprintf(dest, "%s\n", empty ? empty : "");
@@ -2869,21 +2869,21 @@ void vfputsf_float(vector_float *v, FILE *dest, const char *before,
 /**
  *  @brief  Wrapper function for a struct typetable
  *
- *  @param[in]  arg     address of a vector_float pointer
- *  @param[in]  other   address of a vector_float pointer
+ *  @param[in]  arg     address of a vector_char_ptr pointer
+ *  @param[in]  other   address of a vector_char_ptr pointer
  *
- *  @return     a pointer to vector_float
+ *  @return     a pointer to vector_char_ptr
  */
-void *tmpl_vector_copy_float(void *arg, const void *other) {
-    vector_float **dest = NULL;
-    vector_float **source = NULL;
+void *tmpl_vector_copy_char_ptr(void *arg, const void *other) {
+    vector_char_ptr **dest = NULL;
+    vector_char_ptr **source = NULL;
 
     massert_ptr(other);
 
-    dest = (vector_float **)(arg);
-    source = (vector_float **)(other);
+    dest = (vector_char_ptr **)(arg);
+    source = (vector_char_ptr **)(other);
 
-    (*dest) = vnewcopy_float((*source));
+    (*dest) = vnewcopy_char_ptr((*source));
 
     return (*dest);
 }
@@ -2891,29 +2891,29 @@ void *tmpl_vector_copy_float(void *arg, const void *other) {
 /**
  *  @brief  Wrapper function for a struct typetable
  *
- *  @param[in]  arg     address of a vector_float pointer
+ *  @param[in]  arg     address of a vector_char_ptr pointer
  */
-void tmpl_vector_dtor_float(void *arg) {
-    vector_float **v = NULL;
+void tmpl_vector_dtor_char_ptr(void *arg) {
+    vector_char_ptr **v = NULL;
     
     massert_ptr(arg);
 
-    v = (vector_float **)(arg);
-    vdelete_float(v);
+    v = (vector_char_ptr **)(arg);
+    vdelete_char_ptr(v);
 }
 
 /**
  *  @brief  Wrapper function for a struct typetable
  *
- *  @param[in]  s1  address of a vector_float pointer
- *  @param[in]  s2  address of a vector_float pointer
+ *  @param[in]  s1  address of a vector_char_ptr pointer
+ *  @param[in]  s2  address of a vector_char_ptr pointer
  */
-void tmpl_vector_swap_float(void *s1, void *s2) {
-    vector_float **v1 = (vector_float **)(s1);
-    vector_float **v2 = (vector_float **)(s2);
+void tmpl_vector_swap_char_ptr(void *s1, void *s2) {
+    vector_char_ptr **v1 = (vector_char_ptr **)(s1);
+    vector_char_ptr **v2 = (vector_char_ptr **)(s2);
 
     if ((*v1)) {
-        vswap_float(v1, v2);
+        vswap_char_ptr(v1, v2);
     } else {
         (*v1) = (*v2);
         (*v2) = NULL;
@@ -2923,27 +2923,27 @@ void tmpl_vector_swap_float(void *s1, void *s2) {
 /**
  *  @brief  Wrapper function for a struct typetable
  *
- *  @param[in]  c1  address of a vector_float pointer
- *  @param[in]  c2  address of a vector_float pointer
+ *  @param[in]  c1  address of a vector_char_ptr pointer
+ *  @param[in]  c2  address of a vector_char_ptr pointer
  *
  *  @return     -1 if c1 and c2 do not share a comparison function
  *              otherwise, accumulated comparison results between
  *              c1 and c2's elements, within their common length
  *              0 means they are both equivalent, within their common length.
  */
-int tmpl_vector_compare_float(const void *c1, const void *c2) {
-    vector_float *v1 = NULL;
-    vector_float *v2 = NULL;
+int tmpl_vector_compare_char_ptr(const void *c1, const void *c2) {
+    vector_char_ptr *v1 = NULL;
+    vector_char_ptr *v2 = NULL;
 
-    vector_float *vec1 = NULL;
-    vector_float *vec2 = NULL;
+    vector_char_ptr *vec1 = NULL;
+    vector_char_ptr *vec2 = NULL;
 
     size_t size1 = 0;
     size_t size2 = 0;
     size_t size = 0;
 
-    float *target1 = NULL;
-    float *target2 = NULL;
+    char_ptr *target1 = NULL;
+    char_ptr *target2 = NULL;
 
     int delta = 0;
     int i = 0;
@@ -2951,21 +2951,21 @@ int tmpl_vector_compare_float(const void *c1, const void *c2) {
     massert_container(c1);
     massert_container(c2);
 
-    v1 = *(vector_float **)(c1);
-    v2 = *(vector_float **)(c2);
+    v1 = *(vector_char_ptr **)(c1);
+    v2 = *(vector_char_ptr **)(c2);
 
     if (v1->ttbl->compare != v2->ttbl->compare) {
         return -1;
     }
 
-    vec1 = vnewcopy_float(v1);
-    vec2 = vnewcopy_float(v2);
+    vec1 = vnewcopy_char_ptr(v1);
+    vec2 = vnewcopy_char_ptr(v2);
 
-    vsort_float(vec1);
-    vsort_float(vec2);
+    vsort_char_ptr(vec1);
+    vsort_char_ptr(vec2);
 
-    size1 = vsize_float(vec1);
-    size2 = vsize_float(vec2);
+    size1 = vsize_char_ptr(vec1);
+    size2 = vsize_char_ptr(vec2);
 
     size = size1 < size2 ? size1 : size2;
 
@@ -2979,8 +2979,8 @@ int tmpl_vector_compare_float(const void *c1, const void *c2) {
         ++target2;
     }
 
-    vdelete_float(&vec2);
-    vdelete_float(&vec1);
+    vdelete_char_ptr(&vec2);
+    vdelete_char_ptr(&vec1);
 
     /* if delta == 0, both vectors are equivalent within their common length. */
     return delta;
@@ -2989,26 +2989,26 @@ int tmpl_vector_compare_float(const void *c1, const void *c2) {
 /**
  *  @brief  Wrapper function for a struct typetable
  *
- *  @param[in]  arg     address of a vector_float pointer
+ *  @param[in]  arg     address of a vector_char_ptr pointer
  *  @param[in]  dest    file stream (stdout, stderr, a file)
  */
-void tmpl_vector_print_float(const void *arg, FILE *dest) {
-    vector_float *v = NULL;
+void tmpl_vector_print_char_ptr(const void *arg, FILE *dest) {
+    vector_char_ptr *v = NULL;
 
     massert_ptr(arg);
     massert_ptr(dest);
 
-    v = *(vector_float **)(arg);
-    vfputs_float(v, dest);
+    v = *(vector_char_ptr **)(arg);
+    vfputs_char_ptr(v, dest);
 }
 
 /**
  *  @brief  Reassign ttbl to v
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[in]  ttbl    pointer to typetable
  */
-void vsetttbl_float(vector_float *v, struct typetable *ttbl) {
+void vsetttbl_char_ptr(vector_char_ptr *v, struct typetable *ttbl) {
     massert_container(v);
     v->ttbl = ttbl ? ttbl : _void_ptr_;
 }
@@ -3016,11 +3016,11 @@ void vsetttbl_float(vector_float *v, struct typetable *ttbl) {
 /**
  *  @brief  Retrieves width (data size) in v's ttbl
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     size of data type
  */
-size_t vgetwidth_float(vector_float *v) {
+size_t vgetwidth_char_ptr(vector_char_ptr *v) {
     massert_container(v);
     return v->ttbl->width;
 }
@@ -3028,11 +3028,11 @@ size_t vgetwidth_float(vector_float *v) {
 /**
  *  @brief  Retrieves copy function in v's ttbl
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     copy function used by v
  */
-copy_fn vgetcopy_float(vector_float *v) {
+copy_fn vgetcopy_char_ptr(vector_char_ptr *v) {
     massert_container(v);
     return v->ttbl->copy;
 }
@@ -3040,11 +3040,11 @@ copy_fn vgetcopy_float(vector_float *v) {
 /**
  *  @brief  Retrieves dtor function in v's ttbl
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     dtor function used by v
  */
-dtor_fn vgetdtor_float(vector_float *v) {
+dtor_fn vgetdtor_char_ptr(vector_char_ptr *v) {
     massert_container(v);
     return v->ttbl->dtor;
 }
@@ -3052,11 +3052,11 @@ dtor_fn vgetdtor_float(vector_float *v) {
 /**
  *  @brief  Retrieves swap function in v's ttbl
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     swap function used by v
  */
-swap_fn vgetswap_float(vector_float *v) {
+swap_fn vgetswap_char_ptr(vector_char_ptr *v) {
     massert_container(v);
     return v->ttbl->swap;
 }
@@ -3064,11 +3064,11 @@ swap_fn vgetswap_float(vector_float *v) {
 /**
  *  @brief  Retrieves compare function in v's ttbl
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     compare function used by v
  */
-compare_fn vgetcompare_float(vector_float *v) {
+compare_fn vgetcompare_char_ptr(vector_char_ptr *v) {
     massert_container(v);
     return v->ttbl->compare;
 }
@@ -3076,11 +3076,11 @@ compare_fn vgetcompare_float(vector_float *v) {
 /**
  *  @brief  Retrieves print function in v's ttbl
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     print function used by v
  */
-print_fn vgetprint_float(vector_float *v) {
+print_fn vgetprint_char_ptr(vector_char_ptr *v) {
     massert_container(v);
     return v->ttbl->print;
 }
@@ -3088,22 +3088,22 @@ print_fn vgetprint_float(vector_float *v) {
 /**
  *  @brief  Retrieves typetable used by v
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  *
  *  @return     pointer to typetable
  */
-struct typetable *vgetttbl_float(vector_float *v) {
+struct typetable *vgetttbl_char_ptr(vector_char_ptr *v) {
     massert_container(v);
     return v->ttbl;
 }
 
 /**
- *  @brief  Calls malloc to allocate memory for a pointer to vector_float
+ *  @brief  Calls malloc to allocate memory for a pointer to vector_char_ptr
  *
- *  @return     pointer to vector_float
+ *  @return     pointer to vector_char_ptr
  */
-static vector_float *vallocate_float(void) {
-    vector_float *v = NULL;
+static vector_char_ptr *vallocate_char_ptr(void) {
+    vector_char_ptr *v = NULL;
     v = malloc(sizeof *v);
     return v;
 }
@@ -3111,15 +3111,15 @@ static vector_float *vallocate_float(void) {
 /**
  *  @brief  "Constructor" function, initializes vector
  *
- *  @param[in]  v           pointer to vector_float
+ *  @param[in]  v           pointer to vector_char_ptr
  *  @param[in]  capacity    capacity desired for vector
  */
-static void vinit_float(vector_float *v, size_t capacity) {
-    float *start = NULL;
+static void vinit_char_ptr(vector_char_ptr *v, size_t capacity) {
+    char_ptr *start = NULL;
 
     massert_container(v);
 
-    v->ttbl = _float_ ? _float_ : _void_ptr_;
+    v->ttbl = _char_ptr_ ? _char_ptr_ : _void_ptr_;
 
     if (v->ttbl != _void_ptr_) {
         v->ttbl->compare = v->ttbl->compare ? v->ttbl->compare : NULL;
@@ -3144,14 +3144,14 @@ static void vinit_float(vector_float *v, size_t capacity) {
 /**
  *  @brief "Destructor" function, deinitializes vector
  *
- *  @param[in]  v   pointer to vector_float
+ *  @param[in]  v   pointer to vector_char_ptr
  */
-static void vdeinit_float(vector_float *v) {
+static void vdeinit_char_ptr(vector_char_ptr *v) {
     if (v == NULL) {
         return;
     }
 
-    vclear_float(v);
+    vclear_char_ptr(v);
 
     free(v->impl.start);
     v->impl.start = NULL;
@@ -3164,12 +3164,12 @@ static void vdeinit_float(vector_float *v) {
 /**
  *  @brief  Swaps the content at first and second, address from within v
  *
- *  @param[in]  v       pointer to vector_float
+ *  @param[in]  v       pointer to vector_char_ptr
  *  @param[out] first   first address to swap content
  *  @param[out] second  second address to swap content
  */
-static void vswapaddr_float(vector_float *v, float *first, float *second) {
-    float *temp = NULL;
+static void vswapaddr_char_ptr(vector_char_ptr *v, char_ptr *first, char_ptr *second) {
+    char_ptr *temp = NULL;
 
     massert_container(v);
     massert_ptr(first);
@@ -3189,18 +3189,18 @@ static void vswapaddr_float(vector_float *v, float *first, float *second) {
 /**
  *  @brief  Initializes and returns an iterator that refers to arg
  *
- *  @param[in]  arg     pointer to vector_float
+ *  @param[in]  arg     pointer to vector_char_ptr
  *
  *  @return     iterator that refers to v,
  *              position is at v's first element
  */
-static iterator vibegin_float(void *arg) {
-    vector_float *v = NULL;
+static iterator vibegin_char_ptr(void *arg) {
+    vector_char_ptr *v = NULL;
     iterator it;
 
-    v = (vector_float *)(arg);
+    v = (vector_char_ptr *)(arg);
 
-    it.itbl = vector_iterator_table_ptr_id_float;
+    it.itbl = vector_iterator_table_ptr_id_char_ptr;
     it.container = v;
     it.curr = v->impl.start;
 
@@ -3210,18 +3210,18 @@ static iterator vibegin_float(void *arg) {
 /**
  *  @brief  Initializes and returns an iterator that refers to arg
  *
- *  @param[in]  arg     pointer to vector_float
+ *  @param[in]  arg     pointer to vector_char_ptr
  *
  *  @return     iterator that refers to v;
  *              position is at one block past v's last element
  */
-static iterator viend_float(void *arg) {
-    vector_float *v = NULL;
+static iterator viend_char_ptr(void *arg) {
+    vector_char_ptr *v = NULL;
     iterator it;
 
-    v = (vector_float *)(arg);
+    v = (vector_char_ptr *)(arg);
 
-    it.itbl = vector_iterator_table_ptr_id_float;
+    it.itbl = vector_iterator_table_ptr_id_char_ptr;
     it.container = v;
     it.curr = v->impl.finish;
 
@@ -3232,17 +3232,17 @@ static iterator viend_float(void *arg) {
  *  @brief  Initializes and returns an iterator that
  *          is one block past it's current position
  *
- *  @param[in]  it      iterator that refers to a vector_float
+ *  @param[in]  it      iterator that refers to a vector_char_ptr
  *
  *  @return     a new iterator that is one block past it's current position
  */
-static iterator vinext_float(iterator it) {
-    vector_float *v = NULL;
+static iterator vinext_char_ptr(iterator it) {
+    vector_char_ptr *v = NULL;
     iterator iter;
 
-    v = (vector_float *)(it.container);
+    v = (vector_char_ptr *)(it.container);
 
-    iter.itbl = vector_iterator_table_ptr_id_float;
+    iter.itbl = vector_iterator_table_ptr_id_char_ptr;
     iter.container = v;
     iter.curr = it.curr;
 
@@ -3259,24 +3259,24 @@ static iterator vinext_float(iterator it) {
  *  @brief  Initializes and returns an iterator that
  *          is n blocks past it's current position
  *
- *  @param[in]  it      iterator that refers to a vector_float
+ *  @param[in]  it      iterator that refers to a vector_char_ptr
  *
  *  @return     a new iterator that is n block's past it's current position
  */
-static iterator vinextn_float(iterator it, int n) {
-    vector_float *v = NULL;
+static iterator vinextn_char_ptr(iterator it, int n) {
+    vector_char_ptr *v = NULL;
     iterator iter;
     int pos = 0;
 
-    v = (vector_float *)(it.container);
+    v = (vector_char_ptr *)(it.container);
 
-    iter.itbl = vector_iterator_table_ptr_id_float;
+    iter.itbl = vector_iterator_table_ptr_id_char_ptr;
     iter.container = v;
     iter.curr = it.curr;
 
     pos = ptr_distance(v->impl.start, iter.curr, v->ttbl->width);
 
-    if ((vsize_float(v) - pos) <= 0) {
+    if ((vsize_char_ptr(v) - pos) <= 0) {
         char str[256];
         sprintf(str, "Cannot advance %d times from position %d.", n, pos);
         ERROR(__FILE__, str);
@@ -3291,17 +3291,17 @@ static iterator vinextn_float(iterator it, int n) {
  *  @brief  Initializes and returns an iterator that
  *          is one block behind it's current position
  *
- *  @param[in]  it      iterator that refers to a vector_float
+ *  @param[in]  it      iterator that refers to a vector_char_ptr
  *
  *  @return     a new iterator that is one block behind it's current position
  */
-static iterator viprev_float(iterator it) {
-    vector_float *v = (vector_float *)(it.container);
+static iterator viprev_char_ptr(iterator it) {
+    vector_char_ptr *v = (vector_char_ptr *)(it.container);
     iterator iter;
 
-    v = (vector_float *)(it.container);
+    v = (vector_char_ptr *)(it.container);
 
-    iter.itbl = vector_iterator_table_ptr_id_float;
+    iter.itbl = vector_iterator_table_ptr_id_char_ptr;
     iter.container = v;
     iter.curr = it.curr;
 
@@ -3318,24 +3318,24 @@ static iterator viprev_float(iterator it) {
  *  @brief  Initializes and returns an iterator that
  *          is n blocks behind it's current position
  *
- *  @param[in]  it      iterator that refers to a vector_float
+ *  @param[in]  it      iterator that refers to a vector_char_ptr
  *
  *  @return     a new iterator that is n block's behind it's current position
  */
-static iterator viprevn_float(iterator it, int n) {
-    vector_float *v = (vector_float *)(it.container);
+static iterator viprevn_char_ptr(iterator it, int n) {
+    vector_char_ptr *v = (vector_char_ptr *)(it.container);
     iterator iter;
     int pos = 0;
 
-    v = (vector_float *)(it.container);
+    v = (vector_char_ptr *)(it.container);
 
-    iter.itbl = vector_iterator_table_ptr_id_float;
+    iter.itbl = vector_iterator_table_ptr_id_char_ptr;
     iter.container = v;
     iter.curr = it.curr;
 
     pos = ptr_distance(v->impl.start, iter.curr, v->ttbl->width);
 
-    if ((vsize_float(v) - pos) <= 0) {
+    if ((vsize_char_ptr(v) - pos) <= 0) {
         char str[256];
         sprintf(str, "Cannot retract %d times from position %d.", n, pos);
         ERROR(__FILE__, str);
@@ -3349,8 +3349,8 @@ static iterator viprevn_float(iterator it, int n) {
 /**
  *  @brief  Determines the distance between first and last numerically
  *
- *  @param[in]  first   pointer to iterator that refers to a vector_float
- *  @param[in]  last    pointer to iterator that refers to a vector_float
+ *  @param[in]  first   pointer to iterator that refers to a vector_char_ptr
+ *  @param[in]  last    pointer to iterator that refers to a vector_char_ptr
  *
  *  @return     numerical distance between first and last
  *
@@ -3360,45 +3360,45 @@ static iterator viprevn_float(iterator it, int n) {
  *  To find the index position of an iterator, leave one of the parameters
  *  NULL when calling the distance function.
  */
-static int vidistance_float(iterator *first, iterator *last) {
-    vector_float *v = NULL;
+static int vidistance_char_ptr(iterator *first, iterator *last) {
+    vector_char_ptr *v = NULL;
 
     if (first == NULL && last != NULL) {
-        v = (vector_float *)(last->container);
-        return (int)((float *)(last->curr) - v->impl.start);
+        v = (vector_char_ptr *)(last->container);
+        return (int)((char_ptr *)(last->curr) - v->impl.start);
     } else if (last == NULL && first != NULL) {
-        v = (vector_float *)(first->container);
-        return (int)((float *)(first->curr) - v->impl.start);
+        v = (vector_char_ptr *)(first->container);
+        return (int)((char_ptr *)(first->curr) - v->impl.start);
     } else if (first == NULL && last == NULL) {
         return 0;
     } else {
-        v = (vector_float *)(first->container);
-        return (int)((float *)(last->curr) - (float *)(first->curr));
+        v = (vector_char_ptr *)(first->container);
+        return (int)((char_ptr *)(last->curr) - (char_ptr *)(first->curr));
     }
 }
 
 /**
  *  @brief  Advances the position of it n blocks
  *
- *  @param[in]  it      pointer to iterator that refers to a vector_float
+ *  @param[in]  it      pointer to iterator that refers to a vector_char_ptr
  *  @param[in]  n       desired amount of blocks to move
  *
  *  @return     pointer to iterator
  */
-static iterator *viadvance_float(iterator *it, int n) {
-    vector_float *v = NULL;
+static iterator *viadvance_char_ptr(iterator *it, int n) {
+    vector_char_ptr *v = NULL;
     int pos = 0;
 
     massert_iterator(it);
 
     pos = ptr_distance(v->impl.start, it->curr, v->ttbl->width);
 
-    if ((vsize_float(v) - pos) < 0) {
+    if ((vsize_char_ptr(v) - pos) < 0) {
         char str[256];
         sprintf(str, "Cannot advance %d times from position %d.", n, pos);
         ERROR(__FILE__, str);
     } else {
-        v = (vector_float *)(it->container);
+        v = (vector_char_ptr *)(it->container);
         it->curr = (char *)(it->curr) + (n * v->ttbl->width);
     }
 
@@ -3408,16 +3408,16 @@ static iterator *viadvance_float(iterator *it, int n) {
 /**
  *  @brief  Increments the position of it 1 block forward
  *
- *  @param[in]  it     pointer to iterator that refers to a vector_float
+ *  @param[in]  it     pointer to iterator that refers to a vector_char_ptr
  *
  *  @return     pointer to iterator
  */
-static iterator *viincr_float(iterator *it) {
-    vector_float *v = NULL;
+static iterator *viincr_char_ptr(iterator *it) {
+    vector_char_ptr *v = NULL;
 
     massert_iterator(it);
 
-    v = (vector_float *)(it->container);
+    v = (vector_char_ptr *)(it->container);
 
     if (it->curr == v->impl.finish) {
         ERROR(__FILE__, "Cannot increment - already at end.");
@@ -3431,16 +3431,16 @@ static iterator *viincr_float(iterator *it) {
 /**
  *  @brief  Decrements the position of it 1 block backward
  *
- *  @param[in]  it     pointer to iterator that refers to a vector_float
+ *  @param[in]  it     pointer to iterator that refers to a vector_char_ptr
  *
  *  @return     pointer to iterator
  */
-static iterator *videcr_float(iterator *it) {
-    vector_float *v = NULL;
+static iterator *videcr_char_ptr(iterator *it) {
+    vector_char_ptr *v = NULL;
 
     massert_iterator(it);
 
-    v = (vector_float *)(it->container);
+    v = (vector_char_ptr *)(it->container);
 
     if (it->curr == v->impl.start) {
         ERROR(__FILE__, "Cannot decrement - already at begin.");
@@ -3455,11 +3455,11 @@ static iterator *videcr_float(iterator *it) {
  *  @brief  Retrieves the address of the value referred to
  *          by it's current position
  *
- *  @param[in]  it  iterator that refers to a vector_float
+ *  @param[in]  it  iterator that refers to a vector_char_ptr
  *
  *  @return     address of an element from within a vector
  */
-static void *vicurr_float(iterator it) {
+static void *vicurr_char_ptr(iterator it) {
     return it.curr;
 }
 
@@ -3467,12 +3467,12 @@ static void *vicurr_float(iterator it) {
  *  @brief  Retrieves the address of first element from
  *          the vector it is iterating
  *
- *  @param[in]  it  iterator that refers to a vector_float
+ *  @param[in]  it  iterator that refers to a vector_char_ptr
  *
  *  @return     address of the first element from within a vector
  */
-static void *vistart_float(iterator it) {
-    vector_float *v = (vector_float *)(it.container);
+static void *vistart_char_ptr(iterator it) {
+    vector_char_ptr *v = (vector_char_ptr *)(it.container);
     return v->impl.start;
 }
 
@@ -3480,50 +3480,50 @@ static void *vistart_float(iterator it) {
  *  @brief  Retrieves the address of the block one past
  *          the last element from within the vector it is iterating
  *
- *  @param[in]  it  iterator that refers to a vector_float
+ *  @param[in]  it  iterator that refers to a vector_char_ptr
  *
  *  @return     address of the element that is one block past
  *              the rear element from within the vector being iterated
  */
-static void *vifinish_float(iterator it) {
-    vector_float *v = (vector_float *)(it.container);
+static void *vifinish_char_ptr(iterator it) {
+    vector_char_ptr *v = (vector_char_ptr *)(it.container);
     return v->impl.finish;
 }
 
 /**
  *  @brief  Determines if it has elements to visit in the forward direction
  *
- *  @param[in]  it  iterator that refers to a vector_float
+ *  @param[in]  it  iterator that refers to a vector_char_ptr
  *
  *  @return     true if elements remain in the forward direction,
  *              false otherwise
  */
-static bool vihasnext_float(iterator it) {
-    vector_float *v = (vector_float *)(it.container);
+static bool vihasnext_char_ptr(iterator it) {
+    vector_char_ptr *v = (vector_char_ptr *)(it.container);
     return it.curr != v->impl.finish;
 }
 
 /**
  *  @brief  Determines if it has elements to visit in the backward direction
  *
- *  @param[in]  it  iterator that refers to a vector_float
+ *  @param[in]  it  iterator that refers to a vector_char_ptr
  *
  *  @return     true if elements remain in the backward direction,
  *              false otherwise
  */
-static bool vihasprev_float(iterator it) {
-    vector_float *v = (vector_float *)(it.container);
+static bool vihasprev_char_ptr(iterator it) {
+    vector_char_ptr *v = (vector_char_ptr *)(it.container);
     return it.curr != v->impl.start;
 }
 
 /**
  *  @brief  Retrieve a container's typetable
  *
- *  @param[in]  arg     pointer to vector_float
+ *  @param[in]  arg     pointer to vector_char_ptr
  *
  *  @return     pointer to typetable
  */
-static struct typetable *vigetttbl_float(void *arg) {
-    vector_float *v = (vector_float *)(arg);
+static struct typetable *vigetttbl_char_ptr(void *arg) {
+    vector_char_ptr *v = (vector_char_ptr *)(arg);
     return v->ttbl;
 }

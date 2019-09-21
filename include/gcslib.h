@@ -72,9 +72,11 @@
  *      vector_tmpl
  *      mergesort_tmpl
  */
+/*
 #include "vector_float.h"
 #include "vector_int.h"
 #include "vector_str.h"
+*/
 
 /**
  *  Dependencies:
