@@ -1,9 +1,9 @@
 /**
- *  @file       vector_tmpl.c
- *  @brief      Template source file for a type-safe dynamic array ADT
+ *  @file       vector_cstr.c
+ *  @brief      Source for preprocessed template instantiation of vector(cstr)
  *
  *  @author     Gemuele Aludino
- *  @date       11 Jul 2019
+ *  @date       21 Sep 2019
  *  @copyright  Copyright © 2019 Gemuele Aludino
  */
 /**
@@ -28,30 +28,18 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifdef T
-
-#include <assert.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-
-/**
- *  @file       utils.h
- *  @brief      Required for (struct typetable) and related functions
- */
-#include "utils.h"
-
-/**
- *  @file       iterator.h
- *  @brief      Required for iterator (struct iterator) and related functions
- */
-#include "iterator.h"
+#include "vector_cstr.h"
 
 /**
  *  @file       mergesort.h
  *  @brief      Public header file for access to mergesort-related functions
  */
 #include "mergesort.h"
+
+#include <assert.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
 
 /**
  *  @def        VECTOR_TMPL_MAXIMUM_STACK_BUFFER_SIZE
@@ -66,160 +54,129 @@
 #define BACK(VEC)       ((VEC->impl.finish) - 1)
 #define END(VEC)        (VEC->impl.end_of_storage)
 
-#define vallocate(T) tmpl(vallocate, T)
-#define vinit(T) tmpl(vinit, T)
-#define vdeinit(T) tmpl(vdeinit, T)
-#define vswapaddr(T) tmpl(vswapaddr, T)
-
-#define vector_iterator(T) tmpl(vector_iterator, T)
-
-#define vibegin(T) tmpl(vibegin, T)
-#define viend(T) tmpl(viend, T)
-
-#define vinext(T) tmpl(vinext, T)
-#define vinextn(T) tmpl(vinextn, T)
-
-#define viprev(T) tmpl(viprev, T)
-#define viprevn(T) tmpl(viprevn, T)
-
-#define vidistance(T) tmpl(vidistance, T)
-
-#define viadvance(T) tmpl(viadvance, T)
-#define viincr(T)    tmpl(viincr, T)
-#define videcr(T) tmpl(videcr, T)
-
-#define vicurr(T) tmpl(vicurr, T)
-#define vistart(T) tmpl(vistart, T)
-#define vifinish(T) tmpl(vifinish, T)
-
-#define vihasnext(T) tmpl(vihasnext, T)
-#define vihasprev(T) tmpl(vihasprev, T)
-
-#define vigetttbl(T) tmpl(vigetttbl, T)
-
 /**
- *  @struct     vector(T)
+ *  @struct     vector_cstr
  *  @brief      Represents a type-safe dynamic array ADT
  *
- *  Note that struct vector(T) and struct vector_base(T) are
+ *  Note that struct vector_cstr and struct vector_base_cstr are
  *  opaque -- their fields cannot be accessed directly,
- *  nor can instances of struct vector(T)/struct vector_base(T)
+ *  nor can instances of struct vector_cstr/struct vector_base_cstr
  *  be created on the stack. This is done to enforce encapsulation.
  */
-struct vector(T) {
-    struct vector_base(T) {
-        T *start;           /**< address of array base (first element) */
-        T *finish;          /**< address reserved for next rear element */
-        T *end_of_storage;  /**< addresses last allocated block of storage */
+struct vector_cstr {
+    struct vector_base_cstr {
+        cstr *start; /**< address of array base (first element) */
+        cstr *finish; /**< address reserved for next rear element */
+        cstr *end_of_storage; /**< addresses last allocated block of storage */
     } impl;
 
     struct typetable *ttbl; /*<< data width, cpy, dtor, swap, compare, print */
 };
 
-struct typetable table_id(ttbl_vector, T) = {
-    sizeof(struct vector(T)),
-    tmpl_vector_copy(T),
-    tmpl_vector_dtor(T),
-    tmpl_vector_swap(T),
-    tmpl_vector_compare(T),
-    tmpl_vector_print(T)
+struct typetable ttbl_vector_cstr = {
+    sizeof(struct vector_cstr),
+    tmpl_vector_copy_cstr,
+    tmpl_vector_dtor_cstr,
+    tmpl_vector_swap_cstr,
+    tmpl_vector_compare_cstr,
+    tmpl_vector_print_cstr
 };
 
-struct typetable *vector_typetable_ptr_id(T) = &table_id(ttbl_vector, T);
+struct typetable *_vector_cstr_ = &ttbl_vector_cstr;
 
-static vector(T) *vallocate(T)(void);
-static void vinit(T)(vector(T) *v, size_t capacity);
-static void vdeinit(T)(vector(T) *v);
-static void vswapaddr(T)(vector(T) *v, T *first, T *second);
+static vector_cstr *vallocate_cstr(void);
+static void vinit_cstr(vector_cstr *v, size_t capacity);
+static void vdeinit_cstr(vector_cstr *v);
+static void vswapaddr_cstr(vector_cstr *v, cstr *first, cstr *second);
 
-static iterator vibegin(T)(void *arg);
-static iterator viend(T)(void *arg);
+static iterator vibegin_cstr(void *arg);
+static iterator viend_cstr(void *arg);
 
-static iterator vinext(T)(iterator it);
-static iterator vinextn(T)(iterator it, int n);
+static iterator vinext_cstr(iterator it);
+static iterator vinextn_cstr(iterator it, int n);
 
-static iterator viprev(T)(iterator it);
-static iterator viprevn(T)(iterator it, int n);
+static iterator viprev_cstr(iterator it);
+static iterator viprevn_cstr(iterator it, int n);
 
-static int vidistance(T)(iterator *first, iterator *last);
+static int vidistance_cstr(iterator *first, iterator *last);
 
-static iterator *viadvance(T)(iterator *it, int n);
-static iterator *viincr(T)(iterator *it);
-static iterator *videcr(T)(iterator *it);
+static iterator *viadvance_cstr(iterator *it, int n);
+static iterator *viincr_cstr(iterator *it);
+static iterator *videcr_cstr(iterator *it);
 
-static void *vicurr(T)(iterator it);
-static void *vistart(T)(iterator it);
-static void *vifinish(T)(iterator it);
+static void *vicurr_cstr(iterator it);
+static void *vistart_cstr(iterator it);
+static void *vifinish_cstr(iterator it);
 
-static bool vihasnext(T)(iterator it);
-static bool vihasprev(T)(iterator it);
+static bool vihasnext_cstr(iterator it);
+static bool vihasprev_cstr(iterator it);
 
-static struct typetable *vigetttbl(T)(void *arg);
+static struct typetable *vigetttbl_cstr(void *arg);
 
-struct iterator_table table_id(itbl_vector, T) = {
-    vibegin(T),
-    viend(T),
-    vinext(T),
-    vinextn(T),
-    viprev(T),
-    viprevn(T),
-    viadvance(T),
-    viincr(T),
-    videcr(T),
-    vicurr(T),
-    vistart(T),
-    vifinish(T),
-    vidistance(T),
-    vihasnext(T),
-    vihasprev(T),
-    vigetttbl(T)
+struct iterator_table itbl_vector_cstr = {
+    vibegin_cstr,
+    viend_cstr,
+    vinext_cstr,
+    vinextn_cstr,
+    viprev_cstr,
+    viprevn_cstr,
+    viadvance_cstr,
+    viincr_cstr,
+    videcr_cstr,
+    vicurr_cstr,
+    vistart_cstr,
+    vifinish_cstr,
+    vidistance_cstr,
+    vihasnext_cstr,
+    vihasprev_cstr,
+    vigetttbl_cstr
 };
 
-struct iterator_table *vector_iterator_table_ptr_id(T) = &table_id(itbl_vector, T);
+struct iterator_table *_vector_iterator_cstr_ = &itbl_vector_cstr;
 
 /**
- *  @brief  Allocates, constructs, and returns a pointer to vector(T),
+ *  @brief  Allocates, constructs, and returns a pointer to vector_cstr,
  *          size VECTOR_DEFAULT_CAPACITY (16)
  *
- *  @return     pointer to vector(T)
+ *  @return     pointer to vector_cstr
  */
-vector(T) *vnew(T)(void) {
-    vector(T) *v = vallocate(T)();              /* allocate */
-    vinit(T)(v, VECTOR_DEFAULT_CAPACITY);       /* construct */
-    return v;                                   /* return */
+vector_cstr *vnew_cstr(void) {
+    vector_cstr *v = vallocate_cstr(); /* allocate */
+    vinit_cstr(v, VECTOR_DEFAULT_CAPACITY); /* construct */
+    return v; /* return */
 }
 
 /**
- *  @brief  Allocates, constructs, and returns a pointer to vector(T),
+ *  @brief  Allocates, constructs, and returns a pointer to vector_cstr,
  *          size n
  *
- *  @return     pointer to vector(T)
+ *  @return     pointer to vector_cstr
  */
-vector(T) *vnewr(T)(size_t n) {
-    vector(T) *v = vallocate(T)();          /* allocate */
-    vinit(T)(v, n);                         /* construct */
-    return v;                               /* return */
+vector_cstr *vnewr_cstr(size_t n) {
+    vector_cstr *v = vallocate_cstr(); /* allocate */
+    vinit_cstr(v, n); /* construct */
+    return v; /* return */
 }
 
 /**
- *  @brief  Calls vnewr and returns a pointer to vector(T),
+ *  @brief  Calls vnewr and returns a pointer to vector_cstr,
  *          filled with n copies of val
  *
  *  @param[in]  n       number of elements to copy
  *  @param[in]  val     element to copy
  *
- *  @return     pointer to vector(T)
+ *  @return     pointer to vector_cstr
  *
  *  If ttbl has a copy function defined,
  *  n copies of val will be inserted into the returned vector
  *  using the copy function - this copy function is intended for
  *  deep copies. Otherwise, val will be shallow-copied using memcpy.
  */
-vector(T) *vnewfill(T)(size_t n, T val) {
-    vector(T) *v = NULL;
-    T *sentinel = NULL;
+vector_cstr *vnewfill_cstr(size_t n, cstr val) {
+    vector_cstr *v = NULL;
+    cstr *sentinel = NULL;
 
-    v = vnewr(T)(n);
+    v = vnewr_cstr(n);
     sentinel = v->impl.start + n;
 
     if (v->ttbl->copy) {
@@ -244,24 +201,24 @@ vector(T) *vnewfill(T)(size_t n, T val) {
 }
 
 /**
- *  @brief  Calls vnewr and returns a pointer to vector(T),
+ *  @brief  Calls vnewr and returns a pointer to vector_cstr,
  *          filled with n copies of valaddr
  *
  *  @param[in]  n       number of elements to copy
  *  @param[in]  valaddr address of element to copy
  *
- *  @return     pointer to vector(T)
+ *  @return     pointer to vector_cstr
  *
  *  If ttbl has a copy function defined,
  *  n copies of valaddr will be inserted into the returned vector
  *  using the copy function - this copy function is intended for
  *  deep copies. Otherwise, valaddr will be shallow-copied using memcpy.
  */
-vector(T) *vnewfillptr(T)(size_t n, T *valaddr) {
-    vector(T) *v = NULL;
-    T *sentinel = NULL;
+vector_cstr *vnewfillptr_cstr(size_t n, cstr *valaddr) {
+    vector_cstr *v = NULL;
+    cstr *sentinel = NULL;
 
-    v = vnewr(T)(n);
+    v = vnewr_cstr(n);
     sentinel = v->impl.start + n;
 
     if (v->ttbl->copy) {
@@ -293,7 +250,7 @@ vector(T) *vnewfillptr(T)(size_t n, T *valaddr) {
  *  @param[in]  first   represents the beginning of the range (inclusive)
  *  @param[in]  last    represents the end of the range (exclusive)
  *
- *  @return     pointer to vector(T)
+ *  @return     pointer to vector_cstr
  *
  *  iterators first and last must refer to the same struct iterator_table,
  *  and would ideally refer to the same container -- but there are no mechanisms
@@ -309,14 +266,14 @@ vector(T) *vnewfillptr(T)(size_t n, T *valaddr) {
  *  using the copy function -- this function meant for deep copying.
  *  Otherwise, [first, last) will be shallow-copied using memcpy.
  */
-vector(T) *vnewrnge(T)(iterator first, iterator last) {
+vector_cstr *vnewrnge_cstr(iterator first, iterator last) {
     int delta = 0;
 
     struct typetable *ttbl_first = NULL;
-    vector(T) *v = NULL;
+    vector_cstr *v = NULL;
 
-    T *sentinel = NULL;
-    T *curr = NULL;
+    cstr *sentinel = NULL;
+    cstr *curr = NULL;
 
     if (first.itbl != last.itbl) {
         /**
@@ -328,25 +285,25 @@ vector(T) *vnewrnge(T)(iterator first, iterator last) {
          *  different container types (this is determiend by what itbls
          *  they each point to)
          */
-        ERROR(__FILE__, "first and last must have matching container types and refer to the same container.");
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)331, "first and last must have matching container types and refer to the same container.");
         return NULL;
     }
 
     delta = it_distance(&first, &last);
     ttbl_first = it_get_ttbl(first);
 
-    v = vnewr(T)(delta);
+    v = vnewr_cstr(delta);
 
-    sentinel = it_curr(last);         /* iteration range is [first, last) */
+    sentinel = it_curr(last); /* iteration range is [first, last) */
 
     if (ttbl_first->copy) {
-        while ((curr = it_curr(first)) != sentinel)  {
+        while ((curr = it_curr(first)) != sentinel) {
             ttbl_first->copy(v->impl.finish++, curr);
 
             it_incr(&first);
         }
     } else {
-        while ((curr = it_curr(first)) != sentinel)  {
+        while ((curr = it_curr(first)) != sentinel) {
             memcpy(v->impl.finish++, curr, v->ttbl->width);
 
             it_incr(&first);
@@ -357,10 +314,10 @@ vector(T) *vnewrnge(T)(iterator first, iterator last) {
 }
 
 /**
- *  @brief  Calls vnewr and returns a pointer to vector(T),
- *          filled with elements from an existing vector(T) v.
+ *  @brief  Calls vnewr and returns a pointer to vector_cstr,
+ *          filled with elements from an existing vector_cstr v.
  *
- *  @param[in]  v   pointer to vector(T), containing the desired source elements
+ *  @param[in]  v   pointer to vector_cstr, containing the desired source elements
  *
  *  @return     pointer to vector, with copies of v's elements
  *
@@ -369,17 +326,17 @@ vector(T) *vnewrnge(T)(iterator first, iterator last) {
  *  copy function -- this function is meant for deep copying.
  *  Otherwise, the contents of v will be shallow-copied using memcpy.
  */
-vector(T) *vnewcopy(T)(vector(T) *v) {
-    vector(T) *copy = NULL;
+vector_cstr *vnewcopy_cstr(vector_cstr *v) {
+    vector_cstr *copy = NULL;
 
-    T *sentinel = NULL;
-    T *curr = NULL;
+    cstr *sentinel = NULL;
+    cstr *curr = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)378, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    copy = vnewr(T)(vcapacity(T)(v));
+    copy = vnewr_cstr(vcapacity_cstr(v));
 
-    sentinel = copy->impl.finish + vsize(T)(v);
+    sentinel = copy->impl.finish + vsize_cstr(v);
     curr = v->impl.start;
 
     if (v->ttbl->copy) {
@@ -396,22 +353,22 @@ vector(T) *vnewcopy(T)(vector(T) *v) {
 }
 
 /**
- *  @brief  Calls vallocate(T) to allocate a new vector(T), named move,
- *          and transfers ownership of v's fields to vector(T) move.
+ *  @brief  Calls vallocate_cstr to allocate a new vector_cstr, named move,
+ *          and transfers ownership of v's fields to vector_cstr move.
  *
- *  @param[out] v   Address of a pointer to vector(T)
+ *  @param[out] v   Address of a pointer to vector_cstr
  *
- *  @return     pointer to vector(T), initialized with v's fields
+ *  @return     pointer to vector_cstr, initialized with v's fields
  *
  *  vector v is reinitialized with the same ttbl, with size 1.
  *  v may be deleted by the client, or reused.
  */
-vector(T) *vnewmove(T)(vector(T) **v) {
-    vector(T) *move = NULL;
+vector_cstr *vnewmove_cstr(vector_cstr **v) {
+    vector_cstr *move = NULL;
 
-    massert_ptr((*v));
+    ;if ((((*v)) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "(*v)"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)412, ("['""(*v)""' was found to be NULL - '""(*v)""' must be nonnull to continue.]")); abort();};;
 
-    move = vallocate(T)();
+    move = vallocate_cstr();
 
     /**
      *  A new vector, move, is constructed from the contents of an existing vector,
@@ -424,29 +381,29 @@ vector(T) *vnewmove(T)(vector(T) **v) {
     move->impl.end_of_storage = (*v)->impl.end_of_storage;
     move->ttbl = (*v)->ttbl;
 
-    vinit(T)((*v), 1);
+    vinit_cstr((*v), 1);
 
     return move;
 }
 
 /**
- *  @brief  Calls vdeinit(T) (vector(T)'s destructor) and deallocates the pointer v.
+ *  @brief  Calls vdeinit_cstr (vector_cstr's destructor) and deallocates the pointer v.
  *
- *  @param[out] v   Address of a pointer to vector(T)
+ *  @param[out] v   Address of a pointer to vector_cstr
  *
- *  Every call to any of vector(T)'s "new" functions should be accompanied
- *  by a call to vdelete(T) when a pointer to vector(T) is no longer needed.
+ *  Every call to any of vector_cstr's "new" functions should be accompanied
+ *  by a call to vdelete_cstr when a pointer to vector_cstr is no longer needed.
  *
- *  If the vector(T) has a ttbl with a dtor function defined,
- *  the elements within the vector(T) will be destroyed using the dtor function.
+ *  If the vector_cstr has a ttbl with a dtor function defined,
+ *  the elements within the vector_cstr will be destroyed using the dtor function.
  *
  *  Note that if the elements from within v are dynamically allocated,
  *  and/or the elements have dynamically allocated fields --
  *  and there is no dtor function defined, memory management
  *  will become the client's responsibility.
  */
-void vdelete(T)(vector(T) **v) {
-    massert_ptr((*v));
+void vdelete_cstr(vector_cstr **v) {
+    ;if ((((*v)) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "(*v)"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)449, ("['""(*v)""' was found to be NULL - '""(*v)""' must be nonnull to continue.]")); abort();};;
 
     /**
      *  Deinitialization involves releasing all dynamically allocated
@@ -456,7 +413,7 @@ void vdelete(T)(vector(T) **v) {
      *  (*v)->impl.start has its memory freed, and the remainder of (*v)'s fields
      *  are set NULL.
      */
-    vdeinit(T)((*v));
+    vdeinit_cstr((*v));
 
     /* finally, the memory (*v) points to will be freed. */
     free((*v));
@@ -464,54 +421,54 @@ void vdelete(T)(vector(T) **v) {
 }
 
 /**
- *  @brief  Returns an iterator that points to the first element in vector(T)
+ *  @brief  Returns an iterator that points to the first element in vector_cstr
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     iterator that refers to v
  */
-iterator vbegin(T)(vector(T) *v) {
-    massert_container(v);
-    return vibegin(T)(v);
+iterator vbegin_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)474, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
+    return vibegin_cstr(v);
 }
 
 /**
  *  @brief  Returns an iterator that pointers to an element that is one block
  *          past the last element in v
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     iterator that refers to v
  */
-iterator vend(T)(vector(T) *v) {
-    massert_container(v);
-    return viend(T)(v);
+iterator vend_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)487, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
+    return viend_cstr(v);
 }
 
 /**
  *  @brief  Returns the logical length of v
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     logical length of v
  */
-size_t vsize(T)(vector(T) *v) {
-    massert_container(v);
+size_t vsize_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)499, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
     return v->impl.finish - v->impl.start;
 }
 
 /**
  *  @brief  Returns the theoretical maximum amount of elements that
- *          can be stored by vector(T)
+ *          can be stored by vector_cstr
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     theoretical maximum logical length of v
  */
-size_t vmaxsize(T)(vector(T) *v) {
+size_t vmaxsize_cstr(vector_cstr *v) {
     size_t ptr_sz = 0;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)514, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
     /* ptr_sz is 8 bytes on 64 bit system, 4 bytes on 32 bit system */
     ptr_sz = (sizeof(void *) == 8) ? 8 : 4;
@@ -519,37 +476,37 @@ size_t vmaxsize(T)(vector(T) *v) {
 }
 
 /**
- *  @brief  Resizes the vector(T) to size n
+ *  @brief  Resizes the vector_cstr to size n
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *  @param[in]  n   desired size for v
  *
- *  If n is less than the current logical length (vsize(T)(v)),
+ *  If n is less than the current logical length (vsize_cstr(v)),
  *  v will be truncated (excess elements are destroyed),
  *  otherwise, v's capacity will be extended.
  */
-void vresize(T)(vector(T) *v, size_t n) {
+void vresize_cstr(vector_cstr *v, size_t n) {
     size_t old_size = 0;
     size_t old_capacity = 0;
 
-    T *target = NULL;
-    T *newstart = NULL;
+    cstr *target = NULL;
+    cstr *newstart = NULL;
 
     int back_index = 0;
     int i = 0;
 
     size_t fin = 0;
     size_t end = 0;
-    
-    massert_container(v);
 
-    old_size = vsize(T)(v);
-    old_capacity = vcapacity(T)(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)544, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
+
+    old_size = vsize_cstr(v);
+    old_capacity = vcapacity_cstr(v);
 
     if (old_capacity == n) {
         return;
     } else if (n == 0) {
-        WARNING(__FILE__, "vresize must receive a nonzero value for n.");
+        ulog(stderr, "[WARNING]", "src/vector_tmpl.c", __func__, (long int)552, "vresize must receive a nonzero value for n.");
     }
 
     /**
@@ -568,7 +525,7 @@ void vresize(T)(vector(T) *v, size_t n) {
     }
 
     newstart = realloc(v->impl.start, n * v->ttbl->width);
-    massert_realloc(newstart);
+    ;if (((newstart) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "newstart"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)571, ("[Request for heap storage reallocation failed (realloc returned NULL and was assigned to '""newstart""')]")); abort();};;
 
     fin = n > old_size ? old_size : n;
     end = n > old_size ? n : fin;
@@ -579,9 +536,9 @@ void vresize(T)(vector(T) *v, size_t n) {
 }
 
 /**
- *  @brief  Resizes the vector(T) to size n elements.
+ *  @brief  Resizes the vector_cstr to size n elements.
  *
- *  @param[in]  v           pointer to vector(T)
+ *  @param[in]  v           pointer to vector_cstr
  *  @param[in]  n           desired size for v
  *  @param[in]  val         element to fill new blocks with
  *
@@ -589,18 +546,18 @@ void vresize(T)(vector(T) *v, size_t n) {
  *  to the new blocks for the resize.
  *
  *  If n is less than or equal to the size of v,
- *  the vector(T) will be cleared and new memory of size n will be
+ *  the vector_cstr will be cleared and new memory of size n will be
  *  initialized, with each block consisting of copies of val.
  */
-void vresizefill(T)(vector(T) *v, size_t n, T val) {
+void vresizefill_cstr(vector_cstr *v, size_t n, cstr val) {
     size_t old_capacity = 0;
 
-    T *sentinel = NULL;
-    T *newstart = NULL;
+    cstr *sentinel = NULL;
+    cstr *newstart = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)601, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    old_capacity = vcapacity(T)(v);
+    old_capacity = vcapacity_cstr(v);
 
     sentinel = v->impl.start + n;
 
@@ -609,7 +566,7 @@ void vresizefill(T)(vector(T) *v, size_t n, T val) {
          *  If n is greater than the old size, multiple instances of valaddr are
          *  appended to the rear of the vector following a resize.
          */
-        vresize(T)(v, n);
+        vresize_cstr(v, n);
 
         /* sentinel must be updated to reflect the resize. */
         sentinel = v->impl.start + n;
@@ -652,7 +609,7 @@ void vresizefill(T)(vector(T) *v, size_t n, T val) {
          *  will be overwritten anyway.
          */
         newstart = calloc(n, v->ttbl->width);
-        massert_calloc(newstart);
+        ;if (((newstart) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "newstart"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)655, ("[Request for heap storage allocation failed (calloc returned NULL and was assigned to '""newstart""')]")); abort();};;
 
         /* pointers at impl are re-established */
         v->impl.start = newstart;
@@ -674,9 +631,9 @@ void vresizefill(T)(vector(T) *v, size_t n, T val) {
 }
 
 /**
- *  @brief  Resizes the vector(T) to size n elements.
+ *  @brief  Resizes the vector_cstr to size n elements.
  *
- *  @param[in]  v           pointer to vector(T)
+ *  @param[in]  v           pointer to vector_cstr
  *  @param[in]  n           desired size for v
  *  @param[in]  valaddr     address of element to fill new blocks with
  *
@@ -684,18 +641,18 @@ void vresizefill(T)(vector(T) *v, size_t n, T val) {
  *  to the new blocks for the resize.
  *
  *  If n is less than or equal to the size of v,
- *  the vector(T) will be cleared and new memory of size n will be
+ *  the vector_cstr will be cleared and new memory of size n will be
  *  initialized, with each block consisting of copies of valaddr.
  */
-void vresizefillptr(T)(vector(T) *v, size_t n, T *valaddr) {
+void vresizefillptr_cstr(vector_cstr *v, size_t n, cstr *valaddr) {
     size_t old_capacity = 0;
 
-    T *sentinel = NULL;
-    T *newstart = NULL;
+    cstr *sentinel = NULL;
+    cstr *newstart = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)696, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    old_capacity = vcapacity(T)(v);
+    old_capacity = vcapacity_cstr(v);
 
     sentinel = v->impl.start + n;
 
@@ -704,7 +661,7 @@ void vresizefillptr(T)(vector(T) *v, size_t n, T *valaddr) {
          *  If n is greater than the old size, multiple instances of valaddr are
          *  appended to the rear of the vector following a resize.
          */
-        vresize(T)(v, n);
+        vresize_cstr(v, n);
 
         /* sentinel must be updated to reflect the resize. */
         sentinel = v->impl.start + n;
@@ -747,7 +704,7 @@ void vresizefillptr(T)(vector(T) *v, size_t n, T *valaddr) {
          *  will be overwritten anyway.
          */
         newstart = calloc(n, v->ttbl->width);
-        massert_calloc(newstart);
+        ;if (((newstart) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "newstart"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)750, ("[Request for heap storage allocation failed (calloc returned NULL and was assigned to '""newstart""')]")); abort();};;
 
         /* pointers at impl are re-established */
         v->impl.start = newstart;
@@ -771,24 +728,24 @@ void vresizefillptr(T)(vector(T) *v, size_t n, T *valaddr) {
 /**
  *  @brief  Returns the capacity of v
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return         capacity of v
  */
-size_t vcapacity(T)(vector(T) *v) {
-    massert_container(v);
+size_t vcapacity_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)779, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
     return v->impl.end_of_storage - v->impl.start;
 }
 
 /**
  *  @brief  Determines if v is an empty vector, or not
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     true if v->impl.start == v->impl.finish, false otherwise
  */
-bool vempty(T)(vector(T) *v) {
-    massert_container(v);
+bool vempty_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)791, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
     /**
      *  Since v->impl.finish is always one address ahead of vector's back element,
      *  if v->impl.start == v->impl.finish, the vector is empty.
@@ -796,63 +753,63 @@ bool vempty(T)(vector(T) *v) {
     return v->impl.start == v->impl.finish;
 }
 
-void vreserve(T)(vector(T) *v, size_t n) {
-    massert_container(v);
+void vreserve_cstr(vector_cstr *v, size_t n) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)800, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
     /**
      *  Reserve is effectively a resize,
      *  but verifies that the value of n meets the requirements for a reservation.
      */
-    if (n > vcapacity(T)(v)) {
-        vresize(T)(v, n);
+    if (n > vcapacity_cstr(v)) {
+        vresize_cstr(v, n);
     } else {
         /* no-op */
-        ERROR(__FILE__, "n must be greater than vector's buffer capacity.");
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)810, "n must be greater than vector's buffer capacity.");
         return;
     }
 }
 
 /**
- *  @brief  Shrinks vector(T)'s buffer to that of its logical length
+ *  @brief  Shrinks vector_cstr's buffer to that of its logical length
  *
- *  @param[in] v    pointer to vector(T)
+ *  @param[in] v    pointer to vector_cstr
  *
  *  This function is effectively a conditional resize --
  *  but verifies that:
  *      - vector is not empty
  *      - vector's finish pointer is not equal to end_of_storage pointer
  */
-void vshrinktofit(T)(vector(T) *v) {
-    massert_container(v);
+void vshrinktofit_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)826, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
     if ((v->impl.start != v->impl.finish) && (v->impl.finish != v->impl.end_of_storage)) {
-        vresize(T)(v, vsize(T)(v));
+        vresize_cstr(v, vsize_cstr(v));
     }
 }
 
 /**
  *  @brief  Retrieves the address of an element from vector at index n
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *  @param[in]  n   index of desired element
  *
  *  @return     address of element at n
  *
  *  A bounds check is performed to ensure that n is a valid index.
  */
-T *vat(T)(vector(T) *v, size_t n) {
+cstr *vat_cstr(vector_cstr *v, size_t n) {
     size_t size = 0;
-    T *target = NULL;
+    cstr *target = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)847, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    size = vsize(T)(v);
+    size = vsize_cstr(v);
     target = NULL;
 
     if (n >= size) {
         char str[256];
         sprintf(str, "Input %lu is greater than vector's logical length, %lu -- index out of bounds.", n, size);
-        ERROR(__FILE__, str);
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)855, str);
         return NULL;
     } else if (n == 0) {
         /* if n is 0, it's the front of the vector */
@@ -869,60 +826,60 @@ T *vat(T)(vector(T) *v, size_t n) {
 }
 
 /**
- *  @brief  Retrieves the address of the front element from vector(T)
+ *  @brief  Retrieves the address of the front element from vector_cstr
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     address of front element
  */
-T *vfront(T)(vector(T) *v) {
-    massert_container(v);
+cstr *vfront_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)879, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
     return v->impl.start;
 }
 
 /**
- *  @brief  Retrieves the address of the rear element from vector(T)
+ *  @brief  Retrieves the address of the rear element from vector_cstr
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     address of rear element
  */
-T *vback(T)(vector(T) *v) {
-    massert_container(v);
+cstr *vback_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)891, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
     return v->impl.finish - 1;
 }
 
 /**
- *  @brief  Retrieves the address of vector(T)'s buffer
+ *  @brief  Retrieves the address of vector_cstr's buffer
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     address of v->impl.start
  */
-T **vdata(T)(vector(T) *v) {
-    massert_container(v);
+cstr **vdata_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)903, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
     return &(v->impl.start);
 }
 
 /**
  *  @brief  Retrieves the address of an element from vector at index n
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *  @param[in]  n   index of desired element
  *
  *  @return     address of element at n
  *
  *  A bounds check is performed to ensure that n is a valid index.
  */
-const T *vatconst(T)(vector(T) *v, size_t n) {
-    T *target = NULL;
+const cstr *vatconst_cstr(vector_cstr *v, size_t n) {
+    cstr *target = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)920, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    if (n >= vsize(T)(v)) {
+    if (n >= vsize_cstr(v)) {
         char str[256];
-        sprintf(str, "Input %lu is greater than vector's logical length, %lu -- index out of bounds.", n, vsize(T)(v));
-        ERROR(__FILE__, str);
+        sprintf(str, "Input %lu is greater than vector's logical length, %lu -- index out of bounds.", n, vsize_cstr(v));
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)925, str);
         return NULL;
     }
 
@@ -931,60 +888,60 @@ const T *vatconst(T)(vector(T) *v, size_t n) {
 }
 
 /**
- *  @brief  Retrieves the address of the front element from vector(T)
+ *  @brief  Retrieves the address of the front element from vector_cstr
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     address of front element, const qualified
  */
-const T *vfrontconst(T)(vector(T) *v) {
-    const T *result = (const T *)(v->impl.start);
+const cstr *vfrontconst_cstr(vector_cstr *v) {
+    const cstr *result = (const cstr *)(v->impl.start);
     return result;
 }
 
 /**
- *  @brief  Retrieves the address of the rear element from vector(T)
+ *  @brief  Retrieves the address of the rear element from vector_cstr
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     address of rear element, const qualified
  */
-const T *vbackconst(T)(vector(T) *v) {
-    const T *result = (const T *)(v->impl.finish - 1);
+const cstr *vbackconst_cstr(vector_cstr *v) {
+    const cstr *result = (const cstr *)(v->impl.finish - 1);
     return result;
 }
 
 /**
- *  @brief  Retrieves the address of vector(T)'s buffer
+ *  @brief  Retrieves the address of vector_cstr's buffer
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     address of v->impl.start, const qualified
  */
-const T **vdataconst(T)(vector(T) *v) {
-    const T **result = (const T **)(&v->impl.start);
+const cstr **vdataconst_cstr(vector_cstr *v) {
+    const cstr **result = (const cstr **)(&v->impl.start);
     return result;
 }
 
 /**
- *  @brief  Assigns a range of elements to vector(T), starting at its beginning
+ *  @brief  Assigns a range of elements to vector_cstr, starting at its beginning
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[in]  first   represents the beginning of the range (inc)
  *  @param[in]  last    represents the end of the range, (exc)
  *
  *  Elements in this vector will be destroyed, and replaced with
  *  contents from [first, last).
  *  
- *  If the range of [first, last) exceeds that of vcapacity(T)(v),
+ *  If the range of [first, last) exceeds that of vcapacity_cstr(v),
  *  the capacity will be increased to that of size it_distance(&first, &last).
  */
-void vassignrnge(T)(vector(T) *v, iterator first, iterator last) {
+void vassignrnge_cstr(vector_cstr *v, iterator first, iterator last) {
     int delta = it_distance(&first, &last);
     struct typetable *ttbl_first = it_get_ttbl(first);
 
-    T *sentinel = it_curr(last);
-    T *curr = NULL;
+    cstr *sentinel = it_curr(last);
+    cstr *curr = NULL;
 
     if (first.itbl != last.itbl) {
         /**
@@ -996,75 +953,75 @@ void vassignrnge(T)(vector(T) *v, iterator first, iterator last) {
          *  different container types (this is determiend by what itbls
          *  they each point to)
          */
-        ERROR(__FILE__, "first and last must matching container types and refer to the same container.");
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)999, "first and last must matching container types and refer to the same container.");
         return;
     }
 
     /**
      *  Clear the vector. 
      */
-    vclear(T)(v);
+    vclear_cstr(v);
 
     /**
      *  Resize vector if necessary.
      */
-    if (delta >= vcapacity(T)(v)) {
-        vresize(T)(v, delta);
+    if (delta >= vcapacity_cstr(v)) {
+        vresize_cstr(v, delta);
     }
 
     if (ttbl_first->copy) {
-        while ((curr = it_curr(first)) != sentinel)  {
+        while ((curr = it_curr(first)) != sentinel) {
             ttbl_first->copy(v->impl.finish++, curr);
             it_incr(&first);
         }
     } else {
-        while ((curr = it_curr(first)) != sentinel)  {
+        while ((curr = it_curr(first)) != sentinel) {
             memcpy(v->impl.finish++, curr, v->ttbl->width);
             it_incr(&first);
         };
-    } 
+    }
 }
 
 /**
  *  @brief  Assigns n copies of an element, starting at beginning of vector
  *
- *  @param[in]  v           pointer to vector(T)
+ *  @param[in]  v           pointer to vector_cstr
  *  @param[in]  n           amount of elements to assign
  *  @param[in]  val         the element to assign
  * 
  *  Elements in this vector will be destroyed,
  *  and replaced with n copies of val.
  * 
- *  If n exceeds that of vcapacity(T)(v),
+ *  If n exceeds that of vcapacity_cstr(v),
  *  the capacity of this vector will be increased to that of size n.
  */
-void vassignfill(T)(vector(T) *v, size_t n, T val) {
-    T *sentinel = NULL;
+void vassignfill_cstr(vector_cstr *v, size_t n, cstr val) {
+    cstr *sentinel = NULL;
 
     /**
      *  Clear the vector. 
      */
-    vclear(T)(v);
+    vclear_cstr(v);
 
     /**
      *  Resize vector if necessary.
      */
-    if (n > vcapacity(T)(v)) {
-        vresize(T)(v, n);
+    if (n > vcapacity_cstr(v)) {
+        vresize_cstr(v, n);
     }
 
     sentinel = v->impl.start + n;
     v->impl.finish = v->impl.start;
 
     if (v->ttbl->copy) {
-        while (v->impl.finish != sentinel)  {
+        while (v->impl.finish != sentinel) {
             v->ttbl->copy(v->impl.finish++, &val);
         }
     } else {
-        while (v->impl.finish != sentinel)  {
+        while (v->impl.finish != sentinel) {
             memcpy(v->impl.finish++, &val, v->ttbl->width);
         };
-    } 
+    }
 }
 
 /**
@@ -1077,36 +1034,36 @@ void vassignfill(T)(vector(T) *v, size_t n, T val) {
  *  Elements in this vector will be destroyed,
  *  and replaced with n copies of valaddr.
  * 
- *  If n exceeds that of vcapacity(T)(v),
+ *  If n exceeds that of vcapacity_cstr(v),
  *  the capacity of this vector will be increased to that of size n.
  */
-void vassignfillptr(T)(vector(T) *v, size_t n, T *valaddr) {
-    T *sentinel = NULL;
+void vassignfillptr_cstr(vector_cstr *v, size_t n, cstr *valaddr) {
+    cstr *sentinel = NULL;
 
     /**
      *  Clear the vector. 
      */
-    vclear(T)(v);
+    vclear_cstr(v);
 
     /**
      *  Resize vector if necessary.
      */
-    if (n > vcapacity(T)(v)) {
-        vresize(T)(v, n);
+    if (n > vcapacity_cstr(v)) {
+        vresize_cstr(v, n);
     }
 
     sentinel = v->impl.start + n;
     v->impl.finish = v->impl.start;
 
     if (v->ttbl->copy) {
-        while (v->impl.finish != sentinel)  {
+        while (v->impl.finish != sentinel) {
             v->ttbl->copy(v->impl.finish++, valaddr);
         }
     } else {
-        while (v->impl.finish != sentinel)  {
+        while (v->impl.finish != sentinel) {
             memcpy(v->impl.finish++, valaddr, v->ttbl->width);
         };
-    } 
+    }
 }
 
 /**
@@ -1120,15 +1077,15 @@ void vassignfillptr(T)(vector(T) *v, size_t n, T *valaddr) {
  *  Otherwise, valaddr will be shallow-copied into v
  *  using memcpy.
  */
-void vpushb(T)(vector(T) *v, T val) {
-   massert_container(v);
+void vpushb_cstr(vector_cstr *v, cstr val) {
+   ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)1124, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
     /**
      *  A doubling strategy is employed when the finish pointer
      *  meets the end_of_storage pointer.
      */
     if (v->impl.finish == v->impl.end_of_storage) {
-        vresize(T)(v, vcapacity(T)(v) * 2);
+        vresize_cstr(v, vcapacity_cstr(v) * 2);
     }
 
     if (v->ttbl->copy) {
@@ -1145,7 +1102,7 @@ void vpushb(T)(vector(T) *v, T val) {
 /**
  *  @brief  Appends an element to the rear of the vector
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[in]  valaddr address of element to be copied
  *
  *  If a copy function is defined in v's ttbl,
@@ -1153,16 +1110,16 @@ void vpushb(T)(vector(T) *v, T val) {
  *  Otherwise, valaddr will be shallow-copied into v
  *  using memcpy.
  */
-void vpushbptr(T)(vector(T) *v, T *valaddr) {
-   massert_container(v);
-   massert_ptr(valaddr);
+void vpushbptr_cstr(vector_cstr *v, cstr *valaddr) {
+   ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)1157, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
+   ;if (((valaddr) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "valaddr"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)1158, ("['""valaddr""' was found to be NULL - '""valaddr""' must be nonnull to continue.]")); abort();};;
 
     /**
      *  A doubling strategy is employed when the finish pointer
      *  meets the end_of_storage pointer.
      */
     if (v->impl.finish == v->impl.end_of_storage) {
-        vresize(T)(v, vcapacity(T)(v) * 2);
+        vresize_cstr(v, vcapacity_cstr(v) * 2);
     }
 
     if (v->ttbl->copy) {
@@ -1179,7 +1136,7 @@ void vpushbptr(T)(vector(T) *v, T *valaddr) {
 /**
  *  @brief  Removes element at the rear of the vector
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  If a dtor function is defined in v's ttbl,
  *  the rear element will be destroyed using the dtor function
@@ -1192,8 +1149,8 @@ void vpushbptr(T)(vector(T) *v, T *valaddr) {
  *  dynamically allocated fields become the client's responsibility
  *  if a dtor function is NOT defined within v's ttbl.
  */
-void vpopb(T)(vector(T) *v) {
-    massert_container(v);
+void vpopb_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)1196, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
     if (v->impl.finish == v->impl.start) {
         /* vpopb is a no-op if vector is empty */
@@ -1220,7 +1177,7 @@ void vpopb(T)(vector(T) *v) {
 /**
  *  @brief  Inserts a value into vector at position specified by pos
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[in]  pos     refers to an element within v
  *  @param[in]  valaddr element to insert
  *
@@ -1233,22 +1190,22 @@ void vpopb(T)(vector(T) *v) {
  *  Otherwise, valaddr will be shallow-copied into v
  *  using memcpy.
  */
-iterator vinsert(T)(vector(T) *v, iterator pos, T val) {
-    T *curr = NULL;
+iterator vinsert_cstr(vector_cstr *v, iterator pos, cstr val) {
+    cstr *curr = NULL;
     size_t ipos = 0;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)1240, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
     /**
      *  A doubling strategy is employed when the finish pointer
      *  meets the end_of_storage pointer.
      */
     if (v->impl.finish == v->impl.end_of_storage) {
-        vresize(T)(v, vcapacity(T)(v) * 2);
+        vresize_cstr(v, vcapacity_cstr(v) * 2);
     }
 
     /**
-     *  To insert within indices (0, vsize(T)(v)),
+     *  To insert within indices (0, vsize_cstr(v)),
      *  begin by appending val to the rear of the vector.
      */
     if (v->ttbl->copy) {
@@ -1268,11 +1225,11 @@ iterator vinsert(T)(vector(T) *v, iterator pos, T val) {
     ipos = it_distance(NULL, &pos);
 
     /**
-     *  Use iterator pos to swap elements from [pos, vsize(T)(v))
+     *  Use iterator pos to swap elements from [pos, vsize_cstr(v))
      *  val will resize at the index originally specified by pos
      */
     while ((curr = it_curr(pos)) != v->impl.finish) {
-        vswapaddr(T)(v, curr, v->impl.finish);
+        vswapaddr_cstr(v, curr, v->impl.finish);
         it_incr(&pos);
     }
 
@@ -1280,13 +1237,13 @@ iterator vinsert(T)(vector(T) *v, iterator pos, T val) {
     ++v->impl.finish;
 
     /* returned is an iterator at refers to val's position in v */
-    return it_next_n(vbegin(T)(v), ipos);
+    return it_next_n(vbegin_cstr(v), ipos);
 }
 
 /**
  *  @brief  Inserts a value into vector at position specified by pos
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[in]  pos     refers to an element within v
  *  @param[in]  valaddr address of element to insert
  *
@@ -1299,23 +1256,23 @@ iterator vinsert(T)(vector(T) *v, iterator pos, T val) {
  *  Otherwise, valaddr will be shallow-copied into v
  *  using memcpy.
  */
-iterator vinsertptr(T)(vector(T) *v, iterator pos, T *valaddr) {
-    T *curr = NULL;
+iterator vinsertptr_cstr(vector_cstr *v, iterator pos, cstr *valaddr) {
+    cstr *curr = NULL;
     size_t ipos = 0;
 
-    massert_container(v);
-    massert_ptr(valaddr);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)1306, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
+    ;if (((valaddr) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "valaddr"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)1307, ("['""valaddr""' was found to be NULL - '""valaddr""' must be nonnull to continue.]")); abort();};;
 
     /**
      *  A doubling strategy is employed when the finish pointer
      *  meets the end_of_storage pointer.
      */
     if (v->impl.finish == v->impl.end_of_storage) {
-        vresize(T)(v, vcapacity(T)(v) * 2);
+        vresize_cstr(v, vcapacity_cstr(v) * 2);
     }
 
     /**
-     *  To insert within indices (0, vsize(T)(v)),
+     *  To insert within indices (0, vsize_cstr(v)),
      *  begin by appending valaddr to the rear of the vector.
      */
     if (v->ttbl->copy) {
@@ -1335,11 +1292,11 @@ iterator vinsertptr(T)(vector(T) *v, iterator pos, T *valaddr) {
     ipos = it_distance(NULL, &pos);
 
     /**
-     *  Use iterator pos to swap elements from [pos, vsize(T)(v))
+     *  Use iterator pos to swap elements from [pos, vsize_cstr(v))
      *  val will resize at the index originally specified by pos
      */
     while ((curr = it_curr(pos)) != v->impl.finish) {
-        vswapaddr(T)(v, curr, v->impl.finish);
+        vswapaddr_cstr(v, curr, v->impl.finish);
         it_incr(&pos);
     }
 
@@ -1347,13 +1304,13 @@ iterator vinsertptr(T)(vector(T) *v, iterator pos, T *valaddr) {
     ++v->impl.finish;
 
     /* returned is an iterator at refers to val's position in v */
-    return it_next_n(vbegin(T)(v), ipos);
+    return it_next_n(vbegin_cstr(v), ipos);
 }
 
 /**
  *  @brief  Inserts n copies of val into vector at position specified by pos
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[in]  pos     refers to an element within v
  *  @param[in]  n       quantity of desired copies of valaddr to insert
  *  @param[in]  val     the desired element to fill vector with
@@ -1367,28 +1324,28 @@ iterator vinsertptr(T)(vector(T) *v, iterator pos, T *valaddr) {
  *  using the copy function - this copy function is intended for
  *  deep copies. Otherwise, val will be shallow-copied using memcpy.
  */
-iterator vinsertfill(T)(vector(T) *v, iterator pos, size_t n, T val) {
+iterator vinsertfill_cstr(vector_cstr *v, iterator pos, size_t n, cstr val) {
     size_t ipos = 0;
     size_t old_size = 0;
     size_t old_capacity = 0;
 
-    T *sentinel = NULL;
-    T *right_adj = NULL;
-    T *finish = NULL;
+    cstr *sentinel = NULL;
+    cstr *right_adj = NULL;
+    cstr *finish = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)1379, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    ipos = it_distance(NULL, &pos);      /**< pos's index position */
-    old_size = vsize(T)(v);                /**< v's former size */
-    old_capacity = vcapacity(T)(v);        /**< v's former capacity */
+    ipos = it_distance(NULL, &pos); /**< pos's index position */
+    old_size = vsize_cstr(v); /**< v's former size */
+    old_capacity = vcapacity_cstr(v); /**< v's former capacity */
 
     if ((old_size + n) >= old_capacity) {
         /**
          *  If inserting n elements will equal or exceed that of old_capacity,
          *  vector will be resized to accomodate ((old_capacity + n) * 2) elements.
          */
-        vresize(T)(v, (old_capacity + n) * 2);
-        pos = it_next_n(vbegin(T)(v), ipos);
+        vresize_cstr(v, (old_capacity + n) * 2);
+        pos = it_next_n(vbegin_cstr(v), ipos);
     }
 
     if (n <= 0) {
@@ -1396,8 +1353,8 @@ iterator vinsertfill(T)(vector(T) *v, iterator pos, size_t n, T val) {
         return pos;
     } else if (n == 1) {
         /* if n is 1, redirect to vinsert and return early */
-        vinsert(T)(v, pos, val);
-        return it_next_n(vbegin(T)(v), ipos);
+        vinsert_cstr(v, pos, val);
+        return it_next_n(vbegin_cstr(v), ipos);
     }
 
     if (ipos == old_size - 1 || ipos == old_size) {
@@ -1415,13 +1372,13 @@ iterator vinsertfill(T)(vector(T) *v, iterator pos, size_t n, T val) {
         }
 
         /* since n == back index, return early */
-        return it_next_n(vbegin(T)(v), n);
+        return it_next_n(vbegin_cstr(v), n);
     } else {
         /* decrement finish pointer so it refers to the rear element */
         --v->impl.finish;
 
         /**
-         *  Each element in the range [n, vsize(T)(v)) will be moved n blocks over
+         *  Each element in the range [n, vsize_cstr(v)) will be moved n blocks over
          *  -- starting with the rear element.
          */
 
@@ -1429,7 +1386,7 @@ iterator vinsertfill(T)(vector(T) *v, iterator pos, size_t n, T val) {
          *  sentinel will be set one position behind pos.curr
          *  to account for the new element(s) being inserted
          */
-        sentinel = (T *)(pos.curr) - 1;
+        sentinel = (cstr *)(pos.curr) - 1;
 
         /* new destination address for finish pointer */
         right_adj = v->impl.finish + n;
@@ -1438,12 +1395,12 @@ iterator vinsertfill(T)(vector(T) *v, iterator pos, size_t n, T val) {
         finish = v->impl.finish + (n + 1);
 
         /**
-         *  Elements [n, vsize(T)(v)) are moved over n blocks to the right,
+         *  Elements [n, vsize_cstr(v)) are moved over n blocks to the right,
          *  starting with v->impl.finish.
          *  Loop stops when finish pointer reach sentinel.
          */
         while (v->impl.finish != sentinel) {
-            vswapaddr(T)(v, v->impl.finish--, right_adj--);
+            vswapaddr_cstr(v, v->impl.finish--, right_adj--);
         }
 
         /**
@@ -1458,7 +1415,7 @@ iterator vinsertfill(T)(vector(T) *v, iterator pos, size_t n, T val) {
          *  of the former sentinel value, which was one position behind
          *  pos.curr)
          */
-        ++v->impl.finish; 
+        ++v->impl.finish;
 
         if (v->ttbl->copy) {
             /* deep copy */
@@ -1476,13 +1433,13 @@ iterator vinsertfill(T)(vector(T) *v, iterator pos, size_t n, T val) {
         v->impl.finish = finish;
     }
 
-    return it_next_n(vbegin(T)(v), ipos);
+    return it_next_n(vbegin_cstr(v), ipos);
 }
 
 /**
  *  @brief  Inserts n copies of valaddr into vector at position specified by pos
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[in]  pos     refers to an element within v
  *  @param[in]  n       quantity of desired copies of valaddr to insert
  *  @param[in]  valaddr address of the desired element to fill vector with
@@ -1496,28 +1453,28 @@ iterator vinsertfill(T)(vector(T) *v, iterator pos, size_t n, T val) {
  *  using the copy function - this copy function is intended for
  *  deep copies. Otherwise, valaddr will be shallow-copied using memcpy.
  */
-iterator vinsertfillptr(T)(vector(T) *v, iterator pos, size_t n, T *valaddr) {
+iterator vinsertfillptr_cstr(vector_cstr *v, iterator pos, size_t n, cstr *valaddr) {
     size_t ipos = 0;
     size_t old_size = 0;
     size_t old_capacity = 0;
 
-    T *sentinel = NULL;
-    T *right_adj = NULL;
-    T *finish = NULL;
+    cstr *sentinel = NULL;
+    cstr *right_adj = NULL;
+    cstr *finish = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)1508, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    ipos = it_distance(NULL, &pos);      /**< pos's index position */
-    old_size = vsize(T)(v);                /**< v's former size */
-    old_capacity = vcapacity(T)(v);        /**< v's former capacity */
+    ipos = it_distance(NULL, &pos); /**< pos's index position */
+    old_size = vsize_cstr(v); /**< v's former size */
+    old_capacity = vcapacity_cstr(v); /**< v's former capacity */
 
     if ((old_size + n) >= old_capacity) {
         /**
          *  If inserting n elements will equal or exceed that of old_capacity,
          *  vector will be resized to accomodate ((old_capacity + n) * 2) elements.
          */
-        vresize(T)(v, (old_capacity + n) * 2);
-        pos = it_next_n(vbegin(T)(v), ipos);
+        vresize_cstr(v, (old_capacity + n) * 2);
+        pos = it_next_n(vbegin_cstr(v), ipos);
     }
 
     if (n <= 0) {
@@ -1525,8 +1482,8 @@ iterator vinsertfillptr(T)(vector(T) *v, iterator pos, size_t n, T *valaddr) {
         return pos;
     } else if (n == 1) {
         /* if n is 1, redirect to vinsert and return early */
-        vinsertptr(T)(v, pos, valaddr);
-        return it_next_n(vbegin(T)(v), ipos);
+        vinsertptr_cstr(v, pos, valaddr);
+        return it_next_n(vbegin_cstr(v), ipos);
     }
 
     if (ipos == old_size - 1 || ipos == old_size) {
@@ -1544,13 +1501,13 @@ iterator vinsertfillptr(T)(vector(T) *v, iterator pos, size_t n, T *valaddr) {
         }
 
         /* since n == back index, return early */
-        return it_next_n(vbegin(T)(v), n);
+        return it_next_n(vbegin_cstr(v), n);
     } else {
         /* decrement finish pointer so it refers to the rear element */
         --v->impl.finish;
 
         /**
-         *  Each element in the range [n, vsize(T)(v)) will be moved n blocks over
+         *  Each element in the range [n, vsize_cstr(v)) will be moved n blocks over
          *  -- starting with the rear element.
          */
 
@@ -1558,7 +1515,7 @@ iterator vinsertfillptr(T)(vector(T) *v, iterator pos, size_t n, T *valaddr) {
          *  sentinel will be set one position behind pos.curr
          *  to account for the new element(s) being inserted
          */
-        sentinel = (T *)(pos.curr) - 1;
+        sentinel = (cstr *)(pos.curr) - 1;
 
         /* new destination address for finish pointer */
         right_adj = v->impl.finish + n;
@@ -1567,12 +1524,12 @@ iterator vinsertfillptr(T)(vector(T) *v, iterator pos, size_t n, T *valaddr) {
         finish = v->impl.finish + (n + 1);
 
         /**
-         *  Elements [n, vsize(T)(v)) are moved over n blocks to the right,
+         *  Elements [n, vsize_cstr(v)) are moved over n blocks to the right,
          *  starting with v->impl.finish.
          *  Loop stops when finish pointer reach sentinel.
          */
         while (v->impl.finish != sentinel) {
-            vswapaddr(T)(v, v->impl.finish--, right_adj--);
+            vswapaddr_cstr(v, v->impl.finish--, right_adj--);
         }
 
         /**
@@ -1587,7 +1544,7 @@ iterator vinsertfillptr(T)(vector(T) *v, iterator pos, size_t n, T *valaddr) {
          *  of the former sentinel value, which was one position behind
          *  pos.curr)
          */
-        ++v->impl.finish; 
+        ++v->impl.finish;
 
         if (v->ttbl->copy) {
             /* deep copy */
@@ -1605,13 +1562,13 @@ iterator vinsertfillptr(T)(vector(T) *v, iterator pos, size_t n, T *valaddr) {
         v->impl.finish = finish;
     }
 
-    return it_next_n(vbegin(T)(v), ipos);
+    return it_next_n(vbegin_cstr(v), ipos);
 }
 
 /**
  *  @brief  Inserts elements from [first, last) into v, at position pos
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[in]  pos     refers to an element within v
  *  @param[in]  first   represents the beginning of the range (inclusive)
  *  @param[in]  last    represents the end of the range (exclusive)
@@ -1639,23 +1596,23 @@ iterator vinsertfillptr(T)(vector(T) *v, iterator pos, size_t n, T *valaddr) {
  *  using the copy function -- this function meant for deep copying.
  *  Otherwise, [first, last) will be shallow-copied using memcpy.
  */
-iterator vinsertrnge(T)(vector(T) *v, iterator pos,
+iterator vinsertrnge_cstr(vector_cstr *v, iterator pos,
                         iterator first, iterator last) {
     size_t ipos = 0;
     size_t old_size = 0;
     size_t old_capacity = 0;
     size_t delta = 0;
 
-    T *sentinel = NULL;
-    T *right_adj = NULL;
-    T *finish = NULL;
+    cstr *sentinel = NULL;
+    cstr *right_adj = NULL;
+    cstr *finish = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)1653, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    ipos = it_distance(NULL, &pos);        /**< pos's index position */
-    old_size = vsize(T)(v);                /**< v's former size */
-    old_capacity = vcapacity(T)(v);        /**< v's former capacity */
-    delta = it_distance(&first, &last);    /**< index(last) - index(first) */
+    ipos = it_distance(NULL, &pos); /**< pos's index position */
+    old_size = vsize_cstr(v); /**< v's former size */
+    old_capacity = vcapacity_cstr(v); /**< v's former capacity */
+    delta = it_distance(&first, &last); /**< index(last) - index(first) */
 
     if ((old_size + delta) >= old_capacity) {
         /**
@@ -1663,8 +1620,8 @@ iterator vinsertrnge(T)(vector(T) *v, iterator pos,
          *  old_capacity, vector will be resized to
          *  accommodate ((old_capacity + delta) * 2) elements.
          */
-        vresize(T)(v, (old_capacity + delta) * 2);
-        pos = it_next_n(vbegin(T)(v), ipos);
+        vresize_cstr(v, (old_capacity + delta) * 2);
+        pos = it_next_n(vbegin_cstr(v), ipos);
     }
 
     if (delta <= 0) {
@@ -1672,8 +1629,8 @@ iterator vinsertrnge(T)(vector(T) *v, iterator pos,
         return pos;
     } else if (delta == 1) {
         /* if delta is 1, redirect to vinsert and return early */
-        vinsert(T)(v, pos, *(T *)it_curr(first));
-        return it_next_n(vbegin(T)(v), ipos);
+        vinsert_cstr(v, pos, *(cstr *)it_curr(first));
+        return it_next_n(vbegin_cstr(v), ipos);
     }
 
     if (ipos >= old_size - 1) {
@@ -1693,20 +1650,20 @@ iterator vinsertrnge(T)(vector(T) *v, iterator pos,
         }
 
         /* since n == back index, return early */
-        return it_next_n(vbegin(T)(v), delta);
+        return it_next_n(vbegin_cstr(v), delta);
     } else {
         /* decrement finish pointer so it refers to the rear element */
         --v->impl.finish;
 
         /**
-         *  Each element in the range [n, vsize(T)(v))
+         *  Each element in the range [n, vsize_cstr(v))
          *  will be moved delta blocks over
          *  -- starting with the rear element.
          * 
          *  sentinel will be set one position behind pos.curr
          *  to account for the new element(s) being inserted
          */
-        sentinel = (T *)(pos.curr) - 1;
+        sentinel = (cstr *)(pos.curr) - 1;
 
         /* new destination address for finish pointer */
         right_adj = v->impl.finish + delta;
@@ -1715,12 +1672,12 @@ iterator vinsertrnge(T)(vector(T) *v, iterator pos,
         finish = v->impl.finish + (delta + 1);
 
         /**
-         *  Elements [n, vsize(T)(v)) are moved over delta blocks to the right,
+         *  Elements [n, vsize_cstr(v)) are moved over delta blocks to the right,
          *  starting with v->impl.finish.
          *  Loop stops when finish pointer reaches sentinel
          */
         while (v->impl.finish != sentinel) {
-            vswapaddr(T)(v, v->impl.finish--, right_adj--);
+            vswapaddr_cstr(v, v->impl.finish--, right_adj--);
         }
 
         /**
@@ -1754,13 +1711,13 @@ iterator vinsertrnge(T)(vector(T) *v, iterator pos,
         v->impl.finish = finish;
     }
 
-    return it_next_n(vbegin(T)(v), ipos);
+    return it_next_n(vbegin_cstr(v), ipos);
 }
 
 /**
  *  @brief  Moves valaddr into v, at position pos
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[in]  pos     refers to an element from within vector
  *  @param[out] valaddr address of element to move into v
  *
@@ -1774,11 +1731,11 @@ iterator vinsertrnge(T)(vector(T) *v, iterator pos,
  *  A swap function must be defined in v's typetable in order
  *  to run this function, otherwise a regular insert is performed.
  */
-iterator vinsertmove(T)(vector(T) *v, iterator pos, T *valaddr) {
-    T *dst = NULL;
+iterator vinsertmove_cstr(vector_cstr *v, iterator pos, cstr *valaddr) {
+    cstr *dst = NULL;
 
-    massert_container(v);
-    massert_ptr(valaddr);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)1780, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
+    ;if (((valaddr) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "valaddr"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)1781, ("['""valaddr""' was found to be NULL - '""valaddr""' must be nonnull to continue.]")); abort();};;
 
     if (v->ttbl->swap) {
         /**
@@ -1804,13 +1761,13 @@ iterator vinsertmove(T)(vector(T) *v, iterator pos, T *valaddr) {
         v->ttbl->swap(&dst, valaddr);
     }
 
-    return vinsertptr(T)(v, pos, dst);
+    return vinsertptr_cstr(v, pos, dst);
 }
 
 /**
  *  @brief  Removes an element from v at position pos
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *  @param[in]  pos refers to an element from within vector
  *
  *  @return     iterator representing an element that has replaced the
@@ -1824,17 +1781,17 @@ iterator vinsertmove(T)(vector(T) *v, iterator pos, T *valaddr) {
  *  dynamically allocated fields become the client's responsibility
  *  if a dtor function is NOT defined within v's ttbl.
  */
-iterator verase(T)(vector(T) *v, iterator pos) {
+iterator verase_cstr(vector_cstr *v, iterator pos) {
     int ipos = 0;
     size_t back_index = 0;
 
-    T *curr = NULL;
-    T *sentinel = NULL;
+    cstr *curr = NULL;
+    cstr *sentinel = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)1834, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
     ipos = it_distance(NULL, &pos);
-    back_index = vsize(T)(v) - 1;
+    back_index = vsize_cstr(v) - 1;
 
     if ((ipos < 0) || (ipos >= back_index + 1)) {
         /**
@@ -1848,14 +1805,14 @@ iterator verase(T)(vector(T) *v, iterator pos) {
          *  or pos refers to rear vector element,
          *  redirect to popb and return early
          */
-        vpopb(T)(v);
+        vpopb_cstr(v);
 
         /**
          *  pos will no longer refer to an existing element,
          *  so an iterator is returned referring to an element
          *  at the erased element's former index
          */
-        return it_next_n(vbegin(T)(v), ipos);
+        return it_next_n(vbegin_cstr(v), ipos);
     } else if (ipos < back_index && ipos >= 0) {
         if (v->ttbl->dtor) {
             /* If elements were deep copied, release their memory */
@@ -1877,7 +1834,7 @@ iterator verase(T)(vector(T) *v, iterator pos) {
              *  to the left. this process continues until
              *  it_curr(pos) equals v->impl.finish.
              */
-            vswapaddr(T)(v, curr, it_curr(it_next(pos)));
+            vswapaddr_cstr(v, curr, it_curr(it_next(pos)));
             it_incr(&pos);
         }
 
@@ -1890,13 +1847,13 @@ iterator verase(T)(vector(T) *v, iterator pos) {
      *  so an iterator is returned referring to an element
      *  at the erased element's former index
      */
-    return it_next_n(vbegin(T)(v), ipos);
+    return it_next_n(vbegin_cstr(v), ipos);
 }
 
 /**
  *  @brief  Removes elements from v ranging from [pos, last)
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[in]  pos     refers to element from within vector
  *  @param[in]  last    refers to element from within vector
  *
@@ -1911,25 +1868,25 @@ iterator verase(T)(vector(T) *v, iterator pos) {
  *  dynamically allocated fields become the client's responsibility
  *  if a dtor function is NOT defined within v's ttbl.
  */
-iterator verasernge(T)(vector(T) *v, iterator pos, iterator last) {
+iterator verasernge_cstr(vector_cstr *v, iterator pos, iterator last) {
     int ipos = 0;
     int delta = 0;
 
     size_t back_index = 0;
 
-    T *curr = NULL;
-    T *sentinel = NULL;
+    cstr *curr = NULL;
+    cstr *sentinel = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)1923, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    ipos = it_distance(NULL, &pos);     /**< index of pos */
-    delta = it_distance(&pos, &last);   /**< diff between pos/last */
+    ipos = it_distance(NULL, &pos); /**< index of pos */
+    delta = it_distance(&pos, &last); /**< diff between pos/last */
 
-    back_index = vsize(T)(v) - 1;
+    back_index = vsize_cstr(v) - 1;
 
     if ((ipos < 0) || (ipos >= back_index + 1)) {
         /**
-         *  If ipos is negative or ipos is greater than or equal to vsize(T)(v),
+         *  If ipos is negative or ipos is greater than or equal to vsize_cstr(v),
          *  no-op
          */
         return pos;
@@ -1939,14 +1896,14 @@ iterator verasernge(T)(vector(T) *v, iterator pos, iterator last) {
          *  or pos refers to rear vector element,
          *  redirect to popb and return early
          */
-        vpopb(T)(v);
+        vpopb_cstr(v);
 
         /**
          *  pos will no longer refer to an existing element,
          *  so an iterator is returned referring to an element
          *  at the erased element's former index
          */
-        return it_next_n(vbegin(T)(v), ipos);
+        return it_next_n(vbegin_cstr(v), ipos);
     } else if (ipos < back_index && ipos >= 0) {
         curr = NULL;
         sentinel = it_curr(last);
@@ -1960,7 +1917,7 @@ iterator verasernge(T)(vector(T) *v, iterator pos, iterator last) {
         }
 
         /* restoring pos to its original index */
-        pos = it_next_n(vbegin(T)(v), ipos);
+        pos = it_next_n(vbegin_cstr(v), ipos);
 
         /* reassigning sentinel to one block past the last elem */
         sentinel = v->impl.finish;
@@ -1971,7 +1928,7 @@ iterator verasernge(T)(vector(T) *v, iterator pos, iterator last) {
          *  until last reaches the end of the vector.
          */
         while ((curr = it_curr(last)) != sentinel) {
-            vswapaddr(T)(v, curr, it_curr(pos));
+            vswapaddr_cstr(v, curr, it_curr(pos));
 
             it_incr(&pos);
             it_incr(&last);
@@ -1989,7 +1946,7 @@ iterator verasernge(T)(vector(T) *v, iterator pos, iterator last) {
      *  so an iterator is returned referring to an element
      *  at the beginning of the erased element's former range
      */
-    return it_next_n(vbegin(T)(v), ipos);
+    return it_next_n(vbegin_cstr(v), ipos);
 }
 
 /**
@@ -1998,11 +1955,11 @@ iterator verasernge(T)(vector(T) *v, iterator pos, iterator last) {
  *  @param[out] v       address of pointer to vector
  *  @param[out] other   address of pointer to vector
  */
-void vswap(T)(vector(T) **v, vector(T) * *other) {
-    vector(T) *temp = NULL;
+void vswap_cstr(vector_cstr **v, vector_cstr * *other) {
+    vector_cstr *temp = NULL;
 
-    massert_container((*v));
-    massert_container((*other));
+    ;if ((((*v)) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "(*v)"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2004, ("['""(*v)""' was found to be NULL - '""(*v)""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
+    ;if ((((*other)) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "(*other)"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2005, ("['""(*other)""' was found to be NULL - '""(*other)""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
     temp = (*v);
 
@@ -2024,15 +1981,15 @@ void vswap(T)(vector(T) **v, vector(T) * *other) {
 /**
  *  @brief  Destroys elements from within v
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  Memory management of dynamically allocated elements
  *  and/or elements with dynamically allocated fields
  *  become the client's responsibility if a dtor function
  *  is NOT defined within v's ttbl.
  */
-void vclear(T)(vector(T) *v) {
-    massert_container(v);
+void vclear_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2035, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
     if (v->impl.finish == v->impl.start) {
         /**
@@ -2058,7 +2015,7 @@ void vclear(T)(vector(T) *v) {
         }
 
         v->ttbl->dtor(v->impl.finish);
-        bzero(v->impl.start, vsize(T)(v));
+        bzero(v->impl.start, vsize_cstr(v));
         /* v->impl.finish is already at v->impl.start. */
     } else {
         /**
@@ -2066,7 +2023,7 @@ void vclear(T)(vector(T) *v) {
          *  (no dtor function specified in ttbl) --
          *  we just memset and reset the finish pointer.
          */
-        bzero(v->impl.start, vsize(T)(v));
+        bzero(v->impl.start, vsize_cstr(v));
         v->impl.finish = v->impl.start;
     }
 }
@@ -2074,7 +2031,7 @@ void vclear(T)(vector(T) *v) {
 /**
  *  @brief  Inserts a value into vector at position specified by index
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[in]  index   numerical index of element from within v
  *  @param[in]  val     element to insert
  *
@@ -2083,19 +2040,19 @@ void vclear(T)(vector(T) *v) {
  *  Otherwise, val will be shallow-copied into v
  *  using memcpy.
  */
-void vinsertat(T)(vector(T) *v, size_t index, T val) {
+void vinsertat_cstr(vector_cstr *v, size_t index, cstr val) {
     size_t size = 0;
 
-    T *curr = NULL;
+    cstr *curr = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2091, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    size = vsize(T)(v);
+    size = vsize_cstr(v);
 
     if (index >= size) {
         char str[256];
         sprintf(str, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
-        ERROR(__FILE__, str);
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2098, str);
         return;
     }
 
@@ -2104,11 +2061,11 @@ void vinsertat(T)(vector(T) *v, size_t index, T val) {
      *  meets the end_of_storage pointer.
      */
     if (v->impl.finish == v->impl.end_of_storage) {
-        vresize(T)(v, vcapacity(T)(v) * 2);
+        vresize_cstr(v, vcapacity_cstr(v) * 2);
     }
 
     /**
-     *  To insert within indices (0, vsize(T)(v)),
+     *  To insert within indices (0, vsize_cstr(v)),
      *  begin by appending val to the rear of the vector.
      */
 
@@ -2124,13 +2081,13 @@ void vinsertat(T)(vector(T) *v, size_t index, T val) {
      *  All of the above was code for pushb,
      *  but incrementing the finish pointer was omitted.
      * 
-     *  Use index to swap elements from [index, vsize(T)(v))
+     *  Use index to swap elements from [index, vsize_cstr(v))
      *  val will reside at the index originally specified by
      *  index.
      */
     curr = v->impl.start + index;
     while (curr != v->impl.finish) {
-        vswapaddr(T)(v, curr++, v->impl.finish);
+        vswapaddr_cstr(v, curr++, v->impl.finish);
     }
 
     /* restore finish pointer to address of rear element */
@@ -2140,7 +2097,7 @@ void vinsertat(T)(vector(T) *v, size_t index, T val) {
 /**
  *  @brief  Inserts a value into vector at position specified by index
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[in]  index   numerical index of element from within v
  *  @param[in]  valaddr address of element to insert
  *
@@ -2149,20 +2106,20 @@ void vinsertat(T)(vector(T) *v, size_t index, T val) {
  *  Otherwise, valaddr will be shallow-copied into v
  *  using memcpy.
  */
-void vinsertatptr(T)(vector(T) *v, size_t index, T *valaddr) {
+void vinsertatptr_cstr(vector_cstr *v, size_t index, cstr *valaddr) {
     size_t size = 0;
 
-    T *curr = NULL;
+    cstr *curr = NULL;
 
-    massert_container(v);
-    massert_ptr(valaddr);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2157, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
+    ;if (((valaddr) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "valaddr"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2158, ("['""valaddr""' was found to be NULL - '""valaddr""' must be nonnull to continue.]")); abort();};;
 
-    size = vsize(T)(v);
+    size = vsize_cstr(v);
 
     if (index >= size) {
         char str[256];
         sprintf(str, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
-        ERROR(__FILE__, str);
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2165, str);
         return;
     }
 
@@ -2171,11 +2128,11 @@ void vinsertatptr(T)(vector(T) *v, size_t index, T *valaddr) {
      *  meets the end_of_storage pointer.
      */
     if (v->impl.finish == v->impl.end_of_storage) {
-        vresize(T)(v, vcapacity(T)(v) * 2);
+        vresize_cstr(v, vcapacity_cstr(v) * 2);
     }
 
     /**
-     *  To insert within indices (0, vsize(T)(v)),
+     *  To insert within indices (0, vsize_cstr(v)),
      *  begin by appending valaddr to the rear of the vector.
      */
 
@@ -2191,13 +2148,13 @@ void vinsertatptr(T)(vector(T) *v, size_t index, T *valaddr) {
      *  All of the above was code for pushb,
      *  but incrementing the finish pointer was omitted.
      * 
-     *  Use index to swap elements from [index, vsize(T)(v))
+     *  Use index to swap elements from [index, vsize_cstr(v))
      *  val will reside at the index originally specified by
      *  index.
      */
     curr = v->impl.start + index;
     while (curr != v->impl.finish) {
-        vswapaddr(T)(v, curr++, v->impl.finish);
+        vswapaddr_cstr(v, curr++, v->impl.finish);
     }
 
     /* restore finish pointer to address of rear element */
@@ -2207,7 +2164,7 @@ void vinsertatptr(T)(vector(T) *v, size_t index, T *valaddr) {
 /**
  *  @brief  Removes an element from v at position pos
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[in]  index   numerical index of element from within v
  *
  *  If a dtor function is defined in v's ttbl,
@@ -2218,30 +2175,30 @@ void vinsertatptr(T)(vector(T) *v, size_t index, T *valaddr) {
  *  dynamically allocated fields become the client's responsibility
  *  if a dtor function is NOT defined within v's ttbl.
  */
-void veraseat(T)(vector(T) *v, size_t index) {
+void veraseat_cstr(vector_cstr *v, size_t index) {
     size_t size = 0;
     size_t back_index = 0;
 
-    T *curr = NULL;
-    T *next = NULL;
-    T *sentinel = NULL;
+    cstr *curr = NULL;
+    cstr *next = NULL;
+    cstr *sentinel = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2229, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    size = vsize(T)(v);
+    size = vsize_cstr(v);
 
     if (index >= size) {
         char str[256];
         sprintf(str, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
-        ERROR(__FILE__, str);
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2236, str);
         return;
     }
 
     back_index = size - 1;
 
-    curr = v->impl.start + index;   /* element at index */
-    next = index <= vcapacity(T)(v) ? (curr + 1) : NULL;    /* elem adj to curr */
-    sentinel = v->impl.finish;                                    /* one block after last elem */
+    curr = v->impl.start + index; /* element at index */
+    next = index <= vcapacity_cstr(v) ? (curr + 1) : NULL; /* elem adj to curr */
+    sentinel = v->impl.finish; /* one block after last elem */
 
     if (index == back_index || curr == (v->impl.finish - 1)) {
         /**
@@ -2249,7 +2206,7 @@ void veraseat(T)(vector(T) *v, size_t index) {
          *  or pos refers to rear vector element,
          *  redirect to popb and return early
          */
-        vpopb(T)(v);
+        vpopb_cstr(v);
         return;
     } else if (index < back_index && index >= 0) {
         if (v->ttbl->dtor) {
@@ -2263,7 +2220,7 @@ void veraseat(T)(vector(T) *v, size_t index) {
              *  one element to the left. This process continues
              *  until next equals v->impl.finish.
              */
-            vswapaddr(T)(v, curr++, next++);
+            vswapaddr_cstr(v, curr++, next++);
         }
 
         /* decrementing the finish pointer 1 block to the left */
@@ -2293,19 +2250,19 @@ void veraseat(T)(vector(T) *v, size_t index) {
  *  Otherwise, val will be shallow-copied into v
  *  using memcpy.
  */
-void vreplaceat(T)(vector(T) *v, size_t index, T val) {
+void vreplaceat_cstr(vector_cstr *v, size_t index, cstr val) {
     size_t size = 0;
 
-    T *curr = NULL;
+    cstr *curr = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2301, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    size = vsize(T)(v);
+    size = vsize_cstr(v);
 
     if (index >= size) {
         char str[256];
         sprintf(str, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
-        ERROR(__FILE__, str);
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2308, str);
         return;
     }
 
@@ -2347,19 +2304,19 @@ void vreplaceat(T)(vector(T) *v, size_t index, T val) {
  *  Otherwise, valaddr will be shallow-copied into v
  *  using memcpy.
  */
-void vreplaceatptr(T)(vector(T) *v, size_t index, T *valaddr) {
+void vreplaceatptr_cstr(vector_cstr *v, size_t index, cstr *valaddr) {
     size_t size = 0;
 
-    T *curr = NULL;
+    cstr *curr = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2355, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    size = vsize(T)(v);
+    size = vsize_cstr(v);
 
     if (index >= size) {
         char str[256];
         sprintf(str, "index provided [%lu] is out of bounds. size of vector is %lu.", index, size);
-        ERROR(__FILE__, str);
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2362, str);
         return;
     }
 
@@ -2382,26 +2339,26 @@ void vreplaceatptr(T)(vector(T) *v, size_t index, T *valaddr) {
 /**
  *  @brief  Swap two elements from within v
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *  @param[in]  n1  index of first element
  *  @param[in]  n2  index of second element
  */
-void vswapelem(T)(vector(T) *v, size_t n1, size_t n2) {
+void vswapelem_cstr(vector_cstr *v, size_t n1, size_t n2) {
     size_t size = 0;
     size_t capacity = 0;
 
-    bool n1_bad = false;
-    bool n2_bad = false;
-    bool good_indices = false;
+    bool n1_bad = 0;
+    bool n2_bad = 0;
+    bool good_indices = 0;
 
-    T *temp = NULL;
-    T *data_1 = NULL;
-    T *data_2 = NULL;
+    cstr *temp = NULL;
+    cstr *data_1 = NULL;
+    cstr *data_2 = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2401, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    size = vsize(T)(v);
-    capacity = vcapacity(T)(v);
+    size = vsize_cstr(v);
+    capacity = vcapacity_cstr(v);
 
     n1_bad = n1 >= size || n1 >= capacity;
     n2_bad = n2 >= size || n2 >= capacity;
@@ -2416,7 +2373,7 @@ void vswapelem(T)(vector(T) *v, size_t n1, size_t n2) {
             v->ttbl->swap(data_1, data_2);
         } else {
             temp = malloc(v->ttbl->width);
-            massert_ptr(temp);
+            ;if (((temp) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "temp"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2419, ("['""temp""' was found to be NULL - '""temp""' must be nonnull to continue.]")); abort();};;
             memcpy(temp, data_1, v->ttbl->width);
 
             memcpy(data_1, data_2, v->ttbl->width);
@@ -2428,7 +2385,7 @@ void vswapelem(T)(vector(T) *v, size_t n1, size_t n2) {
     } else {
         char str[256];
         sprintf(str, "indices n1 [%lu] and/or n2 [%lu] are out of bounds.", n1, n2);
-        ERROR(__FILE__, str);
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2431, str);
         return;
     }
 }
@@ -2450,24 +2407,24 @@ void vswapelem(T)(vector(T) *v, size_t n1, size_t n2) {
  *  dynamically allocated fields become the client's responsibility
  *  if a dtor function is NOT defined within v's ttbl.
  */
-void vremove(T)(vector(T) *v, T val) {
+void vremove_cstr(vector_cstr *v, cstr val) {
     size_t i = 0;
     size_t size = 0;
 
-    T *curr = NULL;
+    cstr *curr = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2459, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
     if (v->impl.start == v->impl.finish) {
         return;
     }
 
     i = 0;
-    size = vsize(T)(v);
+    size = vsize_cstr(v);
     curr = v->impl.start;
 
     if (v->ttbl->compare(curr, &val) == 0) {
-        veraseat(T)(v, i);
+        veraseat_cstr(v, i);
         --size;
         ++curr;
     }
@@ -2475,7 +2432,7 @@ void vremove(T)(vector(T) *v, T val) {
     for (i = 1; i < size; i++) {
         if (v->ttbl->compare(curr, &val) == 0) {
             --curr;
-            veraseat(T)(v, i--);
+            veraseat_cstr(v, i--);
             --size;
         }
 
@@ -2492,31 +2449,31 @@ void vremove(T)(vector(T) *v, T val) {
  *  For all elements e in v, if unary_predicate(e) == true,
  *  it will be removed.
  */
-void vremoveif(T)(vector(T) *v, bool (*unary_predicate)(const void *)) {
+void vremoveif_cstr(vector_cstr *v, bool (*unary_predicate)(const void *)) {
     size_t i = 0;
     size_t size = 0;
 
-    T *curr = NULL;
+    cstr *curr = NULL;
 
-    massert_container(v);
-    massert_pfunc(unary_predicate);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2501, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
+    ;if (((unary_predicate) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "unary_predicate"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2502, ("['""unary_predicate""' was found to be NULL - '""unary_predicate""' must be assigned to a function with a matching prototype.]")); abort();};;
 
     if (v->impl.start == v->impl.finish) {
         return;
     }
 
     i = 0;
-    size = vsize(T)(v);
+    size = vsize_cstr(v);
     curr = v->impl.start;
 
-    if (unary_predicate(curr) == true) {
-        veraseat(T)(v, i);
+    if (unary_predicate(curr) == 1) {
+        veraseat_cstr(v, i);
         --size;
         ++curr;
     }
 
     for (i = 1; i < size; i++) {
-        if (unary_predicate(curr) == true) {
+        if (unary_predicate(curr) == 1) {
             --curr;
             v_erase_at(v, i--);
             --size;
@@ -2529,24 +2486,24 @@ void vremoveif(T)(vector(T) *v, bool (*unary_predicate)(const void *)) {
 /**
  *  @brief  Append the contents of other to the rear of v
  *
- *  @param[in]  v       pointer to vector(T)
- *  @param[in]  other   pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
+ *  @param[in]  other   pointer to vector_cstr
  *
- *  @return     pointer to vector(T) with other's elements appended
+ *  @return     pointer to vector_cstr with other's elements appended
  *
- *  The merging of vector(T) v and vector(T) other does not mutate other.
+ *  The merging of vector_cstr v and vector_cstr other does not mutate other.
  */
-vector(T) *vmerge(T)(vector(T) *v, vector(T) * other) {
+vector_cstr *vmerge_cstr(vector_cstr *v, vector_cstr * other) {
     size_t size_other = 0;
     size_t capacity_v = 0;
 
-    T *sentinel = NULL;
+    cstr *sentinel = NULL;
 
-    massert_container(v);
-    massert_ptr(other);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2545, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
+    ;if (((other) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "other"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2546, ("['""other""' was found to be NULL - '""other""' must be nonnull to continue.]")); abort();};;
 
-    size_other = vsize(T)(v);
-    capacity_v = vcapacity(T)(v);
+    size_other = vsize_cstr(v);
+    capacity_v = vcapacity_cstr(v);
 
     if (size_other >= capacity_v) {
         /**
@@ -2554,7 +2511,7 @@ vector(T) *vmerge(T)(vector(T) *v, vector(T) * other) {
          *  will exceed that of v's capacity,
          *  resize v
          */
-        vresize(T)(v, capacity_v * 2);
+        vresize_cstr(v, capacity_v * 2);
     }
 
     sentinel = other->impl.finish;
@@ -2600,11 +2557,11 @@ vector(T) *vmerge(T)(vector(T) *v, vector(T) * other) {
  *
  *  @param[in]  v   pointer to vector
  */
-void vreverse(T)(vector(T) *v) {
-    T *back = NULL;
-    T *restore = NULL;
+void vreverse_cstr(vector_cstr *v) {
+    cstr *back = NULL;
+    cstr *restore = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2607, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
     back = v->impl.finish - 1;
 
@@ -2617,7 +2574,7 @@ void vreverse(T)(vector(T) *v) {
 
     while (v->impl.finish != back) {
         /* swap addresses at finish and back */
-        vswapaddr(T)(v, v->impl.finish++, back--);
+        vswapaddr_cstr(v, v->impl.finish++, back--);
 
         /**
          *  Increment finish, decrement back --
@@ -2633,22 +2590,22 @@ void vreverse(T)(vector(T) *v) {
 }
 
 /**
- *  @brief  Returns a new vector(T) with the contents of base
+ *  @brief  Returns a new vector_cstr with the contents of base
  *
  *  @param[in]  ttbl    typetable matching that of bases's element type
  *  @param[in]  base    base address of an array to copy
  *  @param[in]  length  logical length of base
  *
- *  @return     pointer to vector(T) with contents of base
+ *  @return     pointer to vector_cstr with contents of base
  */
-vector(T) *varrtov(T)(T *base, size_t length) {
-    vector(T) *v = NULL;
+vector_cstr *varrtov_cstr(cstr *base, size_t length) {
+    vector_cstr *v = NULL;
 
-    T *target = NULL;
+    cstr *target = NULL;
 
-    massert_ptr(base);
+    ;if (((base) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "base"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2649, ("['""base""' was found to be NULL - '""base""' must be nonnull to continue.]")); abort();};;
 
-    v = vnewr(T)(length);
+    v = vnewr_cstr(length);
 
     target = base;
 
@@ -2686,19 +2643,19 @@ vector(T) *varrtov(T)(T *base, size_t length) {
  *  Since this vector will be using a pre-existing pointer,
  *  be careful and pay special attention to the management of its memory.
  */
-vector(T) *vptrtov(T)(T *base, size_t length, size_t capacity) {
-    vector(T) *v = NULL;
+vector_cstr *vptrtov_cstr(cstr *base, size_t length, size_t capacity) {
+    vector_cstr *v = NULL;
 
-    massert_ptr(base);
+    ;if (((base) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "base"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2692, ("['""base""' was found to be NULL - '""base""' must be nonnull to continue.]")); abort();};;
 
-    v = vallocate(T)();
+    v = vallocate_cstr();
 
     /**
      *  An appropriate typetable will be chosen that matches
      *  that of the type T for base.
      */
-    v->ttbl = vector_type_table_ptr_id(T)
-    ? vector_type_table_ptr_id(T) : _void_ptr_;
+    v->ttbl = _cstr_
+    ? _cstr_ : _void_ptr_;
 
     if (v->ttbl != _void_ptr_) {
         v->ttbl->compare = v->ttbl->compare ? v->ttbl->compare : NULL;
@@ -2708,7 +2665,7 @@ vector(T) *vptrtov(T)(T *base, size_t length, size_t capacity) {
     }
 
     if (capacity <= 0) {
-        WARNING(__FILE__, "Provided input capacity was less than or equal to 0. This may result in undefined behavior.");
+        ulog(stderr, "[WARNING]", "src/vector_tmpl.c", __func__, (long int)2711, "Provided input capacity was less than or equal to 0. This may result in undefined behavior.");
     }
 
     v->impl.start = base;
@@ -2721,17 +2678,17 @@ vector(T) *vptrtov(T)(T *base, size_t length, size_t capacity) {
 /**
  *  @brief  Performs a linear search to find val using the ttbl->compare function
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[in]  val     a copy of an element to find
  */
-int vsearch(T)(vector(T) *v, T val) {
+int vsearch_cstr(vector_cstr *v, cstr val) {
     int (*comparator)(const void *, const void *) = NULL;
 
-    T *curr = NULL;
-    bool found = false;
+    cstr *curr = NULL;
+    bool found = 0;
     int result = 0;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2734, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
     comparator = v->ttbl->compare ? v->ttbl->compare : void_ptr_compare;
     curr = v->impl.start;
@@ -2739,7 +2696,7 @@ int vsearch(T)(vector(T) *v, T val) {
     /* standard linear search of val using comparator */
     while (curr != v->impl.finish) {
         if (comparator(curr, &val) == 0) {
-            found = true;
+            found = 1;
             break;
         }
 
@@ -2754,22 +2711,22 @@ int vsearch(T)(vector(T) *v, T val) {
 /**
  *  @brief  Sorts the contents of v using ttbl->compare
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  */
-void vsort(T)(vector(T) *v) {
+void vsort_cstr(vector_cstr *v) {
     size_t size = 0;
     int (*comparator)(const void *, const void *) = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2763, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    size = vsize(T)(v);
+    size = vsize_cstr(v);
 
     if (size < 2) {
         /* why sort a data structure if size < 2? */
         return;
     }
 
-    comparator = v->ttbl->compare 
+    comparator = v->ttbl->compare
     ? v->ttbl->compare : void_ptr_compare;
 
     /* cstdlib qsort (best performance) */
@@ -2783,40 +2740,40 @@ void vsort(T)(vector(T) *v) {
 }
 
 /**
- *  @brief  Prints a diagnostic of vector(T) to stdout
+ *  @brief  Prints a diagnostic of vector_cstr to stdout
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  */
-void vputs(T)(vector(T) *v) {
+void vputs_cstr(vector_cstr *v) {
     /* redirect to vfputs with stream stdout */
-    vfputs(T)(v, stdout);
+    vfputs_cstr(v, stdout);
 }
 
 /**
- *  @brief  Prints the contents of vector(T) with user-defined formatting
+ *  @brief  Prints the contents of vector_cstr with user-defined formatting
  *
- *  @param[in]  v           pointer to vector(T)
+ *  @param[in]  v           pointer to vector_cstr
  *  @param[in]  before      string that appears before any elements appear
  *  @param[in]  after       string that appears after all the elements have appeared
  *  @param[in]  postelem    string that appears after each element, except the last one
  *  @param[in]  breaklim    amount of elements that print before a line break occurs.
  *                          0 means no line breaks
  */
-void vputsf(T)(vector(T) *v, const char *before, const char *after,
+void vputsf_cstr(vector_cstr *v, const char *before, const char *after,
                const char *postelem, const char *empty, size_t breaklim) {
     /* redirect to vfputsf with stream stdout */
-    vfputsf(T)(v, stdout, before, after, postelem, empty, breaklim);
+    vfputsf_cstr(v, stdout, before, after, postelem, empty, breaklim);
 }
 
 /**
- *  @brief  Prints a diagnostic of vector(T) to file stream dest
+ *  @brief  Prints a diagnostic of vector_cstr to file stream dest
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[in]  dest    file stream (e.g stdout, stderr, a file)
  */
-void vfputs(T)(vector(T) *v, FILE *dest) {
-    char buffer1[MAXIMUM_STACK_BUFFER_SIZE];
-    char buffer2[MAXIMUM_STACK_BUFFER_SIZE];
+void vfputs_cstr(vector_cstr *v, FILE *dest) {
+    char buffer1[16384];
+    char buffer2[16384];
 
     const char *link = "------------------------------";
     const char *bytes_label = NULL;
@@ -2825,25 +2782,25 @@ void vfputs(T)(vector(T) *v, FILE *dest) {
 
     const size_t breaklim = 1;
 
-    massert_container(v);
-    massert_ptr(dest);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2828, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
+    ;if (((dest) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "dest"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2829, ("['""dest""' was found to be NULL - '""dest""' must be nonnull to continue.]")); abort();};;
 
     sprintf(buffer1, "\n%s\n%s\n%s\n", link, "Elements", link);
 
     bytes_label = v->ttbl->width == 1 ? "byte" : "bytes";
 
     sprintf(buffer2, "%s\n%s\t\t%lu\n%s\t%lu\n%s\t%lu %s\n%s\n", link, "Size",
-            vsize(T)(v), "Capacity", vcapacity(T)(v), "Element size", v->ttbl->width,
+            vsize_cstr(v), "Capacity", vcapacity_cstr(v), "Element size", v->ttbl->width,
             bytes_label, link);
 
-    vfputsf(T)(v, dest, buffer1, buffer2, postelem, empty, breaklim);
+    vfputsf_cstr(v, dest, buffer1, buffer2, postelem, empty, breaklim);
 }
 
 /**
- *  @brief  Prints the contents of vector(T) with user-defined formatting,
+ *  @brief  Prints the contents of vector_cstr with user-defined formatting,
  *          to file stream dest
  *
- *  @param[in]  v           pointer to vector(T)
+ *  @param[in]  v           pointer to vector_cstr
  *  @param[in]  dest        file stream (e.g. stdout, stderr, a file)
  *  @param[in]  before      string that appears before any elements appear
  *  @param[in]  after       string that appears after all the elements have appeared
@@ -2851,7 +2808,7 @@ void vfputs(T)(vector(T) *v, FILE *dest) {
  *  @param[in]  breaklim    amount of elements that print before a line break occurs.
  *                          0 means no line breaks
  */
-void vfputsf(T)(vector(T) *v, FILE *dest, const char *before,
+void vfputsf_cstr(vector_cstr *v, FILE *dest, const char *before,
                 const char *after, const char *postelem, const char *empty,
                 size_t breaklim) {
     void (*print)(const void *, FILE *dest) = NULL;
@@ -2860,16 +2817,16 @@ void vfputsf(T)(vector(T) *v, FILE *dest, const char *before,
     size_t i = 0;
     size_t curr = 0;
 
-    T *target = NULL;
+    cstr *target = NULL;
 
-    massert_container(v);
-    massert_ptr(dest);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2865, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
+    ;if (((dest) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "dest"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2866, ("['""dest""' was found to be NULL - '""dest""' must be nonnull to continue.]")); abort();};;
 
     fprintf(dest, "%s", before ? before : "");
 
     print = v->ttbl->print ? v->ttbl->print : void_ptr_print;
 
-    size = vsize(T)(v);
+    size = vsize_cstr(v);
 
     if (size == 0) {
         fprintf(dest, "%s\n", empty ? empty : "");
@@ -2880,7 +2837,7 @@ void vfputsf(T)(vector(T) *v, FILE *dest, const char *before,
             print(target, dest);
 
             /* address - disable for release */
-            fprintf(dest, "\t\t(%s%p%s)", KCYN, (void *)(target), KNRM);
+            fprintf(dest, "\t\t(%s%p%s)", "\x1B[0;36m" /**< cyan */, (void *)(target), "\x1B[0;0m" /**< reset to standard color/weight */);
 
             if (i < size - 1) {
                 fprintf(dest, "%s", postelem ? postelem : "");
@@ -2901,21 +2858,21 @@ void vfputsf(T)(vector(T) *v, FILE *dest, const char *before,
 /**
  *  @brief  Wrapper function for a struct typetable
  *
- *  @param[in]  arg     address of a vector(T) pointer
- *  @param[in]  other   address of a vector(T) pointer
+ *  @param[in]  arg     address of a vector_cstr pointer
+ *  @param[in]  other   address of a vector_cstr pointer
  *
- *  @return     a pointer to vector(T)
+ *  @return     a pointer to vector_cstr
  */
-void *tmpl_vector_copy(T)(void *arg, const void *other) {
-    vector(T) **dest = NULL;
-    vector(T) **source = NULL;
+void *tmpl_vector_copy_cstr(void *arg, const void *other) {
+    vector_cstr **dest = NULL;
+    vector_cstr **source = NULL;
 
-    massert_ptr(other);
+    ;if (((other) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "other"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2913, ("['""other""' was found to be NULL - '""other""' must be nonnull to continue.]")); abort();};;
 
-    dest = (vector(T) **)(arg);
-    source = (vector(T) **)(other);
+    dest = (vector_cstr **)(arg);
+    source = (vector_cstr **)(other);
 
-    (*dest) = vnewcopy(T)((*source));
+    (*dest) = vnewcopy_cstr((*source));
 
     return (*dest);
 }
@@ -2923,29 +2880,29 @@ void *tmpl_vector_copy(T)(void *arg, const void *other) {
 /**
  *  @brief  Wrapper function for a struct typetable
  *
- *  @param[in]  arg     address of a vector(T) pointer
+ *  @param[in]  arg     address of a vector_cstr pointer
  */
-void tmpl_vector_dtor(T)(void *arg) {
-    vector(T) **v = NULL;
-    
-    massert_ptr(arg);
+void tmpl_vector_dtor_cstr(void *arg) {
+    vector_cstr **v = NULL;
 
-    v = (vector(T) **)(arg);
-    vdelete(T)(v);
+    ;if (((arg) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "arg"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2931, ("['""arg""' was found to be NULL - '""arg""' must be nonnull to continue.]")); abort();};;
+
+    v = (vector_cstr **)(arg);
+    vdelete_cstr(v);
 }
 
 /**
  *  @brief  Wrapper function for a struct typetable
  *
- *  @param[in]  s1  address of a vector(T) pointer
- *  @param[in]  s2  address of a vector(T) pointer
+ *  @param[in]  s1  address of a vector_cstr pointer
+ *  @param[in]  s2  address of a vector_cstr pointer
  */
-void tmpl_vector_swap(T)(void *s1, void *s2) {
-    vector(T) **v1 = (vector(T) **)(s1);
-    vector(T) **v2 = (vector(T) **)(s2);
+void tmpl_vector_swap_cstr(void *s1, void *s2) {
+    vector_cstr **v1 = (vector_cstr **)(s1);
+    vector_cstr **v2 = (vector_cstr **)(s2);
 
     if ((*v1)) {
-        vswap(T)(v1, v2);
+        vswap_cstr(v1, v2);
     } else {
         (*v1) = (*v2);
         (*v2) = NULL;
@@ -2955,49 +2912,49 @@ void tmpl_vector_swap(T)(void *s1, void *s2) {
 /**
  *  @brief  Wrapper function for a struct typetable
  *
- *  @param[in]  c1  address of a vector(T) pointer
- *  @param[in]  c2  address of a vector(T) pointer
+ *  @param[in]  c1  address of a vector_cstr pointer
+ *  @param[in]  c2  address of a vector_cstr pointer
  *
  *  @return     -1 if c1 and c2 do not share a comparison function
  *              otherwise, accumulated comparison results between
  *              c1 and c2's elements, within their common length
  *              0 means they are both equivalent, within their common length.
  */
-int tmpl_vector_compare(T)(const void *c1, const void *c2) {
-    vector(T) *v1 = NULL;
-    vector(T) *v2 = NULL;
+int tmpl_vector_compare_cstr(const void *c1, const void *c2) {
+    vector_cstr *v1 = NULL;
+    vector_cstr *v2 = NULL;
 
-    vector(T) *vec1 = NULL;
-    vector(T) *vec2 = NULL;
+    vector_cstr *vec1 = NULL;
+    vector_cstr *vec2 = NULL;
 
     size_t size1 = 0;
     size_t size2 = 0;
     size_t size = 0;
 
-    T *target1 = NULL;
-    T *target2 = NULL;
+    cstr *target1 = NULL;
+    cstr *target2 = NULL;
 
     int delta = 0;
     int i = 0;
 
-    massert_container(c1);
-    massert_container(c2);
+    ;if (((c1) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "c1"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2983, ("['""c1""' was found to be NULL - '""c1""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
+    ;if (((c2) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "c2"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)2984, ("['""c2""' was found to be NULL - '""c2""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    v1 = *(vector(T) **)(c1);
-    v2 = *(vector(T) **)(c2);
+    v1 = *(vector_cstr **)(c1);
+    v2 = *(vector_cstr **)(c2);
 
     if (v1->ttbl->compare != v2->ttbl->compare) {
         return -1;
     }
 
-    vec1 = vnewcopy(T)(v1);
-    vec2 = vnewcopy(T)(v2);
+    vec1 = vnewcopy_cstr(v1);
+    vec2 = vnewcopy_cstr(v2);
 
-    vsort(T)(vec1);
-    vsort(T)(vec2);
+    vsort_cstr(vec1);
+    vsort_cstr(vec2);
 
-    size1 = vsize(T)(vec1);
-    size2 = vsize(T)(vec2);
+    size1 = vsize_cstr(vec1);
+    size2 = vsize_cstr(vec2);
 
     size = size1 < size2 ? size1 : size2;
 
@@ -3011,8 +2968,8 @@ int tmpl_vector_compare(T)(const void *c1, const void *c2) {
         ++target2;
     }
 
-    vdelete(T)(&vec2);
-    vdelete(T)(&vec1);
+    vdelete_cstr(&vec2);
+    vdelete_cstr(&vec1);
 
     /* if delta == 0, both vectors are equivalent within their common length. */
     return delta;
@@ -3021,121 +2978,121 @@ int tmpl_vector_compare(T)(const void *c1, const void *c2) {
 /**
  *  @brief  Wrapper function for a struct typetable
  *
- *  @param[in]  arg     address of a vector(T) pointer
+ *  @param[in]  arg     address of a vector_cstr pointer
  *  @param[in]  dest    file stream (stdout, stderr, a file)
  */
-void tmpl_vector_print(T)(const void *arg, FILE *dest) {
-    vector(T) *v = NULL;
+void tmpl_vector_print_cstr(const void *arg, FILE *dest) {
+    vector_cstr *v = NULL;
 
-    massert_ptr(arg);
-    massert_ptr(dest);
+    ;if (((arg) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "arg"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3030, ("['""arg""' was found to be NULL - '""arg""' must be nonnull to continue.]")); abort();};;
+    ;if (((dest) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "dest"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3031, ("['""dest""' was found to be NULL - '""dest""' must be nonnull to continue.]")); abort();};;
 
-    v = *(vector(T) **)(arg);
-    vfputs(T)(v, dest);
+    v = *(vector_cstr **)(arg);
+    vfputs_cstr(v, dest);
 }
 
 /**
  *  @brief  Reassign ttbl to v
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[in]  ttbl    pointer to typetable
  */
-void vsetttbl(T)(vector(T) *v, struct typetable *ttbl) {
-    massert_container(v);
+void vsetttbl_cstr(vector_cstr *v, struct typetable *ttbl) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3044, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
     v->ttbl = ttbl ? ttbl : _void_ptr_;
 }
 
 /**
  *  @brief  Retrieves width (data size) in v's ttbl
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     size of data type
  */
-size_t vgetwidth(T)(vector(T) *v) {
-    massert_container(v);
+size_t vgetwidth_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3056, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
     return v->ttbl->width;
 }
 
 /**
  *  @brief  Retrieves copy function in v's ttbl
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     copy function used by v
  */
-copy_fn vgetcopy(T)(vector(T) *v) {
-    massert_container(v);
+copy_fn vgetcopy_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3068, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
     return v->ttbl->copy;
 }
 
 /**
  *  @brief  Retrieves dtor function in v's ttbl
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     dtor function used by v
  */
-dtor_fn vgetdtor(T)(vector(T) *v) {
-    massert_container(v);
+dtor_fn vgetdtor_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3080, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
     return v->ttbl->dtor;
 }
 
 /**
  *  @brief  Retrieves swap function in v's ttbl
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     swap function used by v
  */
-swap_fn vgetswap(T)(vector(T) *v) {
-    massert_container(v);
+swap_fn vgetswap_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3092, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
     return v->ttbl->swap;
 }
 
 /**
  *  @brief  Retrieves compare function in v's ttbl
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     compare function used by v
  */
-compare_fn vgetcompare(T)(vector(T) *v) {
-    massert_container(v);
+compare_fn vgetcompare_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3104, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
     return v->ttbl->compare;
 }
 
 /**
  *  @brief  Retrieves print function in v's ttbl
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     print function used by v
  */
-print_fn vgetprint(T)(vector(T) *v) {
-    massert_container(v);
+print_fn vgetprint_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3116, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
     return v->ttbl->print;
 }
 
 /**
  *  @brief  Retrieves typetable used by v
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  *
  *  @return     pointer to typetable
  */
-struct typetable *vgetttbl(T)(vector(T) *v) {
-    massert_container(v);
+struct typetable *vgetttbl_cstr(vector_cstr *v) {
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3128, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
     return v->ttbl;
 }
 
 /**
- *  @brief  Calls malloc to allocate memory for a pointer to vector(T)
+ *  @brief  Calls malloc to allocate memory for a pointer to vector_cstr
  *
- *  @return     pointer to vector(T)
+ *  @return     pointer to vector_cstr
  */
-static vector(T) *vallocate(T)(void) {
-    vector(T) *v = NULL;
+static vector_cstr *vallocate_cstr(void) {
+    vector_cstr *v = NULL;
     v = malloc(sizeof *v);
     return v;
 }
@@ -3143,16 +3100,16 @@ static vector(T) *vallocate(T)(void) {
 /**
  *  @brief  "Constructor" function, initializes vector
  *
- *  @param[in]  v           pointer to vector(T)
+ *  @param[in]  v           pointer to vector_cstr
  *  @param[in]  capacity    capacity desired for vector
  */
-static void vinit(T)(vector(T) *v, size_t capacity) {
-    T *start = NULL;
+static void vinit_cstr(vector_cstr *v, size_t capacity) {
+    cstr *start = NULL;
 
-    massert_container(v);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3152, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
 
-    v->ttbl = vector_type_table_ptr_id(T)
-    ? vector_type_table_ptr_id(T) : _void_ptr_;
+    v->ttbl = _cstr_
+    ? _cstr_ : _void_ptr_;
 
     if (v->ttbl != _void_ptr_) {
         v->ttbl->compare = v->ttbl->compare ? v->ttbl->compare : NULL;
@@ -3162,12 +3119,12 @@ static void vinit(T)(vector(T) *v, size_t capacity) {
     }
 
     if (capacity <= 0) {
-        WARNING(__FILE__, "Provided input capacity was less than or equal to 0. Will default to capacity of 1.");
+        ulog(stderr, "[WARNING]", "src/vector_tmpl.c", __func__, (long int)3165, "Provided input capacity was less than or equal to 0. Will default to capacity of 1.");
         capacity = 1;
-    } 
+    }
 
     start = calloc(capacity, v->ttbl->width);
-    massert_calloc(start);
+    ;if (((start) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "start"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3170, ("[Request for heap storage allocation failed (calloc returned NULL and was assigned to '""start""')]")); abort();};;
 
     v->impl.start = start;
     v->impl.finish = v->impl.start;
@@ -3177,14 +3134,14 @@ static void vinit(T)(vector(T) *v, size_t capacity) {
 /**
  *  @brief "Destructor" function, deinitializes vector
  *
- *  @param[in]  v   pointer to vector(T)
+ *  @param[in]  v   pointer to vector_cstr
  */
-static void vdeinit(T)(vector(T) *v) {
+static void vdeinit_cstr(vector_cstr *v) {
     if (v == NULL) {
         return;
     }
 
-    vclear(T)(v);
+    vclear_cstr(v);
 
     free(v->impl.start);
     v->impl.start = NULL;
@@ -3197,19 +3154,19 @@ static void vdeinit(T)(vector(T) *v) {
 /**
  *  @brief  Swaps the content at first and second, address from within v
  *
- *  @param[in]  v       pointer to vector(T)
+ *  @param[in]  v       pointer to vector_cstr
  *  @param[out] first   first address to swap content
  *  @param[out] second  second address to swap content
  */
-static void vswapaddr(T)(vector(T) *v, T *first, T *second) {
-    T *temp = NULL;
+static void vswapaddr_cstr(vector_cstr *v, cstr *first, cstr *second) {
+    cstr *temp = NULL;
 
-    massert_container(v);
-    massert_ptr(first);
-    massert_ptr(second);
+    ;if (((v) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "v"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3207, ("['""v""' was found to be NULL - '""v""' must be assigned to the return value of a container initializer function prior to use.]")); abort();};;
+    ;if (((first) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "first"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3208, ("['""first""' was found to be NULL - '""first""' must be nonnull to continue.]")); abort();};;
+    ;if (((second) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "second"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3209, ("['""second""' was found to be NULL - '""second""' must be nonnull to continue.]")); abort();};;
 
     temp = malloc(v->ttbl->width);
-    massert_malloc(temp);
+    ;if (((temp) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "temp"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3212, ("[Request for heap storage allocation failed (malloc returned NULL and was assigned to '""temp""')]")); abort();};;
     memcpy(temp, first, v->ttbl->width);
 
     memcpy(first, second, v->ttbl->width);
@@ -3222,18 +3179,18 @@ static void vswapaddr(T)(vector(T) *v, T *first, T *second) {
 /**
  *  @brief  Initializes and returns an iterator that refers to arg
  *
- *  @param[in]  arg     pointer to vector(T)
+ *  @param[in]  arg     pointer to vector_cstr
  *
  *  @return     iterator that refers to v,
  *              position is at v's first element
  */
-static iterator vibegin(T)(void *arg) {
-    vector(T) *v = NULL;
+static iterator vibegin_cstr(void *arg) {
+    vector_cstr *v = NULL;
     iterator it;
 
-    v = (vector(T) *)(arg);
+    v = (vector_cstr *)(arg);
 
-    it.itbl = vector_iterator_table_ptr_id(T);
+    it.itbl = _vector_iterator_cstr_;
     it.container = v;
     it.curr = v->impl.start;
 
@@ -3243,18 +3200,18 @@ static iterator vibegin(T)(void *arg) {
 /**
  *  @brief  Initializes and returns an iterator that refers to arg
  *
- *  @param[in]  arg     pointer to vector(T)
+ *  @param[in]  arg     pointer to vector_cstr
  *
  *  @return     iterator that refers to v;
  *              position is at one block past v's last element
  */
-static iterator viend(T)(void *arg) {
-    vector(T) *v = NULL;
+static iterator viend_cstr(void *arg) {
+    vector_cstr *v = NULL;
     iterator it;
 
-    v = (vector(T) *)(arg);
+    v = (vector_cstr *)(arg);
 
-    it.itbl = vector_iterator_table_ptr_id(T);
+    it.itbl = _vector_iterator_cstr_;
     it.container = v;
     it.curr = v->impl.finish;
 
@@ -3265,22 +3222,22 @@ static iterator viend(T)(void *arg) {
  *  @brief  Initializes and returns an iterator that
  *          is one block past it's current position
  *
- *  @param[in]  it      iterator that refers to a vector(T)
+ *  @param[in]  it      iterator that refers to a vector_cstr
  *
  *  @return     a new iterator that is one block past it's current position
  */
-static iterator vinext(T)(iterator it) {
-    vector(T) *v = NULL;
+static iterator vinext_cstr(iterator it) {
+    vector_cstr *v = NULL;
     iterator iter;
 
-    v = (vector(T) *)(it.container);
+    v = (vector_cstr *)(it.container);
 
-    iter.itbl = vector_iterator_table_ptr_id(T);
+    iter.itbl = _vector_iterator_cstr_;
     iter.container = v;
     iter.curr = it.curr;
 
     if (iter.curr == v->impl.finish) {
-        ERROR(__FILE__, "Cannot advance - iterator already at end.");
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3283, "Cannot advance - iterator already at end.");
     } else {
         iter.curr = (char *)(v->impl.finish) + (v->ttbl->width);
     }
@@ -3292,27 +3249,27 @@ static iterator vinext(T)(iterator it) {
  *  @brief  Initializes and returns an iterator that
  *          is n blocks past it's current position
  *
- *  @param[in]  it      iterator that refers to a vector(T)
+ *  @param[in]  it      iterator that refers to a vector_cstr
  *
  *  @return     a new iterator that is n block's past it's current position
  */
-static iterator vinextn(T)(iterator it, int n) {
-    vector(T) *v = NULL;
+static iterator vinextn_cstr(iterator it, int n) {
+    vector_cstr *v = NULL;
     iterator iter;
     int pos = 0;
 
-    v = (vector(T) *)(it.container);
+    v = (vector_cstr *)(it.container);
 
-    iter.itbl = vector_iterator_table_ptr_id(T);
+    iter.itbl = _vector_iterator_cstr_;
     iter.container = v;
     iter.curr = it.curr;
 
     pos = ptr_distance(v->impl.start, iter.curr, v->ttbl->width);
 
-    if ((vsize(T)(v) - pos) <= 0) {
+    if ((vsize_cstr(v) - pos) <= 0) {
         char str[256];
         sprintf(str, "Cannot advance %d times from position %d.", n, pos);
-        ERROR(__FILE__, str);
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3315, str);
     } else {
         iter.curr = (char *)(iter.curr) + (n * v->ttbl->width);
     }
@@ -3324,22 +3281,22 @@ static iterator vinextn(T)(iterator it, int n) {
  *  @brief  Initializes and returns an iterator that
  *          is one block behind it's current position
  *
- *  @param[in]  it      iterator that refers to a vector(T)
+ *  @param[in]  it      iterator that refers to a vector_cstr
  *
  *  @return     a new iterator that is one block behind it's current position
  */
-static iterator viprev(T)(iterator it) {
-    vector(T) *v = (vector(T) *)(it.container);
+static iterator viprev_cstr(iterator it) {
+    vector_cstr *v = (vector_cstr *)(it.container);
     iterator iter;
 
-    v = (vector(T) *)(it.container);
+    v = (vector_cstr *)(it.container);
 
-    iter.itbl = vector_iterator_table_ptr_id(T);
+    iter.itbl = _vector_iterator_cstr_;
     iter.container = v;
     iter.curr = it.curr;
 
     if (iter.curr == v->impl.start) {
-        ERROR(__FILE__, "Cannot retract - already at begin.");
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3342, "Cannot retract - already at begin.");
     } else {
         iter.curr = (char *)(v->impl.finish) - (v->ttbl->width);
     }
@@ -3351,27 +3308,27 @@ static iterator viprev(T)(iterator it) {
  *  @brief  Initializes and returns an iterator that
  *          is n blocks behind it's current position
  *
- *  @param[in]  it      iterator that refers to a vector(T)
+ *  @param[in]  it      iterator that refers to a vector_cstr
  *
  *  @return     a new iterator that is n block's behind it's current position
  */
-static iterator viprevn(T)(iterator it, int n) {
-    vector(T) *v = (vector(T) *)(it.container);
+static iterator viprevn_cstr(iterator it, int n) {
+    vector_cstr *v = (vector_cstr *)(it.container);
     iterator iter;
     int pos = 0;
 
-    v = (vector(T) *)(it.container);
+    v = (vector_cstr *)(it.container);
 
-    iter.itbl = vector_iterator_table_ptr_id(T);
+    iter.itbl = _vector_iterator_cstr_;
     iter.container = v;
     iter.curr = it.curr;
 
     pos = ptr_distance(v->impl.start, iter.curr, v->ttbl->width);
 
-    if ((vsize(T)(v) - pos) <= 0) {
+    if ((vsize_cstr(v) - pos) <= 0) {
         char str[256];
         sprintf(str, "Cannot retract %d times from position %d.", n, pos);
-        ERROR(__FILE__, str);
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3374, str);
     } else {
         iter.curr = (char *)(iter.curr) + (n * v->ttbl->width);
     }
@@ -3382,8 +3339,8 @@ static iterator viprevn(T)(iterator it, int n) {
 /**
  *  @brief  Determines the distance between first and last numerically
  *
- *  @param[in]  first   pointer to iterator that refers to a vector(T)
- *  @param[in]  last    pointer to iterator that refers to a vector(T)
+ *  @param[in]  first   pointer to iterator that refers to a vector_cstr
+ *  @param[in]  last    pointer to iterator that refers to a vector_cstr
  *
  *  @return     numerical distance between first and last
  *
@@ -3393,45 +3350,45 @@ static iterator viprevn(T)(iterator it, int n) {
  *  To find the index position of an iterator, leave one of the parameters
  *  NULL when calling the distance function.
  */
-static int vidistance(T)(iterator *first, iterator *last) {
-    vector(T) *v = NULL;
+static int vidistance_cstr(iterator *first, iterator *last) {
+    vector_cstr *v = NULL;
 
     if (first == NULL && last != NULL) {
-        v = (vector(T) *)(last->container);
-        return (int)((T *)(last->curr) - v->impl.start);
+        v = (vector_cstr *)(last->container);
+        return (int)((cstr *)(last->curr) - v->impl.start);
     } else if (last == NULL && first != NULL) {
-        v = (vector(T) *)(first->container);
-        return (int)((T *)(first->curr) - v->impl.start);
+        v = (vector_cstr *)(first->container);
+        return (int)((cstr *)(first->curr) - v->impl.start);
     } else if (first == NULL && last == NULL) {
         return 0;
     } else {
-        v = (vector(T) *)(first->container);
-        return (int)((T *)(last->curr) - (T *)(first->curr));
+        v = (vector_cstr *)(first->container);
+        return (int)((cstr *)(last->curr) - (cstr *)(first->curr));
     }
 }
 
 /**
  *  @brief  Advances the position of it n blocks
  *
- *  @param[in]  it      pointer to iterator that refers to a vector(T)
+ *  @param[in]  it      pointer to iterator that refers to a vector_cstr
  *  @param[in]  n       desired amount of blocks to move
  *
  *  @return     pointer to iterator
  */
-static iterator *viadvance(T)(iterator *it, int n) {
-    vector(T) *v = NULL;
+static iterator *viadvance_cstr(iterator *it, int n) {
+    vector_cstr *v = NULL;
     int pos = 0;
 
-    massert_iterator(it);
+    if (((it) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "it"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3425, ("['""it""' was found to be NULL - '""it""' must point to an initialized iterator, such that it refers to a non-null pointer-to-container.]")); abort();};;
 
     pos = ptr_distance(v->impl.start, it->curr, v->ttbl->width);
 
-    if ((vsize(T)(v) - pos) < 0) {
+    if ((vsize_cstr(v) - pos) < 0) {
         char str[256];
         sprintf(str, "Cannot advance %d times from position %d.", n, pos);
-        ERROR(__FILE__, str);
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3432, str);
     } else {
-        v = (vector(T) *)(it->container);
+        v = (vector_cstr *)(it->container);
         it->curr = (char *)(it->curr) + (n * v->ttbl->width);
     }
 
@@ -3441,19 +3398,19 @@ static iterator *viadvance(T)(iterator *it, int n) {
 /**
  *  @brief  Increments the position of it 1 block forward
  *
- *  @param[in]  it     pointer to iterator that refers to a vector(T)
+ *  @param[in]  it     pointer to iterator that refers to a vector_cstr
  *
  *  @return     pointer to iterator
  */
-static iterator *viincr(T)(iterator *it) {
-    vector(T) *v = NULL;
+static iterator *viincr_cstr(iterator *it) {
+    vector_cstr *v = NULL;
 
-    massert_iterator(it);
+    if (((it) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "it"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3451, ("['""it""' was found to be NULL - '""it""' must point to an initialized iterator, such that it refers to a non-null pointer-to-container.]")); abort();};;
 
-    v = (vector(T) *)(it->container);
+    v = (vector_cstr *)(it->container);
 
     if (it->curr == v->impl.finish) {
-        ERROR(__FILE__, "Cannot increment - already at end.");
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3456, "Cannot increment - already at end.");
     } else {
         it->curr = (char *)(it->curr) + (v->ttbl->width);
     }
@@ -3464,19 +3421,19 @@ static iterator *viincr(T)(iterator *it) {
 /**
  *  @brief  Decrements the position of it 1 block backward
  *
- *  @param[in]  it     pointer to iterator that refers to a vector(T)
+ *  @param[in]  it     pointer to iterator that refers to a vector_cstr
  *
  *  @return     pointer to iterator
  */
-static iterator *videcr(T)(iterator *it) {
-    vector(T) *v = NULL;
+static iterator *videcr_cstr(iterator *it) {
+    vector_cstr *v = NULL;
 
-    massert_iterator(it);
+    if (((it) == (0))) { fprintf(stderr, "Assertion failed: (%s)\n", "it"); ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3474, ("['""it""' was found to be NULL - '""it""' must point to an initialized iterator, such that it refers to a non-null pointer-to-container.]")); abort();};;
 
-    v = (vector(T) *)(it->container);
+    v = (vector_cstr *)(it->container);
 
     if (it->curr == v->impl.start) {
-        ERROR(__FILE__, "Cannot decrement - already at begin.");
+        ulog(stderr, "[ERROR]", "src/vector_tmpl.c", __func__, (long int)3479, "Cannot decrement - already at begin.");
     } else {
         it->curr = (char *)(it->curr) - (v->ttbl->width);
     }
@@ -3488,11 +3445,11 @@ static iterator *videcr(T)(iterator *it) {
  *  @brief  Retrieves the address of the value referred to
  *          by it's current position
  *
- *  @param[in]  it  iterator that refers to a vector(T)
+ *  @param[in]  it  iterator that refers to a vector_cstr
  *
  *  @return     address of an element from within a vector
  */
-static void *vicurr(T)(iterator it) {
+static void *vicurr_cstr(iterator it) {
     return it.curr;
 }
 
@@ -3500,12 +3457,12 @@ static void *vicurr(T)(iterator it) {
  *  @brief  Retrieves the address of first element from
  *          the vector it is iterating
  *
- *  @param[in]  it  iterator that refers to a vector(T)
+ *  @param[in]  it  iterator that refers to a vector_cstr
  *
  *  @return     address of the first element from within a vector
  */
-static void *vistart(T)(iterator it) {
-    vector(T) *v = (vector(T) *)(it.container);
+static void *vistart_cstr(iterator it) {
+    vector_cstr *v = (vector_cstr *)(it.container);
     return v->impl.start;
 }
 
@@ -3513,54 +3470,50 @@ static void *vistart(T)(iterator it) {
  *  @brief  Retrieves the address of the block one past
  *          the last element from within the vector it is iterating
  *
- *  @param[in]  it  iterator that refers to a vector(T)
+ *  @param[in]  it  iterator that refers to a vector_cstr
  *
  *  @return     address of the element that is one block past
  *              the rear element from within the vector being iterated
  */
-static void *vifinish(T)(iterator it) {
-    vector(T) *v = (vector(T) *)(it.container);
+static void *vifinish_cstr(iterator it) {
+    vector_cstr *v = (vector_cstr *)(it.container);
     return v->impl.finish;
 }
 
 /**
  *  @brief  Determines if it has elements to visit in the forward direction
  *
- *  @param[in]  it  iterator that refers to a vector(T)
+ *  @param[in]  it  iterator that refers to a vector_cstr
  *
  *  @return     true if elements remain in the forward direction,
  *              false otherwise
  */
-static bool vihasnext(T)(iterator it) {
-    vector(T) *v = (vector(T) *)(it.container);
+static bool vihasnext_cstr(iterator it) {
+    vector_cstr *v = (vector_cstr *)(it.container);
     return it.curr != v->impl.finish;
 }
 
 /**
  *  @brief  Determines if it has elements to visit in the backward direction
  *
- *  @param[in]  it  iterator that refers to a vector(T)
+ *  @param[in]  it  iterator that refers to a vector_cstr
  *
  *  @return     true if elements remain in the backward direction,
  *              false otherwise
  */
-static bool vihasprev(T)(iterator it) {
-    vector(T) *v = (vector(T) *)(it.container);
+static bool vihasprev_cstr(iterator it) {
+    vector_cstr *v = (vector_cstr *)(it.container);
     return it.curr != v->impl.start;
 }
 
 /**
  *  @brief  Retrieve a container's typetable
  *
- *  @param[in]  arg     pointer to vector(T)
+ *  @param[in]  arg     pointer to vector_cstr
  *
  *  @return     pointer to typetable
  */
-static struct typetable *vigetttbl(T)(void *arg) {
-    vector(T) *v = (vector(T) *)(arg);
+static struct typetable *vigetttbl_cstr(void *arg) {
+    vector_cstr *v = (vector_cstr *)(arg);
     return v->ttbl;
 }
-
-#else
-typedef int __PLACEHOLDER_TYPEDEF_GCSLIB__;
-#endif /* T */

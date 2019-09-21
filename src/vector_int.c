@@ -89,5 +89,3 @@
 #include "vector_tmpl.c"
 #undef T
 #endif
-
-
