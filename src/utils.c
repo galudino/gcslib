@@ -55,7 +55,7 @@ struct typetable ttbl_unsigned_long_int;
 struct typetable ttbl_long_long_int;
 struct typetable ttbl_signed_long_long_int;
 struct typetable ttbl_unsigned_long_long_int;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable ttbl_float;
 struct typetable ttbl_double;
@@ -83,7 +83,7 @@ struct typetable ttbl_int32;
 
 #if __STD_VERSION__ >= 199901L
 struct typetable ttbl_int64;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable ttbl_uint8;
 struct typetable ttbl_uint16;
@@ -91,7 +91,7 @@ struct typetable ttbl_uint32;
 
 #if __STD_VERSION__ >= 199901L
 struct typetable ttbl_uint64;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 void *str_copy(void *arg, const void *other) {
     char **target = (char **)(arg);
@@ -231,7 +231,7 @@ int unsigned_long_long_int_compare(const void *c1, const void *c2) {
     return (int)(*((unsigned long long int *)c1) -
                  *((unsigned long long int *)c2));
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 int float_compare(const void *c1, const void *c2) {
     float result = -99999.9;
@@ -324,7 +324,7 @@ int str_compare(const void *c1, const void *c2) {
     char *csecond = malloc(strlen(second) + 1);
     massert_malloc(cfirst);
     massert_malloc(second);
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
     strcpy(cfirst, first);
     strcpy(csecond, second);
@@ -340,7 +340,7 @@ int str_compare(const void *c1, const void *c2) {
 
     free(csecond);
     csecond = NULL;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
     return result;
 }
@@ -359,7 +359,7 @@ int str_compare_ignore_case(const void *c1, const void *c2) {
     char *csecond = malloc(strlen(second) + 1);
     massert_malloc(cfirst);
     massert_malloc(csecond);
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
     strcpy(cfirst, first);
     strcpy(csecond, second);
@@ -384,7 +384,7 @@ int str_compare_ignore_case(const void *c1, const void *c2) {
 
     free(csecond);
     csecond = NULL;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
     return i;
 }
@@ -425,7 +425,7 @@ int int32_compare(const void *c1, const void *c2) {
 int int64_compare(const void *c1, const void *c2) {
     return long_long_int_compare(c1, c2);
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 int uint8_compare(const void *c1, const void *c2) {
     return unsigned_char_compare(c1, c2);
@@ -443,7 +443,7 @@ int uint32_compare(const void *c1, const void *c2) {
 int uint64_compare(const void *c1, const void *c2) {
     return unsigned_long_long_int_compare(c1, c2);
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 void char_print(const void *arg, FILE *dest) {
     fprintf(dest, "%c", *(char *)arg);
@@ -505,7 +505,7 @@ void signed_long_long_int_print(const void *arg, FILE *dest) {
 void unsigned_long_long_int_print(const void *arg, FILE *dest) {
     fprintf(dest, "%llu", *(unsigned long long int *)arg);
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 void float_print(const void *arg, FILE *dest) {
     fprintf(dest, "%f", *(float *)arg);
@@ -555,7 +555,7 @@ void int32_print(const void *arg, FILE *dest) {
 void int64_print(const void *arg, FILE *dest) {
     long_long_int_print(arg, dest);
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 void uint8_print(const void *arg, FILE *dest) {
     unsigned_char_print(arg, dest);
@@ -573,7 +573,7 @@ void uint32_print(const void *arg, FILE *dest) {
 void uint64_print(const void *arg, FILE *dest) {
     unsigned_long_long_int_print(arg, dest);
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 char *char_parse(const void *arg) {
     const char value = *(char *)arg;
@@ -742,7 +742,7 @@ char *unsigned_long_long_int_parse(const void *arg) {
     massert_malloc(parsed);
     return parsed;
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 char *float_parse(const void *arg) {
     const char value = *(float *)arg;
@@ -851,7 +851,7 @@ char *int32_parse(const void *arg) {
 char *int64_parse(const void *arg) {
     return long_long_int_parse(arg);
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 char *uint8_parse(const void *arg) {
     return unsigned_char_parse(arg);
@@ -869,7 +869,7 @@ char *uint32_parse(const void *arg) {
 char *uint64_parse(const void *arg) {
     return unsigned_long_long_int_parse(arg);
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 char *str_trim_left(char *to_trim, const char *charset) {
     size_t trim_length = 0;
@@ -1002,7 +1002,7 @@ int gcs__strncmp(const char *c1, const char *c2, size_t n) {
 
     return diff;
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 void void_ptr_swap(void **n1, void **n2) {
     void *temp = *n1;
@@ -1071,7 +1071,7 @@ struct typetable ttbl_unsigned_long_long_int = {sizeof(unsigned long long int),
                                                 NULL,
                                                 unsigned_long_long_int_compare,
                                                 unsigned_long_long_int_print};
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable ttbl_float = {sizeof(float), NULL,          NULL,
                                NULL,          float_compare, float_print};
@@ -1127,7 +1127,7 @@ struct typetable ttbl_int32 = {sizeof(int), NULL,        NULL,
 struct typetable ttbl_int64 = {
     sizeof(long long int), NULL, NULL, NULL, long_long_int_compare,
     long_long_int_print};
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable ttbl_uint8 = {
     sizeof(unsigned char), NULL, NULL, NULL, unsigned_char_compare,
@@ -1148,7 +1148,7 @@ struct typetable ttbl_uint64 = {sizeof(unsigned long long int),
                                 NULL,
                                 unsigned_long_long_int_compare,
                                 unsigned_long_long_int_print};
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable *_char_ = &ttbl_char;
 struct typetable *_signed_char_ = &ttbl_signed_char;
@@ -1174,7 +1174,7 @@ struct typetable *_unsigned_long_long_int_ = &ttbl_unsigned_long_long_int;
 struct typetable *_long_long_int_ = NULL;
 struct typetable *_signed_long_long_int_ = NULL;
 struct typetable *_unsigned_long_long_int_ = NULL;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable *_float_ = &ttbl_float;
 struct typetable *_double_ = &ttbl_double;
@@ -1207,7 +1207,7 @@ struct typetable *_int64_t_ = &ttbl_int64;
 #else
 struct typetable *_int64_ = NULL;
 struct typetable *_int64_t = NULL;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable *_uint8_ = &ttbl_uint8;
 struct typetable *_uint8_t_ = &ttbl_uint8;
@@ -1222,7 +1222,7 @@ struct typetable *_uint64_t_ = &ttbl_uint64;
 #else
 struct typetable *_uint64_ = NULL;
 struct typetable *_uint64_t_ = NULL;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable *_pthread_t_ = NULL;
 
@@ -1290,7 +1290,7 @@ int ulog(FILE *dest, const char *level, const char *file, const char *func,
     is_integer = line / (long long int)(line) == 1.000000 || line == 0.00000;
 #else
     is_integer = line / (long int)(line) == 1.000000 || line == 0.00000;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
     is_integer = is_currency ? false : is_integer;
 
