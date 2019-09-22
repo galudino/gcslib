@@ -927,6 +927,83 @@ char *str_trim(char *to_trim, const char *charset) {
     return str_trim_left(str_trim_right(to_trim, charset), charset);
 }
 
+#if !defined(_STRING_H) || !defined(_STRING_H_)
+char *gcs__strcpy(char *dst, const char *src) {
+    char ch = ' ';
+    while ((ch = (*src++)) != '\0') {
+        (*dst++) = ch;
+    }
+    LOG(__FILE__, "gcs__strcpy");
+    return dst;
+}
+
+char *gcs__strncpy(char *dst, const char *src, size_t n) {
+    char ch = ' ';
+    int i = 0;
+    while ((ch = (*src++)) != '\0' && (i++) < n) {
+        (*dst++) = ch;
+    }
+
+    return dst;
+}
+
+char *gcs__strdup(const char *src) {
+    char *str = NULL;
+    str = malloc(gcs__strlen(src) + 1);
+    massert_malloc(str);
+
+    strcpy(str, src);
+    return str;
+}
+
+char *gcs__strndup(const char *src, size_t n) {
+    char *str = NULL;
+    size_t len = gcs__strlen(src);
+    int delta = len - n;
+
+    if (delta > 0) {
+        str = malloc(n + 1);
+        massert_malloc(str);
+        gcs__strncpy(str, src, n);
+    }
+
+    return str;
+}
+
+size_t gcs__strlen(const char *src) {
+    int len = 0;
+    while ((*src++) != '\0') {
+        ++len;
+    }
+
+    return len;
+}
+
+int gcs__strcmp(const char *c1, const char *c2) {
+    int diff = 0;
+    while ((*c1) != '\0') {
+        if ((*c1++) != (*c2++)) {
+            diff += (c1 - c2);
+        }
+    }
+
+    return diff;
+}
+
+int gcs__strncmp(const char *c1, const char *c2, size_t n) {
+    int diff = 0;
+    int i = 0;
+
+    while ((i++) < n || (*c1) != '\0') {
+        if ((*c1++) != (*c2++)) {
+            diff += (c1 - c2);
+        }
+    }
+
+    return diff;
+}
+#endif
+
 void void_ptr_swap(void **n1, void **n2) {
     void *temp = *n1;
     *n1 = *n2;

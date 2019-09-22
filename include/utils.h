@@ -456,13 +456,27 @@ char *str_trim_left(char *to_trim, const char *charset);
 char *str_trim_right(char *to_trim, const char *charset);
 char *str_trim(char *to_trim, const char *charset);
 
+#if !defined(_STRING_H) || !defined(_STRING_H_)
+/**< gcs: string utilities */
+char *gcs__strcpy(char *dst, const char *src);
+char *gcs__strncpy(char *dst, const char *src, size_t n);
+char *gcs__strdup(const char *src);
+char *gcs__strndup(const char *src, size_t n);
+size_t gcs__strlen(const char *src);
+int gcs__strcmp(const char *c1, const char *c2);
+int gcs__strncmp(const char *c1, const char *c2, size_t n);
+
+#define strcpy(dst, src)        gcs__strcpy(dst, src)
+#define strncpy(dst, src, n)    gcs__strncpy(dst, src, n)
+#define strdup(src)             gcs__strdup(src)
+#define strndup(src, n)         gcs__strndup(src, n)
+#define strlen(src)             gcs__strlen(src)
+#define strcmp(c1, c2)          gcs__strcmp(c1, c2)
+#define strncmp(c1, c2, n)      gcs__strncmp(c1, c2, n)
+#endif
+
 #define streql(s1, s2) strcmp(s1, s2) == 0
 #define strneql(s1, s2, n) strncmp(s1, s2, n) == 0
-
-#if __linux__ && !__POSIX__
-#define strdup(str)         strcpy(malloc(strlen(str) + 1), str)
-#define strndup(str, n)     strcpy(malloc(strlen(str + n) + 1), (str + n));
-#endif
 
 /**< void ptr swappage */
 void void_ptr_swap(void **n1, void **n2);
