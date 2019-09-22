@@ -111,13 +111,7 @@ int main(int argc, const char *argv[]) {
     */
 
     /* populate 1,000,000,000 ints and delete them, vector with ints - 5.133s */
-    vector_int *v = vnew_int();
-    int i = 0;
-    for (i = 0; i < 1000000000; i++) {
-        vpushb_int(v, i);
-    }
 
-    vdelete_int(&v);
 
     /* conclusion - even though (vector)'s void *start field really stores ints -- 
       (char *)(v->impl.start) + (element * sizeof(int)) is the equivalent of (v->impl.start + element)

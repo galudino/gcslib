@@ -456,7 +456,7 @@ char *str_trim_left(char *to_trim, const char *charset);
 char *str_trim_right(char *to_trim, const char *charset);
 char *str_trim(char *to_trim, const char *charset);
 
-#if !defined(_STRING_H) || !defined(_STRING_H_)
+#if !defined(_STRING_H) || __APPLE__ && !defined(_STRING_H_)
 /**< gcs: string utilities */
 char *gcs__strcpy(char *dst, const char *src);
 char *gcs__strncpy(char *dst, const char *src, size_t n);
@@ -465,14 +465,11 @@ char *gcs__strndup(const char *src, size_t n);
 size_t gcs__strlen(const char *src);
 int gcs__strcmp(const char *c1, const char *c2);
 int gcs__strncmp(const char *c1, const char *c2, size_t n);
+#endif
 
-#define strcpy(dst, src)        gcs__strcpy(dst, src)
-#define strncpy(dst, src, n)    gcs__strncpy(dst, src, n)
-#define strdup(src)             gcs__strdup(src)
-#define strndup(src, n)         gcs__strndup(src, n)
-#define strlen(src)             gcs__strlen(src)
-#define strcmp(c1, c2)          gcs__strcmp(c1, c2)
-#define strncmp(c1, c2, n)      gcs__strncmp(c1, c2, n)
+#if __linux__ && !__POSIX__
+#define strdup(str) strcpy(malloc(strlen(str) + 1), src)
+#define strndup(str, n) strcpy(malloc(n + 1), (str + n))
 #endif
 
 #define streql(s1, s2) strcmp(s1, s2) == 0
@@ -828,7 +825,7 @@ ULOG_TOGGLE_ATTR(MESSAGE);
  *  @brief      Shorthand macro for ulog to note bugs in a program
  *
  *  Use the preprocessor directive
- *      #define ULOG_DISABLE_BUG 
+ *      #define ULOG_DISABLE_BUG
  *  before the inclusion of utils.h (or before these directives)
  *  to disable the BUG macro.
  */
@@ -879,7 +876,7 @@ ULOG_TOGGLE_ATTR(MESSAGE);
  *  @def        ERROR
  *  @brief      Shorthand macro for ulog to display errors for a program
  *
- *  Use the preprocessor directive 
+ *  Use the preprocessor directive
  *      #define ULOG_DISABLE_ERROR
  *  before the inclusion of utils.h (or before these directives)
  *  to disable the ERROR macro.
@@ -897,7 +894,7 @@ ULOG_TOGGLE_ATTR(MESSAGE);
           (long int)__LINE__, MSG)
 # else
 #  define ERROR(FILEMACRO, MSG)
-# endif   
+# endif
 #endif
 
 /**
@@ -935,15 +932,15 @@ extern bool ulog_attrs_disable[UTILS_LOG_ATTRS_COUNT];
  *  wrapped with the ERROR macro defined in this header file.
  *  Then, just like the assert macro, abort() is invoked
  *  and the program ends.
- * 
+ *
  *  Unlike the original assert macro,
  *  NDEBUG will not disable massert - massert
  *  will persist whether you are in debug mode, or release mode.
- * 
+ *
  *  massert is most useful when a program is no longer fit
  *  to continue, given a particular condition --
  *  a description message of your choice can be provided.
- * 
+ *
  *  If no message is preferred, you may provide an empty string.
  */
 #define massert(CONDITION, MESSAGE)\

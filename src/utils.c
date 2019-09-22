@@ -927,7 +927,7 @@ char *str_trim(char *to_trim, const char *charset) {
     return str_trim_left(str_trim_right(to_trim, charset), charset);
 }
 
-#if !defined(_STRING_H) || !defined(_STRING_H_)
+#if !defined(_STRING_H) || __APPLE__ && !defined(_STRING_H_)
 char *gcs__strcpy(char *dst, const char *src) {
     char ch = ' ';
     while ((ch = (*src++)) != '\0') {
