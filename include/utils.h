@@ -465,6 +465,7 @@ char *gcs__strndup(const char *src, size_t n);
 size_t gcs__strlen(const char *src);
 int gcs__strcmp(const char *c1, const char *c2);
 int gcs__strncmp(const char *c1, const char *c2, size_t n);
+void gcs__memcpy(void *dst, const void *src, size_t width);
 #endif /* !defined(_STRING_H) || __APPLE__ && !defined(_STRING_H_) */
 
 #if __linux__ && !__POSIX__

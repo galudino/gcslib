@@ -1002,6 +1002,18 @@ int gcs__strncmp(const char *c1, const char *c2, size_t n) {
 
     return diff;
 }
+
+void gcs__memcpy(void *dst, const void *src, size_t width) {
+    char *dest = dst;
+    const char *source = src;
+
+    while (((*dest++) = (*source++)) != '\0') { 
+
+    }
+
+    return dst;
+}
+
 #endif /* __STDC_VERSION__ >= 199901L */
 
 void void_ptr_swap(void **n1, void **n2) {
