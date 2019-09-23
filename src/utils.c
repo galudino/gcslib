@@ -97,12 +97,10 @@ void *str_copy(void *arg, const void *other) {
     char **target = (char **)(arg);
     char **source = (char **)(other);
 
-    /*
-    (*target) = strdup((*source));
-    return (*target);
-    */
+    (*target) = malloc(strlen((*source) + 1));
+    massert_malloc((*target));
+    strcpy((*target), (*source));
 
-    (*target) = strcpy(malloc(strlen((*source)) + 1), (*source));
     return (*target) ? (*target) : NULL;
 }
 
@@ -110,7 +108,10 @@ void *cstr_copy(void *arg, const void *other) {
     char **target = (char **)(arg);
     char **source = (char **)(other);
 
-    (*target) = strcpy(malloc(strlen((*source)) + 1), (*source));
+    (*target) = malloc(strlen((*source) + 1));
+    massert_malloc((*target));
+    strcpy((*target), (*source));
+    
     return (*target) ? (*target) : NULL;
 }
 
