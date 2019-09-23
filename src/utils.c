@@ -147,7 +147,10 @@ void str_swap(void *arg, void *other) {
     char **source = (char **)(other);
 
     if ((*dest)) {
-        char *temp = strcpy(malloc(strlen((*dest)) + 1), (*dest));
+        char *temp = malloc(strlen(*dest) + 1);
+        massert_malloc(temp);
+        strcpy(temp, (*dest));
+
         (*dest) = (*source);
         (*source) = temp;
     } else {
@@ -161,7 +164,10 @@ void cstr_swap(void *arg, void *other) {
     char **source = (char **)(other);
 
     if ((*dest)) {
-        char *temp = strcpy(malloc(strlen((*dest)) + 1), (*dest));
+        char *temp = malloc(strlen(*dest) + 1);
+        massert_malloc(temp);
+        strcpy(temp, (*dest));
+        
         (*dest) = (*source);
         (*source) = temp;
     } else {
@@ -585,7 +591,10 @@ char *char_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
+    massert_malloc(parsed);
+    strcpy(parsed, buffer);
+
     massert_malloc(parsed);
     return parsed;
 }
@@ -599,8 +608,10 @@ char *signed_char_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+
     return parsed;
 }
 
@@ -613,8 +624,10 @@ char *unsigned_char_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+
     return parsed;
 }
 
@@ -626,8 +639,11 @@ char *short_int_parse(const void *arg) {
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value);
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+
     return parsed;
 }
 
@@ -644,8 +660,10 @@ char *unsigned_short_int_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+
     return parsed;
 }
 
@@ -658,8 +676,10 @@ char *int_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -676,8 +696,10 @@ char *unsigned_int_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -690,8 +712,10 @@ char *long_int_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -708,8 +732,10 @@ char *unsigned_long_int_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -722,8 +748,10 @@ char *long_long_int_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -739,10 +767,13 @@ char *unsigned_long_long_int_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
+
 #endif /* __STDC_VERSION__ >= 199901L */
 
 char *float_parse(const void *arg) {
@@ -768,8 +799,10 @@ char *double_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -782,8 +815,10 @@ char *long_double_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -796,8 +831,10 @@ char *bool_parse(const void *arg) {
 
     sprintf(buffer, format, value ? "true" : "false");
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -814,8 +851,10 @@ char *str_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -831,8 +870,10 @@ char *void_ptr_parse(const void *arg) {
 
     sprintf(buffer, format, arg);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
