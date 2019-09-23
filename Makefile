@@ -130,7 +130,7 @@ clean:
 	@echo "Removing object files..."
 	@echo;
 
-	rm $(OBJECTS)
+	rm -rf $(OBJECTS) || true
 
 	@echo;
 	@echo "Removed all object files."
@@ -140,7 +140,7 @@ clean:
 	@echo "Removing executables..."
 	@echo;
 
-	rm $(ALL_EXE)
+	rm -rf $(ALL_EXE) || true
 
 	@echo;
 	@echo "Removed all executables."
@@ -150,7 +150,7 @@ clean:
 	@echo "Removing packages..."
 	@echo;
 
-	rm -r *.dSYM
+	rm -rf *.dSYM || true
 
 	@echo;
 	@echo "Packages removed."
