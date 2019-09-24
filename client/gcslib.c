@@ -29,13 +29,11 @@
  */
 
 #define TESTING_VECTOR_CSTRING
+#include "gcslib.h" /**< Entire gcslib_c library */
 #include "vector_cstring.h"
 #include "vector_int32.h"
-#include "gcslib.h" /**< Entire gcslib_c library */
 
-
-#include "vec2D.h"  /**< vec2D API, a test "object" */
-
+#include "vec2D.h" /**< vec2D API, a test "object" */
 
 #include <assert.h>
 #include <dirent.h>
@@ -71,6 +69,9 @@ void test_listtmpl_str(void);
 
 bool remove_if_even(const void *arg);
 
+person::person() : base() {
+}
+
 /**
  *  @brief  Program execution begins here
  *
@@ -98,7 +99,7 @@ int main(int argc, const char *argv[]) {
     */
 
     /* test_listvp_int_merge(); */
-    
+
     /* populate 1,000,000,000 ints and delete them, vector with void *start - 6.074s */
     /*
     vector *v = v_new(_int_);
@@ -119,19 +120,22 @@ int main(int argc, const char *argv[]) {
 
     vdelete_int(&v);
 
-    /* conclusion - even though (vector)'s void *start field really stores ints -- 
-      (char *)(v->impl.start) + (element * sizeof(int)) is the equivalent of (v->impl.start + element)
-       there is indirection involved...and there is no match for a natively-typed data structure.
-       we can achieve genericity through full use of macros (hideous),
-       or partial use of macros by parametrizing the type information, and the rest being "real" code.
-       the net effect ends up being the same either way -- the "templated" method is easier to write/maintain,
-       whereas the full macro version is easier to instantiate overall.
+    /* conclusion - even though (vector)'s void *start field really stores ints
+      -- (char *)(v->impl.start) + (element * sizeof(int)) is the equivalent of
+      (v->impl.start + element) there is indirection involved...and there is no
+      match for a natively-typed data structure. we can achieve genericity
+      through full use of macros (hideous), or partial use of macros by
+      parametrizing the type information, and the rest being "real" code. the
+      net effect ends up being the same either way -- the "templated" method is
+      easier to write/maintain, whereas the full macro version is easier to
+      instantiate overall.
 
-       A happy medium is to write "templated" code, and use the header/source file pairing
-       to do a little bit of find-and-replace, manually (this is what the preprocessor is doing anyway, on the fly)
-       You'll end up with a natively-typed data structure that is ready to use at your whim.
-       This is a good strategy for types you are going to be using all the time for a project,
-       or just...ever (like ints, doubles, and (char *)).  */
+       A happy medium is to write "templated" code, and use the header/source
+      file pairing to do a little bit of find-and-replace, manually (this is
+      what the preprocessor is doing anyway, on the fly) You'll end up with a
+      natively-typed data structure that is ready to use at your whim. This is a
+      good strategy for types you are going to be using all the time for a
+      project, or just...ever (like ints, doubles, and (char *)).  */
 
     /*
     test_listvp_int();
@@ -332,11 +336,11 @@ void test_vectortmpl_str() {
 
 void test_vectorvp_str_assign() {
     vector *v1 = v_new(_str_);
-    const char *arr1[] = {"alpha", "beta",    "charlie", "delta",
-                          "echo",  "foxtrot", "kilo"};
+    const char *arr1[] = { "alpha", "beta",    "charlie", "delta",
+                           "echo",  "foxtrot", "kilo" };
 
     vector *v2 = v_new(_str_);
-    const char *arr2[] = {"j", "k", "l", "m", "n", "o", "p", "q", "r"};
+    const char *arr2[] = { "j", "k", "l", "m", "n", "o", "p", "q", "r" };
 
     int i = 0;
     for (i = 0; i < sizeof(arr1) / sizeof(char *); i++) {
@@ -351,10 +355,10 @@ void test_vectorvp_str_assign() {
     v_puts(v2);
 
     {
-        iterator it = {NULL, NULL, NULL};
-        iterator pos = {NULL, NULL, NULL};
-        iterator beg = {NULL, NULL, NULL};
-        iterator end = {NULL, NULL, NULL};
+        iterator it = { NULL, NULL, NULL };
+        iterator pos = { NULL, NULL, NULL };
+        iterator beg = { NULL, NULL, NULL };
+        iterator end = { NULL, NULL, NULL };
         char *filler = "filler";
 
         pos = it_next_n(v_begin(v1), 3);
@@ -374,11 +378,11 @@ void test_vectorvp_str_assign() {
 
 void test_vectortmpl_str_assign() {
     vector(str) *v1 = vnew(str)();
-    char *arr1[] = {"alpha", "beta",    "charlie", "delta",
-                    "echo",  "foxtrot", "kilo"};
+    char *arr1[] = { "alpha", "beta",    "charlie", "delta",
+                     "echo",  "foxtrot", "kilo" };
 
     vector(str) *v2 = vnew(str)();
-    char *arr2[] = {"j", "k", "l", "m", "n", "o", "p", "q", "r"};
+    char *arr2[] = { "j", "k", "l", "m", "n", "o", "p", "q", "r" };
 
     int i = 0;
 
@@ -479,9 +483,9 @@ void test_listvp_str() {
 
     char *curr = NULL;
 
-    iterator it = {NULL, NULL, NULL};
-    iterator end = {NULL, NULL, NULL};
-    iterator pos = {NULL, NULL, NULL};
+    iterator it = { NULL, NULL, NULL };
+    iterator end = { NULL, NULL, NULL };
+    iterator pos = { NULL, NULL, NULL };
 
     int i = -1;
     void *sentinel = NULL;
@@ -702,18 +706,14 @@ void test_listvp_int_merge() {
 }
 
 void test_listvp_str_splice() {
-
 }
 
 void test_listvp_vec2D() {
-
 }
 
 void test_listtmpl_int() {
-
 }
 
 void test_listtmpl_str() {
-
 }
 #endif
