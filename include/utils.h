@@ -39,7 +39,7 @@
 typedef unsigned char bool;
 # define false '\0'
 # define true '0'
-#endif
+#endif /* __STD_VERSION__ >= 199901L */
 
 #include <stdint.h>
 #include <stddef.h>
@@ -456,13 +456,25 @@ char *str_trim_left(char *to_trim, const char *charset);
 char *str_trim_right(char *to_trim, const char *charset);
 char *str_trim(char *to_trim, const char *charset);
 
-#define streql(s1, s2) strcmp(s1, s2) == 0
-#define strneql(s1, s2, n) strncmp(s1, s2, n) == 0
+#if !defined(_STRING_H) || __APPLE__ && !defined(_STRING_H_)
+/**< gcs: string utilities */
+char *gcs__strcpy(char *dst, const char *src);
+char *gcs__strncpy(char *dst, const char *src, size_t n);
+char *gcs__strdup(const char *src);
+char *gcs__strndup(const char *src, size_t n);
+size_t gcs__strlen(const char *src);
+int gcs__strcmp(const char *c1, const char *c2);
+int gcs__strncmp(const char *c1, const char *c2, size_t n);
+void gcs__memcpy(void *dst, const void *src, size_t width);
+#endif /* !defined(_STRING_H) || __APPLE__ && !defined(_STRING_H_) */
 
 #if __linux__ && !__POSIX__
-#define strdup(str)         strcpy(malloc(strlen(str) + 1), str)
-#define strndup(str, n)     strcpy(malloc(strlen(str + n) + 1), (str + n));
-#endif
+#define strdup(str) strcpy(malloc(strlen(str) + 1), src)
+#define strndup(str, n) strcpy(malloc(n + 1), (str + n))
+#endif /* __linux__ && !__POSIX__ */
+
+#define streql(s1, s2) strcmp(s1, s2) == 0
+#define strneql(s1, s2, n) strncmp(s1, s2, n) == 0
 
 /**< void ptr swappage */
 void void_ptr_swap(void **n1, void **n2);
@@ -694,7 +706,7 @@ typedef signed long long int *signed_long_long_int_ptr;
 typedef signed long long int **signed_long_long_int_dptr;
 typedef unsigned long long int *unsigned_long_long_int_ptr;
 typedef unsigned long long int **unsigned_long_long_int_dptr;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 typedef float *float_ptr;
 typedef float **float_dptr;
@@ -721,7 +733,7 @@ typedef int **int32_dptr;
 #if __STD_VERSION__ >= 199901L
 typedef long long int *int64_ptr;
 typedef long long int **int64_dptr;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 typedef unsigned char *uint8_ptr;
 typedef unsigned char **uint8_dptr;
@@ -735,7 +747,7 @@ typedef unsigned int **uint32_dptr;
 #if __STD_VERSION__ >= 199901L
 typedef unsigned long long int *uint64_ptr;
 typedef unsigned long long int **uint64_dptr;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 typedef float float32_t;
 typedef double float64_t;
@@ -797,7 +809,7 @@ int ulog(
 # define ULOG_DISABLE_LOG
 # define ULOG_DISABLE_ERROR
 # define ULOG_DISABLE_WARNING
-#endif
+#endif /* ULOG_DISABLE_ALL */
 
 /** Turn off ulog attributes by invoking one or more of these in a function.
 ULOG_TOGGLE_ATTR(DATE);
@@ -814,7 +826,7 @@ ULOG_TOGGLE_ATTR(MESSAGE);
  *  @brief      Shorthand macro for ulog to note bugs in a program
  *
  *  Use the preprocessor directive
- *      #define ULOG_DISABLE_BUG 
+ *      #define ULOG_DISABLE_BUG
  *  before the inclusion of utils.h (or before these directives)
  *  to disable the BUG macro.
  */
@@ -825,15 +837,15 @@ ULOG_TOGGLE_ATTR(MESSAGE);
               __VA_ARGS__)
 # else
 #  define BUG(FILEMACRO, ...)
-# endif
+# endif /* ULOG_DISABLE_BUG */
 #else
 # ifndef ULOG_DISABLE_BUG
 #  define BUG(FILEMACRO, MSG)                                                    \
           ulog(ULOG_STREAM_BUG, "[BUG]", FILEMACRO, __func__, (long int)__LINE__, MSG)
 # else
 #  define BUG(FILEMACRO, MSG)
-# endif
-#endif
+# endif /* ULOG_DISABLE_BUG */
+#endif /* __STDC_VERSION__ >= 199901L */
 
 /**
  *  @def        LOG
@@ -851,21 +863,21 @@ ULOG_TOGGLE_ATTR(MESSAGE);
           __VA_ARGS__)
 # else
 #  define LOG(FILEMACRO, ...)
-# endif
+# endif /* ULOG_DISABLE_LOG */
 #else
 # ifndef ULOG_DISABLE_LOG
 #  define LOG(FILEMACRO, MSG)                                                    \
           ulog(ULOG_STREAM_LOG, "[LOG]", FILEMACRO, __func__, (long int)__LINE__, MSG)
 # else
 #  define LOG(FILEMACRO, MSG)
-# endif
-#endif
+# endif /* ULOG_DISABLE_LOG */
+#endif /* __STDC_VERSION__ >= 199901L */
 
 /**
  *  @def        ERROR
  *  @brief      Shorthand macro for ulog to display errors for a program
  *
- *  Use the preprocessor directive 
+ *  Use the preprocessor directive
  *      #define ULOG_DISABLE_ERROR
  *  before the inclusion of utils.h (or before these directives)
  *  to disable the ERROR macro.
@@ -875,7 +887,7 @@ ULOG_TOGGLE_ATTR(MESSAGE);
 #  define ERROR(FILEMACRO, ...)                                                  \
           ulog(ULOG_STREAM_ERROR, "[ERROR]", FILEMACRO, __func__,                    \
           (long int)__LINE__, __VA_ARGS__)
-# endif
+# endif /* ULOG_DISABLE_ERROR */
 #else
 # ifndef ULOG_DISABLE_ERROR
 #  define ERROR(FILEMACRO, MSG)                                                  \
@@ -883,8 +895,8 @@ ULOG_TOGGLE_ATTR(MESSAGE);
           (long int)__LINE__, MSG)
 # else
 #  define ERROR(FILEMACRO, MSG)
-# endif   
-#endif
+# endif /* ULOG_DISABLE_ERROR */
+#endif /* __STDC_VERSION__ >= 199901L */
 
 /**
  *  @def        WARNING
@@ -895,7 +907,7 @@ ULOG_TOGGLE_ATTR(MESSAGE);
 #  define WARNING(FILEMACRO, ...)                                                \
           ulog(ULOG_STREAM_WARNING, "[WARNING]", FILEMACRO, __func__,                \
           (long int)__LINE__, __VA_ARGS__)
-# endif
+# endif /* ULOG_DISABLE_WARNING */
 #else
 # ifndef ULOG_DISABLE_WARNING
 #  define WARNING(FILEMACRO, MSG)                                                \
@@ -903,8 +915,8 @@ ULOG_TOGGLE_ATTR(MESSAGE);
           (long int)__LINE__, MSG)
 # else
 #  define WARNING(FILEMACRO, MSG)
-# endif
-#endif
+# endif /* ULOG_DISABLE_WARNING */
+#endif /* __STDC_VERSION__ >= 199901L */
 
 #define UTILS_LOG_ATTRS_COUNT 7
 enum ULOG_ATTRS { DATE, TIME, LEVEL, FILENAME, LINE, FUNCTION, MESSAGE };
@@ -921,15 +933,15 @@ extern bool ulog_attrs_disable[UTILS_LOG_ATTRS_COUNT];
  *  wrapped with the ERROR macro defined in this header file.
  *  Then, just like the assert macro, abort() is invoked
  *  and the program ends.
- * 
+ *
  *  Unlike the original assert macro,
  *  NDEBUG will not disable massert - massert
  *  will persist whether you are in debug mode, or release mode.
- * 
+ *
  *  massert is most useful when a program is no longer fit
  *  to continue, given a particular condition --
  *  a description message of your choice can be provided.
- * 
+ *
  *  If no message is preferred, you may provide an empty string.
  */
 #define massert(CONDITION, MESSAGE)\

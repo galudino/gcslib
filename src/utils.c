@@ -55,7 +55,7 @@ struct typetable ttbl_unsigned_long_int;
 struct typetable ttbl_long_long_int;
 struct typetable ttbl_signed_long_long_int;
 struct typetable ttbl_unsigned_long_long_int;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable ttbl_float;
 struct typetable ttbl_double;
@@ -83,7 +83,7 @@ struct typetable ttbl_int32;
 
 #if __STD_VERSION__ >= 199901L
 struct typetable ttbl_int64;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable ttbl_uint8;
 struct typetable ttbl_uint16;
@@ -91,18 +91,16 @@ struct typetable ttbl_uint32;
 
 #if __STD_VERSION__ >= 199901L
 struct typetable ttbl_uint64;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 void *str_copy(void *arg, const void *other) {
     char **target = (char **)(arg);
     char **source = (char **)(other);
 
-    /*
-    (*target) = strdup((*source));
-    return (*target);
-    */
+    (*target) = malloc(strlen((*source) + 1));
+    massert_malloc((*target));
+    strcpy((*target), (*source));
 
-    (*target) = strcpy(malloc(strlen((*source)) + 1), (*source));
     return (*target) ? (*target) : NULL;
 }
 
@@ -110,7 +108,10 @@ void *cstr_copy(void *arg, const void *other) {
     char **target = (char **)(arg);
     char **source = (char **)(other);
 
-    (*target) = strcpy(malloc(strlen((*source)) + 1), (*source));
+    (*target) = malloc(strlen((*source) + 1));
+    massert_malloc((*target));
+    strcpy((*target), (*source));
+    
     return (*target) ? (*target) : NULL;
 }
 
@@ -146,7 +147,10 @@ void str_swap(void *arg, void *other) {
     char **source = (char **)(other);
 
     if ((*dest)) {
-        char *temp = strcpy(malloc(strlen((*dest)) + 1), (*dest));
+        char *temp = malloc(strlen(*dest) + 1);
+        massert_malloc(temp);
+        strcpy(temp, (*dest));
+
         (*dest) = (*source);
         (*source) = temp;
     } else {
@@ -160,7 +164,10 @@ void cstr_swap(void *arg, void *other) {
     char **source = (char **)(other);
 
     if ((*dest)) {
-        char *temp = strcpy(malloc(strlen((*dest)) + 1), (*dest));
+        char *temp = malloc(strlen(*dest) + 1);
+        massert_malloc(temp);
+        strcpy(temp, (*dest));
+        
         (*dest) = (*source);
         (*source) = temp;
     } else {
@@ -231,7 +238,7 @@ int unsigned_long_long_int_compare(const void *c1, const void *c2) {
     return (int)(*((unsigned long long int *)c1) -
                  *((unsigned long long int *)c2));
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 int float_compare(const void *c1, const void *c2) {
     float result = -99999.9;
@@ -324,7 +331,7 @@ int str_compare(const void *c1, const void *c2) {
     char *csecond = malloc(strlen(second) + 1);
     massert_malloc(cfirst);
     massert_malloc(second);
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
     strcpy(cfirst, first);
     strcpy(csecond, second);
@@ -340,7 +347,7 @@ int str_compare(const void *c1, const void *c2) {
 
     free(csecond);
     csecond = NULL;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
     return result;
 }
@@ -359,7 +366,7 @@ int str_compare_ignore_case(const void *c1, const void *c2) {
     char *csecond = malloc(strlen(second) + 1);
     massert_malloc(cfirst);
     massert_malloc(csecond);
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
     strcpy(cfirst, first);
     strcpy(csecond, second);
@@ -384,7 +391,7 @@ int str_compare_ignore_case(const void *c1, const void *c2) {
 
     free(csecond);
     csecond = NULL;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
     return i;
 }
@@ -425,7 +432,7 @@ int int32_compare(const void *c1, const void *c2) {
 int int64_compare(const void *c1, const void *c2) {
     return long_long_int_compare(c1, c2);
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 int uint8_compare(const void *c1, const void *c2) {
     return unsigned_char_compare(c1, c2);
@@ -443,7 +450,7 @@ int uint32_compare(const void *c1, const void *c2) {
 int uint64_compare(const void *c1, const void *c2) {
     return unsigned_long_long_int_compare(c1, c2);
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 void char_print(const void *arg, FILE *dest) {
     fprintf(dest, "%c", *(char *)arg);
@@ -505,7 +512,7 @@ void signed_long_long_int_print(const void *arg, FILE *dest) {
 void unsigned_long_long_int_print(const void *arg, FILE *dest) {
     fprintf(dest, "%llu", *(unsigned long long int *)arg);
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 void float_print(const void *arg, FILE *dest) {
     fprintf(dest, "%f", *(float *)arg);
@@ -555,7 +562,7 @@ void int32_print(const void *arg, FILE *dest) {
 void int64_print(const void *arg, FILE *dest) {
     long_long_int_print(arg, dest);
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 void uint8_print(const void *arg, FILE *dest) {
     unsigned_char_print(arg, dest);
@@ -573,7 +580,7 @@ void uint32_print(const void *arg, FILE *dest) {
 void uint64_print(const void *arg, FILE *dest) {
     unsigned_long_long_int_print(arg, dest);
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 char *char_parse(const void *arg) {
     const char value = *(char *)arg;
@@ -584,7 +591,10 @@ char *char_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
+    massert_malloc(parsed);
+    strcpy(parsed, buffer);
+
     massert_malloc(parsed);
     return parsed;
 }
@@ -598,8 +608,10 @@ char *signed_char_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+
     return parsed;
 }
 
@@ -612,8 +624,10 @@ char *unsigned_char_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+
     return parsed;
 }
 
@@ -625,8 +639,11 @@ char *short_int_parse(const void *arg) {
     char buffer[MAXIMUM_STACK_BUFFER_SIZE];
 
     sprintf(buffer, format, value);
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+
     return parsed;
 }
 
@@ -643,8 +660,10 @@ char *unsigned_short_int_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+
     return parsed;
 }
 
@@ -657,8 +676,10 @@ char *int_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -675,8 +696,10 @@ char *unsigned_int_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -689,8 +712,10 @@ char *long_int_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -707,8 +732,10 @@ char *unsigned_long_int_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -721,8 +748,10 @@ char *long_long_int_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -738,11 +767,14 @@ char *unsigned_long_long_int_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
-#endif
+
+#endif /* __STDC_VERSION__ >= 199901L */
 
 char *float_parse(const void *arg) {
     const char value = *(float *)arg;
@@ -767,8 +799,10 @@ char *double_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -781,8 +815,10 @@ char *long_double_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -795,8 +831,10 @@ char *bool_parse(const void *arg) {
 
     sprintf(buffer, format, value ? "true" : "false");
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -813,8 +851,10 @@ char *str_parse(const void *arg) {
 
     sprintf(buffer, format, value);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -830,8 +870,10 @@ char *void_ptr_parse(const void *arg) {
 
     sprintf(buffer, format, arg);
 
-    parsed = strcpy(malloc(strlen(buffer) + 1), buffer);
+    parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
+    strcpy(parsed, buffer);
+    
     return parsed;
 }
 
@@ -851,7 +893,7 @@ char *int32_parse(const void *arg) {
 char *int64_parse(const void *arg) {
     return long_long_int_parse(arg);
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 char *uint8_parse(const void *arg) {
     return unsigned_char_parse(arg);
@@ -869,7 +911,7 @@ char *uint32_parse(const void *arg) {
 char *uint64_parse(const void *arg) {
     return unsigned_long_long_int_parse(arg);
 }
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 char *str_trim_left(char *to_trim, const char *charset) {
     size_t trim_length = 0;
@@ -926,6 +968,95 @@ char *str_trim(char *to_trim, const char *charset) {
 
     return str_trim_left(str_trim_right(to_trim, charset), charset);
 }
+
+#if !defined(_STRING_H) || __APPLE__ && !defined(_STRING_H_)
+char *gcs__strcpy(char *dst, const char *src) {
+    char ch = ' ';
+    while ((ch = (*src++)) != '\0') {
+        (*dst++) = ch;
+    }
+    LOG(__FILE__, "gcs__strcpy");
+    return dst;
+}
+
+char *gcs__strncpy(char *dst, const char *src, size_t n) {
+    char ch = ' ';
+    int i = 0;
+    while ((ch = (*src++)) != '\0' && (i++) < n) {
+        (*dst++) = ch;
+    }
+
+    return dst;
+}
+
+char *gcs__strdup(const char *src) {
+    char *str = NULL;
+    str = malloc(gcs__strlen(src) + 1);
+    massert_malloc(str);
+
+    strcpy(str, src);
+    return str;
+}
+
+char *gcs__strndup(const char *src, size_t n) {
+    char *str = NULL;
+    size_t len = gcs__strlen(src);
+    int delta = len - n;
+
+    if (delta > 0) {
+        str = malloc(n + 1);
+        massert_malloc(str);
+        gcs__strncpy(str, src, n);
+    }
+
+    return str;
+}
+
+size_t gcs__strlen(const char *src) {
+    int len = 0;
+    while ((*src++) != '\0') {
+        ++len;
+    }
+
+    return len;
+}
+
+int gcs__strcmp(const char *c1, const char *c2) {
+    int diff = 0;
+    while ((*c1) != '\0') {
+        if ((*c1++) != (*c2++)) {
+            diff += (c1 - c2);
+        }
+    }
+
+    return diff;
+}
+
+int gcs__strncmp(const char *c1, const char *c2, size_t n) {
+    int diff = 0;
+    int i = 0;
+
+    while ((i++) < n || (*c1) != '\0') {
+        if ((*c1++) != (*c2++)) {
+            diff += (c1 - c2);
+        }
+    }
+
+    return diff;
+}
+
+void gcs__memcpy(void *dst, const void *src, size_t width) {
+    char *dest = dst;
+    const char *source = src;
+
+    while (((*dest++) = (*source++)) != '\0') { 
+
+    }
+
+    return dst;
+}
+
+#endif /* __STDC_VERSION__ >= 199901L */
 
 void void_ptr_swap(void **n1, void **n2) {
     void *temp = *n1;
@@ -994,7 +1125,7 @@ struct typetable ttbl_unsigned_long_long_int = {sizeof(unsigned long long int),
                                                 NULL,
                                                 unsigned_long_long_int_compare,
                                                 unsigned_long_long_int_print};
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable ttbl_float = {sizeof(float), NULL,          NULL,
                                NULL,          float_compare, float_print};
@@ -1050,7 +1181,7 @@ struct typetable ttbl_int32 = {sizeof(int), NULL,        NULL,
 struct typetable ttbl_int64 = {
     sizeof(long long int), NULL, NULL, NULL, long_long_int_compare,
     long_long_int_print};
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable ttbl_uint8 = {
     sizeof(unsigned char), NULL, NULL, NULL, unsigned_char_compare,
@@ -1071,7 +1202,7 @@ struct typetable ttbl_uint64 = {sizeof(unsigned long long int),
                                 NULL,
                                 unsigned_long_long_int_compare,
                                 unsigned_long_long_int_print};
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable *_char_ = &ttbl_char;
 struct typetable *_signed_char_ = &ttbl_signed_char;
@@ -1097,7 +1228,7 @@ struct typetable *_unsigned_long_long_int_ = &ttbl_unsigned_long_long_int;
 struct typetable *_long_long_int_ = NULL;
 struct typetable *_signed_long_long_int_ = NULL;
 struct typetable *_unsigned_long_long_int_ = NULL;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable *_float_ = &ttbl_float;
 struct typetable *_double_ = &ttbl_double;
@@ -1130,7 +1261,7 @@ struct typetable *_int64_t_ = &ttbl_int64;
 #else
 struct typetable *_int64_ = NULL;
 struct typetable *_int64_t = NULL;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable *_uint8_ = &ttbl_uint8;
 struct typetable *_uint8_t_ = &ttbl_uint8;
@@ -1145,7 +1276,7 @@ struct typetable *_uint64_t_ = &ttbl_uint64;
 #else
 struct typetable *_uint64_ = NULL;
 struct typetable *_uint64_t_ = NULL;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
 struct typetable *_pthread_t_ = NULL;
 
@@ -1213,7 +1344,7 @@ int ulog(FILE *dest, const char *level, const char *file, const char *func,
     is_integer = line / (long long int)(line) == 1.000000 || line == 0.00000;
 #else
     is_integer = line / (long int)(line) == 1.000000 || line == 0.00000;
-#endif
+#endif /* __STDC_VERSION__ >= 199901L */
 
     is_integer = is_currency ? false : is_integer;
 
