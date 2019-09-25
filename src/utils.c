@@ -1056,6 +1056,112 @@ void gcs__memcpy(void *dst, const void *src, size_t width) {
     return dst;
 }
 
+char *gcs__strtok(char *src, const char *delim) {
+    static char *old_str = NULL;
+    return gcs__strtok_r(src, delim, &old_str);
+}
+
+char *gcs__strtok_r(char *src, const char *delim, char **save_ptr) {
+    char *end = NULL;
+    size_t len = 0;
+    size_t i = 0;
+
+    src = src ? src : (*save_ptr);
+
+    /**
+     *  Nothing to tokenize.
+     */
+    if ((*src) == '\0') {
+        (*save_ptr) = src;
+        return NULL;
+    }
+
+    /**
+     *  Advance to delimiter delim.
+     */
+    len = gcs__strlen(src);
+    for (i = 0; i < len; i++) {
+        if (src[i] == (*delim)) {
+            break;
+        }
+    }
+
+    if ((*src) == '\0') {
+        /**
+         *  End of string reached.
+         *  Delimiter never found.
+         */
+        (*save_ptr) = src;
+        return NULL;
+    } else {
+        src[i] = '\0';
+    }
+
+    end = src + (i + 1);
+
+    if ((*end) == '\0') {
+        (*save_ptr) = end;
+        return src;
+    }
+
+    (*save_ptr) = end;
+
+    return src;
+}
+
+int gcs__strncmp(const char *c1, const char *c2, size_t n) {
+    int diff = 0;
+    int i = 0;
+
+    while ((i++) < n || (*c1) != '\0') {
+        if ((*c1++) != (*c2++)) {
+            diff += (c1 - c2);
+        }
+    }
+
+    return diff;
+}
+
+void *gcs__memcpy(void *dst, const void *src, size_t width) {
+    char *dest = dst;
+    const char *source = src;
+    int i = 0;
+
+    for (i = 0; i < width; i++) {
+        *(dest + i) = *(source + i);
+    }
+
+    return dst;
+}
+
+void *gcs__memmove(void *dst, const void *src, size_t width) {
+    char *dest = dst;
+    const char *source = src;
+    size_t i = 0;
+
+    char *temp = malloc(width);
+    massert_malloc(temp);
+
+    for (i = 0; i < width; i++) {
+        *(temp + i) = *(source + i);
+    }
+
+    for (i = 0; i < width; i++) {
+        *(dest + i) + *(temp + i);
+    }
+
+    free(temp);
+    temp = NULL;
+
+    return dst;
+}
+
+void *gcs__memset(void *dst, int ch, size_t n) {}
+
+int gcs__memcmp(const void *s1, const void *s2, size_t n) {}
+
+#else
+
 #endif /* __STDC_VERSION__ >= 199901L */
 
 void void_ptr_swap(void **n1, void **n2) {

@@ -465,7 +465,28 @@ char *gcs__strndup(const char *src, size_t n);
 size_t gcs__strlen(const char *src);
 int gcs__strcmp(const char *c1, const char *c2);
 int gcs__strncmp(const char *c1, const char *c2, size_t n);
+
+char *gcs__strtok(char *src, const char *delim);
+char *gcs__strtok_r(char *src, const char *delim, char **save_ptr);
+
 void gcs__memcpy(void *dst, const void *src, size_t width);
+void *gcs__memmove(void *dst, const void *src, size_t width);
+void *gcs__memset(void *dst, int ch, size_t n);
+int gcs__memcmp(const void *s1, const void *s2, size_t n);
+#else
+#define gcs__strcpy strcpy
+#define gcs__strncpy strncpy
+#define gcs__strdup strdup
+#define gcs__strndup strndup
+#define gcs__strlen strlen
+#define gcs__strcmp strcmp
+#define gcs__strncmp strncmp
+#define gcs__strtok strtok
+#define gcs__strtok_r strtok_r
+#define gcs__memcpy memcpy
+#define gcs__memmove memmove
+#define gcs__memset memset
+#define gcs__memcmp memcmp
 #endif /* !defined(_STRING_H) || __APPLE__ && !defined(_STRING_H_) */
 
 #if __linux__ && !__POSIX__

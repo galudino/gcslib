@@ -69,9 +69,6 @@ void test_listtmpl_str(void);
 
 bool remove_if_even(const void *arg);
 
-person::person() : base() {
-}
-
 /**
  *  @brief  Program execution begins here
  *
