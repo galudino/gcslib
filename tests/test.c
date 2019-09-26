@@ -37,6 +37,7 @@
 #include <string.h>
 
 #include "gcslib.h"
+#include "vector_string.h"
 #include "vec2D.h"
 
 /**

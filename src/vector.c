@@ -1017,11 +1017,6 @@ void v_assignfill(vector *v, size_t n, const void *valaddr) {
  *
  *  @param[in]  v       pointer to vector
  *  @param[in]  valaddr address of element to be copied
- *
- *  If a copy function is defined in v's ttbl,
- *  valaddr will be deep-copied into v.
- *  Otherwise, valaddr will be shallow-copied into v
- *  using memcpy.
  */
 void v_pushb(vector *v, const void *valaddr) {
     massert_container(v);
@@ -1037,7 +1032,7 @@ void v_pushb(vector *v, const void *valaddr) {
 
     if (v->ttbl->copy) {
         /* if copy fn defined in ttbl, deep copy */
-        v->ttbl->copy(v->impl.finish, valaddr);
+        v->ttbl->copy(v->impl.finish, valaddr); 
     } else {
         /* if no copy defined in ttbl, shallow copy */
         memcpy(v->impl.finish, valaddr, v->ttbl->width);

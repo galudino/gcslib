@@ -1136,7 +1136,8 @@ void vpushbptr_str(vector_str *v, str *valaddr) {
 
     if (v->ttbl->copy) {
         /* if copy fn defined in ttbl, deep copy */
-        v->ttbl->copy(v->impl.finish++, valaddr);
+        /*v->ttbl->copy(v->impl.finish++, valaddr);*/
+        memcpy(v->impl.finish++, valaddr, v->ttbl->width);
     } else {
         /* if no copy defined in ttbl, shallow copy */
         memcpy(v->impl.finish++, valaddr, v->ttbl->width);

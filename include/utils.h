@@ -277,6 +277,7 @@ extern struct typetable *_pthread_t_;
 
 /**< Copy functions - casts arg to TYPE and copies the pointee */
 void *str_copy(void *arg, const void *other);
+void *str_cpy(const void *arg);
 void *cstr_copy(void *arg, const void *other);
 void *void_ptr_copy(void *arg, const void *other);
 
@@ -490,7 +491,7 @@ int gcs__memcmp(const void *s1, const void *s2, size_t n);
 #endif /* !defined(_STRING_H) || __APPLE__ && !defined(_STRING_H_) */
 
 #if __linux__ && !__POSIX__
-#define strdup(str) strcpy(malloc(strlen(str) + 1), src)
+#define strdup(str) strcpy(malloc(strlen(str) + 1), str)
 #define strndup(str, n) strcpy(malloc(n + 1), (str + n))
 #endif /* __linux__ && !__POSIX__ */
 

@@ -97,10 +97,10 @@ void *str_copy(void *arg, const void *other) {
     char **target = (char **)(arg);
     char **source = (char **)(other);
 
-    (*target) = malloc(strlen((*source) + 1));
+    (*target) = malloc(strlen((*source)) + 1);
     massert_malloc((*target));
     strcpy((*target), (*source));
-
+    
     return (*target) ? (*target) : NULL;
 }
 
