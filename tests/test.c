@@ -49,7 +49,65 @@
  *  @return     exit status
  */
 int main(int argc, const char * argv[]) {
+    /*
+    vector *v = v_new(_vec2D_);
+    
+    vec2D v1;
+    vec2D v2;
 
+    _vec2D_->copy = NULL;
+    vec2D_init(&v1, 23.1, 34.2);
+    vec2D_init(&v2, 45.3, 42.1);
+
+    v_pushb(v, &v1);
+    v_pushb(v, &v2);
+
+    v_puts(v);
+    v_delete(&v);
+    */
+
+    /*
+    vector *v = v_new(_str_);
+    char *str = NULL;
+
+    _str_->copy = NULL;
+
+    str = strdup("string1");
+    v_pushb(v, &str);
+
+    str = strdup("string2");
+    v_pushb(v, &str);
+
+    v_puts(v);
+
+    v_delete(&v);
+    */
+
+    /*
+    vector_str *v = vnew_str();
+    char *str = NULL;
+
+    _str_->copy = NULL;
+
+    str = strdup("string1");
+    vpushbptr_str(v, &str);
+
+    str = strdup("string2");
+    vpushbptr_str(v, &str);
+    
+    vputs_str(v);
+    vdelete_str(&v);
+    */
+
+    /*
+    vector_str *v = vnew_str();
+
+    vpushb_str(v, "string1");
+    vpushb_str(v, "string2");
+
+    vputs_str(v);
+    vdelete_str(&v);
+    */
 
     return EXIT_SUCCESS;
 }

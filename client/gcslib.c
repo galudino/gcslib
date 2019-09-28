@@ -31,6 +31,7 @@
 #define TESTING_VECTOR_CSTRING
 #include "gcslib.h" /**< Entire gcslib_c library */
 #include "vector_cstring.h"
+#include "vector_string.h"
 #include "vector_int32.h"
 
 #include "vec2D.h" /**< vec2D API, a test "object" */
@@ -77,7 +78,34 @@ bool remove_if_even(const void *arg);
  *
  *  @return     exit status
  */
-int main(int argc, const char *argv[]) {
+int main(int argc, char *argv[]) {
+    char *input_string = NULL;
+    char *buff = NULL;
+    char *curr = NULL;
+    vector_str *v = NULL;
+
+    if (argc < 2) {
+        exit(1);
+    } else {
+        input_string = argv[1];
+    }
+
+    buff = input_string;
+    curr = NULL;
+    v = vnew_str();
+
+    curr = strtok(buff, " ");
+    vpushb_str(v, curr);
+
+    while ((curr = strtok(NULL, " ")) != NULL) {
+        vpushb_str(v, curr);
+    }
+
+    vputs_str(v);
+    printf("buff: %s\n", buff);
+
+    vdelete_str(&v);
+
     /*
     test_vectorvp_int();
     test_vectorvp_str();
