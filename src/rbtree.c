@@ -89,7 +89,6 @@ static void rbn_preorder(rbnode **n, void (*consumer)(void *));
 static void rbn_postorder(rbnode **n, void (*consumer)(void *));
 static void rbn_levelorder(rbnode **n, void (*consumer)(void *));
 
-
 /*<< rbnode: traversal in buffer (used by iterator) - iterative */
 /*
 static rbnode **rbn_inorder_buffer(rbnode **n);
@@ -119,6 +118,51 @@ struct typetable ttbl_rbtree = {
 };
 
 struct typetable *_rbtree_ = &ttbl_rbtree;
+
+iterator rbti_begin(void *arg);
+iterator rbti_end(void *arg);
+
+iterator rbti_next(iterator it);
+iterator rbti_next_n(iterator it, int n);
+
+iterator rbti_prev(iterator it);
+iterator rbti_prev_n(iterator it, int n);
+
+iterator *rbti_advance(iterator *it, int n);
+iterator *rbti_incr(iterator *it);
+iterator *rbti_decr(iterator *it);
+
+void *rbti_curr(iterator it);
+void *rbti_start(iterator it);
+void *rbti_finish(iterator it);
+
+int rbti_distance(iterator *first, iterator *last);
+
+bool rbti_has_next(iterator it);
+bool rbti_has_prev(iterator it);
+
+struct typetable *rbti_get_ttbl(void *arg);
+
+struct iterator_table itbl_rbtree = {
+    rbti_begin,
+    rbti_end,
+    rbti_next,
+    rbti_next_n,
+    rbti_prev,
+    rbti_prev_n,
+    rbti_advance,
+    rbti_incr,
+    rbti_decr,
+    rbti_curr,
+    rbti_start,
+    rbti_finish,
+    rbti_distance,
+    rbti_has_next,
+    rbti_has_prev,
+    rbti_get_ttbl
+};
+
+struct iterator_table *_rbtree_iterator_ = &itbl_rbtree;
 
 /*<< rbtree: allocation/initialization */
 static rbtree *rbt_allocate();
@@ -193,7 +237,17 @@ void rbt_delete(rbtree **t) {
     (*t) = NULL;
 }
 
+iterator rbt_begin(rbtree *t) {
+    iterator it;
 
+    return it;
+}
+
+iterator rbt_end(rbtree *t) {
+    iterator it;
+
+    return it;
+}
 
 size_t rbt_size(rbtree *t) {
     assert(t);
@@ -1465,3 +1519,70 @@ static void rbt_deinit(rbtree *t) {
     t->root = NULL;
 }
 
+iterator rbti_begin(void *arg) {
+    iterator it;
+
+    return it;
+}
+
+iterator rbti_end(void *arg) {
+    iterator it;
+
+    return it;
+}
+
+iterator rbti_next(iterator it) {
+    return it;
+}
+
+iterator rbti_next_n(iterator it, int n) {
+    return it;
+}
+
+iterator rbti_prev(iterator it) {
+    return it;
+}
+
+iterator rbti_prev_n(iterator it, int n) {
+    return it;
+}
+
+iterator *rbti_advance(iterator *it, int n) {
+    return it;
+}
+
+iterator *rbti_incr(iterator *it) {
+    return it;
+}
+
+iterator *rbti_decr(iterator *it) {
+    return it;
+}
+
+void *rbti_curr(iterator it) {
+    return NULL;
+}
+
+void *rbti_start(iterator it) {
+    return NULL;
+}
+
+void *rbti_finish(iterator it) {
+    return NULL;
+}
+
+int rbti_distance(iterator *first, iterator *last) {
+    return 0;
+}
+
+bool rbti_has_next(iterator it) {
+    return false;
+}
+
+bool rbti_has_prev(iterator it) {
+    return false;
+}
+
+struct typetable *rbti_get_ttbl(void *arg) {
+    return NULL;
+}

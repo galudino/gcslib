@@ -82,7 +82,8 @@ rbtree *rbt_newmove(rbtree **t);
 void rbt_delete(rbtree **t);
 
 /*<< rbtree: iterator functions */
-
+iterator rbt_begin(rbtree *t);
+iterator rbt_end(rbtree *t);
 
 /*<< rbtree: length functions */
 size_t rbt_size(rbtree *t);
