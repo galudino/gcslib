@@ -175,15 +175,13 @@
  *  Dependencies:
  *      utils
  *      iterator
- *      vector
  */
-/* #include "rbtree.h" */
+ #include "rbtree.h"
 
 /**
  *  Dependencies:
  *      utils
  *      iterator
- *      vector
  */
 /* #include "rbtree_float.h" */
 /* #include "rbtree_int.h" */
@@ -193,7 +191,6 @@
  *  Dependencies:
  *      utils
  *      iterator
- *      vector
  *      pair_int_str
  */
 /* #include "rbtree_pair_int_str.h" */
