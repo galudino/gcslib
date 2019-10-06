@@ -103,7 +103,7 @@
  *      iterator
  *      mergesort
  */
-/* #include "slist.h" */
+#include "slist.h"
 
 /**
  *  Dependencies:

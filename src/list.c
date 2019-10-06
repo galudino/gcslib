@@ -45,11 +45,13 @@ static void ln_deinit(list_node *n, struct typetable *ttbl);
 static list_node *ln_new(struct typetable *ttbl, const void *valaddr);
 static void ln_delete(list_node **n, struct typetable *ttbl);
 
+/*
 static void ln_swap(list_node *x, list_node *y);
 static void ln_transfer(list_node *n, list_node *first, list_node *last);
 static void ln_reverse(list_node *n);
 static void ln_hook(list_node *n, list_node *position);
 static void ln_unhook(list_node *n);
+*/
 
 /**
  *  @struct     list

@@ -1549,3 +1549,44 @@ size_t lnb_distance(list_node_base *pos, list_node_base *end) {
 
     return count;
 }
+
+slist_node_base *slnb_transfer_after(slist_node_base *n, slist_node_base *begin) {
+    slist_node_base *end = begin->next;
+
+    while (end && end->next) {
+        end = end->next;
+    }
+
+    return slnb_transfer_after_rnge(n, begin, end);
+}
+
+slist_node_base *slnb_transfer_after_rnge(slist_node_base *n, slist_node_base *begin, slist_node_base *end) {
+    slist_node_base *keep = begin->next;
+
+    if (end) {
+        begin->next = end->next;
+        end->next = n->next;
+    } else {
+        begin->next = NULL;
+    }
+
+    n->next = keep;
+    return end;
+}
+
+void slnb_reverse_after(slist_node_base *n) {
+    slist_node_base *tail = n->next;
+    slist_node_base *temp = NULL;
+
+    if (!tail) {
+        return;
+    }
+
+    while ((temp = tail->next) != NULL) {
+        slist_node_base *keep = n->next;
+        n->next = temp;
+
+        tail->next = temp->next;
+        n->next->next = keep;
+    }
+}
