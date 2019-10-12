@@ -91,7 +91,7 @@
  *      utils
  *      iterator
  *      mergesort_tmpl
- *      list_tmpl
+ *      list_tmpllong_double
  */
 /* #include "list_float.h" */
 /* #include "list_int.h" */

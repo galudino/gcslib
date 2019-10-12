@@ -59,7 +59,9 @@ struct typetable ttbl_unsigned_long_long_int;
 
 struct typetable ttbl_float;
 struct typetable ttbl_double;
+#if __STDC_VERSION__ >= 199901L
 struct typetable ttbl_long_double;
+#endif
 
 struct typetable ttbl_bool;
 
@@ -100,7 +102,7 @@ void *str_copy(void *arg, const void *other) {
     (*target) = malloc(strlen((*source)) + 1);
     massert_malloc((*target));
     strcpy((*target), (*source));
-    
+
     return (*target) ? (*target) : NULL;
 }
 
@@ -111,7 +113,7 @@ void *cstr_copy(void *arg, const void *other) {
     (*target) = malloc(strlen((*source) + 1));
     massert_malloc((*target));
     strcpy((*target), (*source));
-    
+
     return (*target) ? (*target) : NULL;
 }
 
@@ -167,7 +169,7 @@ void cstr_swap(void *arg, void *other) {
         char *temp = malloc(strlen(*dest) + 1);
         massert_malloc(temp);
         strcpy(temp, (*dest));
-        
+
         (*dest) = (*source);
         (*source) = temp;
     } else {
@@ -286,6 +288,7 @@ int double_compare(const void *c1, const void *c2) {
     return result;
 }
 
+#if __STDC_VERSION__ >= 199901L
 int long_double_compare(const void *c1, const void *c2) {
     long double result = -99999.9;
     long double long_double1 = *((long double *)c1);
@@ -308,6 +311,7 @@ int long_double_compare(const void *c1, const void *c2) {
 
     return result;
 }
+#endif
 
 int bool_compare(const void *c1, const void *c2) {
     return *((bool *)c1) - *((bool *)c2);
@@ -519,12 +523,18 @@ void float_print(const void *arg, FILE *dest) {
 }
 
 void double_print(const void *arg, FILE *dest) {
+    #if __STD_VERSION__ >= 199901L
     fprintf(dest, "%lf", *(double *)arg);
+    #else
+    fprintf(dest, "%f", *(double *)arg);
+    #endif
 }
 
+#if __STD_VERSION__ >= 199901L
 void long_double_print(const void *arg, FILE *dest) {
     fprintf(dest, "%LF", *(long double *)arg);
 }
+#endif
 
 void bool_print(const void *arg, FILE *dest) {
     fprintf(dest, "%s", *((bool *)arg) ? "true" : "false");
@@ -679,7 +689,7 @@ char *int_parse(const void *arg) {
     parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
     strcpy(parsed, buffer);
-    
+
     return parsed;
 }
 
@@ -699,7 +709,7 @@ char *unsigned_int_parse(const void *arg) {
     parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
     strcpy(parsed, buffer);
-    
+
     return parsed;
 }
 
@@ -715,7 +725,7 @@ char *long_int_parse(const void *arg) {
     parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
     strcpy(parsed, buffer);
-    
+
     return parsed;
 }
 
@@ -735,7 +745,7 @@ char *unsigned_long_int_parse(const void *arg) {
     parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
     strcpy(parsed, buffer);
-    
+
     return parsed;
 }
 
@@ -751,7 +761,7 @@ char *long_long_int_parse(const void *arg) {
     parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
     strcpy(parsed, buffer);
-    
+
     return parsed;
 }
 
@@ -770,7 +780,7 @@ char *unsigned_long_long_int_parse(const void *arg) {
     parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
     strcpy(parsed, buffer);
-    
+
     return parsed;
 }
 
@@ -802,10 +812,11 @@ char *double_parse(const void *arg) {
     parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
     strcpy(parsed, buffer);
-    
+
     return parsed;
 }
 
+#if __STDC_VERSION__ >= 199901L
 char *long_double_parse(const void *arg) {
     const char value = *(long double *)arg;
     const char *format = "%Lf";
@@ -818,9 +829,10 @@ char *long_double_parse(const void *arg) {
     parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
     strcpy(parsed, buffer);
-    
+
     return parsed;
 }
+#endif
 
 char *bool_parse(const void *arg) {
     const bool value = *(bool *)arg;
@@ -834,7 +846,7 @@ char *bool_parse(const void *arg) {
     parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
     strcpy(parsed, buffer);
-    
+
     return parsed;
 }
 
@@ -854,7 +866,7 @@ char *str_parse(const void *arg) {
     parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
     strcpy(parsed, buffer);
-    
+
     return parsed;
 }
 
@@ -873,7 +885,7 @@ char *void_ptr_parse(const void *arg) {
     parsed = malloc(strlen(buffer) + 1);
     massert_malloc(parsed);
     strcpy(parsed, buffer);
-    
+
     return parsed;
 }
 
@@ -1044,9 +1056,11 @@ struct typetable ttbl_float = {sizeof(float), NULL,          NULL,
 struct typetable ttbl_double = {sizeof(double), NULL,           NULL,
                                 NULL,           double_compare, double_print};
 
+#if __STDC_VERSION__ >= 199901L
 struct typetable ttbl_long_double = {
     sizeof(long double), NULL, NULL, NULL, long_double_compare,
     long_double_print};
+#endif
 
 struct typetable ttbl_bool = {sizeof(bool), NULL,         NULL,
                               NULL,         bool_compare, bool_print};
@@ -1143,7 +1157,9 @@ struct typetable *_unsigned_long_long_int_ = NULL;
 
 struct typetable *_float_ = &ttbl_float;
 struct typetable *_double_ = &ttbl_double;
+#if __STDC_VERSION__ >= 199901L
 struct typetable *_long_double_ = &ttbl_long_double;
+#endif
 
 struct typetable *_bool_ = &ttbl_bool;
 
@@ -1389,7 +1405,7 @@ void *allocate_and_copy(struct typetable *ttbl, size_t n, void *first,
     void *result = NULL;
     void *pos = NULL;
     void *curr = NULL;
-    
+
     massert_ttbl(ttbl);
     massert(n > 0, "[n must be greater than 0]");
     massert_ptr(first);

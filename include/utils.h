@@ -179,7 +179,10 @@ extern struct typetable *_unsigned_long_long_int_;
 
 extern struct typetable *_float_;
 extern struct typetable *_double_;
+
+#if __STD_VERSION__ >= 199901L
 extern struct typetable *_long_double_;
+#endif
 
 extern struct typetable *_bool_;
 
@@ -316,7 +319,9 @@ int unsigned_long_long_int_compare(const void *c1, const void *c2);
 
 int float_compare(const void *c1, const void *c2);
 int double_compare(const void *c1, const void *c2);
+#if __STDC_VERSION__ >= 199901L
 int long_double_compare(const void *c1, const void *c2);
+#endif
 
 int bool_compare(const void *c1, const void *c2);
 
@@ -372,7 +377,9 @@ void unsigned_long_long_int_print(const void *arg, FILE *dest);
 
 void float_print(const void *arg, FILE *dest);
 void double_print(const void *arg, FILE *dest);
+#if __STDC_VERSION__ >= 199901L
 void long_double_print(const void *arg, FILE *dest);
+#endif
 
 void bool_print(const void *arg, FILE *dest);
 
@@ -425,7 +432,9 @@ char *unsigned_long_long_int_parse(const void *arg);
 
 char *float_parse(const void *arg);
 char *double_parse(const void *arg);
+#if __STDC_VERSION__ >= 199901L
 char *long_double_parse(const void *arg);
+#endif
 
 char *bool_parse(const void *arg);
 

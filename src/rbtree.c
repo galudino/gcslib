@@ -1135,7 +1135,7 @@ static void rbn_postorder(rbnode **n, void (*consumer)(void *)) {
     is = calloc(sz, sizeof((*is)));
     assert(is);
 
-    value = -1;    
+    value = -1;
 
     current = (*n);
     value = 0;
@@ -1220,7 +1220,7 @@ static void rbn_levelorder(rbnode **n, void (*consumer)(void *)) {
         consumer(&current);
 
         if (current->left) {
- 
+
             tq_rear = (tq_rear + 1) % tq_cap;
             temp_q[tq_rear] = current->left;
             ++tq_size;
@@ -1341,7 +1341,7 @@ static rbnode **rbn_postorder_buffer(rbnode **n) {
     q = calloc(sz, sizeof((*q)));
     assert(q);
 
-    value = -1;   
+    value = -1;
 
     current = (*n);
     value = 0;
@@ -1484,7 +1484,7 @@ static void rbn_fputs(rbnode *n, FILE *dest, char *b, bool last,
 
         fprintf(dest, "]%s ", KNRM);
 
-        fprintf(dest, "(%s%p%s)", KCYN, n, KNRM);
+        fprintf(dest, "(%s%p%s)", KCYN, (void *)(n), KNRM);
 
         fprintf(dest, "\n");
         rbn_fputs(n->left, dest, newbuf, false, print);

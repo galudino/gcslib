@@ -28,6 +28,7 @@
  *  THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if !defined(VECTOR_LONG_DOUBLE_H) && __STD_VERSION__ >= 199901L
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
@@ -292,7 +293,7 @@ vector_long_double *vnewrnge_long_double(iterator first, iterator last) {
          *  Iterators first and last must refer to the same container,
          *  or else the cursor pointer will never meet the sentinel pointer
          *  that will end the copy loop.
-         * 
+         *
          *  This also means that iterators first and last cannot refer to
          *  different container types (this is determiend by what itbls
          *  they each point to)
@@ -509,7 +510,7 @@ void vresize_long_double(vector_long_double *v, size_t n) {
 
     size_t fin = 0;
     size_t end = 0;
-    
+
     massert_container(v);
 
     old_size = vsize_long_double(v);
@@ -944,7 +945,7 @@ const long_double **vdataconst_long_double(vector_long_double *v) {
  *
  *  Elements in this vector will be destroyed, and replaced with
  *  contents from [first, last).
- *  
+ *
  *  If the range of [first, last) exceeds that of vcapacity_long_double(v),
  *  the capacity will be increased to that of size it_distance(&first, &last).
  */
@@ -960,7 +961,7 @@ void vassignrnge_long_double(vector_long_double *v, iterator first, iterator las
          *  Iterators first and last must refer to the same container,
          *  or else the cursor pointer will never meet the sentinel pointer
          *  that will end the copy loop.
-         * 
+         *
          *  This also means that iterators first and last cannot refer to
          *  different container types (this is determiend by what itbls
          *  they each point to)
@@ -970,7 +971,7 @@ void vassignrnge_long_double(vector_long_double *v, iterator first, iterator las
     }
 
     /**
-     *  Clear the vector. 
+     *  Clear the vector.
      */
     vclear_long_double(v);
 
@@ -991,7 +992,7 @@ void vassignrnge_long_double(vector_long_double *v, iterator first, iterator las
             memcpy(v->impl.finish++, curr, v->ttbl->width);
             it_incr(&first);
         };
-    } 
+    }
 }
 
 /**
@@ -1000,10 +1001,10 @@ void vassignrnge_long_double(vector_long_double *v, iterator first, iterator las
  *  @param[in]  v           pointer to vector_long_double
  *  @param[in]  n           amount of elements to assign
  *  @param[in]  val         the element to assign
- * 
+ *
  *  Elements in this vector will be destroyed,
  *  and replaced with n copies of val.
- * 
+ *
  *  If n exceeds that of vcapacity_long_double(v),
  *  the capacity of this vector will be increased to that of size n.
  */
@@ -1011,7 +1012,7 @@ void vassignfill_long_double(vector_long_double *v, size_t n, long_double val) {
     long_double *sentinel = NULL;
 
     /**
-     *  Clear the vector. 
+     *  Clear the vector.
      */
     vclear_long_double(v);
 
@@ -1033,7 +1034,7 @@ void vassignfill_long_double(vector_long_double *v, size_t n, long_double val) {
         while (v->impl.finish != sentinel)  {
             memcpy(v->impl.finish++, &val, v->ttbl->width);
         };
-    } 
+    }
 }
 
 /**
@@ -1045,7 +1046,7 @@ void vassignfill_long_double(vector_long_double *v, size_t n, long_double val) {
  *
  *  Elements in this vector will be destroyed,
  *  and replaced with n copies of valaddr.
- * 
+ *
  *  If n exceeds that of vcapacity_long_double(v),
  *  the capacity of this vector will be increased to that of size n.
  */
@@ -1053,7 +1054,7 @@ void vassignfillptr_long_double(vector_long_double *v, size_t n, long_double *va
     long_double *sentinel = NULL;
 
     /**
-     *  Clear the vector. 
+     *  Clear the vector.
      */
     vclear_long_double(v);
 
@@ -1075,7 +1076,7 @@ void vassignfillptr_long_double(vector_long_double *v, size_t n, long_double *va
         while (v->impl.finish != sentinel)  {
             memcpy(v->impl.finish++, valaddr, v->ttbl->width);
         };
-    } 
+    }
 }
 
 /**
@@ -1427,7 +1428,7 @@ iterator vinsertfill_long_double(vector_long_double *v, iterator pos, size_t n, 
          *  of the former sentinel value, which was one position behind
          *  pos.curr)
          */
-        ++v->impl.finish; 
+        ++v->impl.finish;
 
         if (v->ttbl->copy) {
             /* deep copy */
@@ -1556,7 +1557,7 @@ iterator vinsertfillptr_long_double(vector_long_double *v, iterator pos, size_t 
          *  of the former sentinel value, which was one position behind
          *  pos.curr)
          */
-        ++v->impl.finish; 
+        ++v->impl.finish;
 
         if (v->ttbl->copy) {
             /* deep copy */
@@ -1671,7 +1672,7 @@ iterator vinsertrnge_long_double(vector_long_double *v, iterator pos,
          *  Each element in the range [n, vsize_long_double(v))
          *  will be moved delta blocks over
          *  -- starting with the rear element.
-         * 
+         *
          *  sentinel will be set one position behind pos.curr
          *  to account for the new element(s) being inserted
          */
@@ -1755,18 +1756,18 @@ iterator vinsertmove_long_double(vector_long_double *v, iterator pos, long_doubl
          *  the address of dst will be sent to swap,
          *  along with valaddr (which is already the address of some var
          *  sent in by the client)
-         * 
+         *
          *  The contents of valaddr will be used to initialize dst,
          *  and the standard insert function will be called after.
-         * 
+         *
          *  If no swap function is defined,
          *  a regular insert occurs.
-         *  
+         *
          *  This function can prove useful if a client has a dynamically
          *  allocated type, like a pointer (or a type with dynamically allocated fields)
          *  and wants vector to have full ownership of the memory that param inserted
          *  referred to.
-         * 
+         *
          *  This can help prevent unwanted deep copying of elements, or shallow copies
          *  of elements where there are two pointers referring to the same memory.
          */
@@ -2092,7 +2093,7 @@ void vinsertat_long_double(vector_long_double *v, size_t index, long_double val)
     /**
      *  All of the above was code for pushb,
      *  but incrementing the finish pointer was omitted.
-     * 
+     *
      *  Use index to swap elements from [index, vsize_long_double(v))
      *  val will reside at the index originally specified by
      *  index.
@@ -2159,7 +2160,7 @@ void vinsertatptr_long_double(vector_long_double *v, size_t index, long_double *
     /**
      *  All of the above was code for pushb,
      *  but incrementing the finish pointer was omitted.
-     * 
+     *
      *  Use index to swap elements from [index, vsize_long_double(v))
      *  val will reside at the index originally specified by
      *  index.
@@ -2454,10 +2455,10 @@ void vremove_long_double(vector_long_double *v, long_double val) {
 
 /**
  *  @brief  Removes all occurences of elements that meet a condition within v
- * 
+ *
  *  @param[in]  v                   pointer to vector
  *  @param[in]  unary_predicate     pointer to function
- * 
+ *
  *  For all elements e in v, if unary_predicate(e) == true,
  *  it will be removed.
  */
@@ -2519,7 +2520,7 @@ vector_long_double *vmerge_long_double(vector_long_double *v, vector_long_double
 
     if (size_other >= capacity_v) {
         /**
-         *  If (other's size + v's current size) 
+         *  If (other's size + v's current size)
          *  will exceed that of v's capacity,
          *  resize v
          */
@@ -2537,7 +2538,7 @@ vector_long_double *vmerge_long_double(vector_long_double *v, vector_long_double
          *  other has a copy function defined in its ttbl,
          *  and v shares the same copy function with other,
          *  do a deep copy of other's elements into v.
-         * 
+         *
          *  A deep copy from other to v for types with
          *  dynamically allocated memory means that clearing
          *  v does not affect other whatsoever.
@@ -2550,7 +2551,7 @@ vector_long_double *vmerge_long_double(vector_long_double *v, vector_long_double
          *  If either v/other lack a copy function,
          *  and/or they do not share the same copy function,
          *  a shallow copy of other's elements into v will occur.
-         *  
+         *
          *  A shallow copy from other to v for types with
          *  dynamically allocated memory means that clearing
          *  v will clear the memory associated with the elements
@@ -2638,20 +2639,20 @@ vector_long_double *varrtov_long_double(long_double *base, size_t length) {
 
 /**
  *  @brief  Takes an existing pointer, base, and adapts it for use with vector
- * 
+ *
  *  @param[in]  base        base address of an array to copy, dynamically allocated
  *  @param[in]  length      logical length of base
  *  @param[in]  capacity    memory capacity of base
  *
  *  @return     pointer to vector with contents of base
- *  
+ *
  *  Precondition: base points to a valid address of dynamically allocated memory.
  *  No allocation/copying of any kind is done within this function --
  *  this simply assigns the pointer base to be used by vector --
- *  it acts as a "wrapper" for base. 
- *  
+ *  it acts as a "wrapper" for base.
+ *
  *  An appropriate typetable must be chosen for this instantiation, as always.
- * 
+ *
  *  Since this vector will be using a pre-existing pointer,
  *  be careful and pay special attention to the management of its memory.
  */
@@ -2737,7 +2738,7 @@ void vsort_long_double(vector_long_double *v) {
         return;
     }
 
-    comparator = v->ttbl->compare 
+    comparator = v->ttbl->compare
     ? v->ttbl->compare : void_ptr_compare;
 
     /* cstdlib qsort (best performance) */
@@ -2895,7 +2896,7 @@ void *tmpl_vector_copy_long_double(void *arg, const void *other) {
  */
 void tmpl_vector_dtor_long_double(void *arg) {
     vector_long_double **v = NULL;
-    
+
     massert_ptr(arg);
 
     v = (vector_long_double **)(arg);
@@ -3131,7 +3132,7 @@ static void vinit_long_double(vector_long_double *v, size_t capacity) {
     if (capacity <= 0) {
         WARNING(__FILE__, "Provided input capacity was less than or equal to 0. Will default to capacity of 1.");
         capacity = 1;
-    } 
+    }
 
     start = calloc(capacity, v->ttbl->width);
     massert_calloc(start);
@@ -3513,8 +3514,8 @@ static bool vihasnext_long_double(iterator it) {
  */
 static bool vihasprev_long_double(iterator it) {
     vector_long_double *v = (vector_long_double *)(it.container);
-    return it.curr != v->impl.start;
-}
+    return it.curr != v->impl.start;#if !defined(VECTOR_LONG_DOUBLE_H) && __STD_VERSION__ >= 199901L
+}#if !defined(VECTOR_LONG_DOUBLE_H) && __STD_VERSION__ >= 199901L
 
 /**
  *  @brief  Retrieve a container's typetable
@@ -3527,3 +3528,6 @@ static struct typetable *vigetttbl_long_double(void *arg) {
     vector_long_double *v = (vector_long_double *)(arg);
     return v->ttbl;
 }
+#else
+typedef struct vector_long_double __VECTOR_LONG_DOUBLE_PLACEHOLDER__;
+#endif
