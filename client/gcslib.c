@@ -53,6 +53,7 @@
  *  @return     exit status
  */
 int main(int argc, char *argv[]) {
+    
     rbtree *t = rbt_new(_int_);
     int i = 0;
     int temp = 0;
@@ -64,9 +65,33 @@ int main(int argc, char *argv[]) {
 
     rbt_puts(t);
     
-
-
     rbt_delete(&t);
+
+    {
+        vector *v = v_new(_str_);
+
+        iterator it;
+        char **curr = NULL;
+        char *str = NULL;
+
+        str = "first";
+        v_pushb(v, &str);
+
+        str = "second";
+        v_pushb(v, &str);
+
+        str = "third";
+        v_pushb(v, &str);
+
+        it = v_begin(v);
+        v_erasernge(v, v_begin(v), v_end(v));
+
+        v_puts(v);
+
+        v_delete(&v);
+
+    }
+    
 
     return EXIT_SUCCESS;
 }

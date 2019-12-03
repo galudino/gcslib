@@ -1542,33 +1542,20 @@ iterator v_erase(vector *v, iterator pos) {
          *  at the erased element's former index
          */
         return it_next_n(v_begin(v), ipos);
-    } else if (ipos < back_index && ipos >= 0) {
-        if (v->ttbl->dtor) {
-            /* If elements were deep copied, release their memory */
-            v->ttbl->dtor(pos.curr);
+    } else if (ipos < back_index && ipos >= 0) { 
+        {
+            void *curr = pos.curr;
+            void *next = NULL;
+            void *sentinel = (char *)(v->impl.finish) - v->ttbl->width;
+
+            while (curr != sentinel) {
+                next = (char *)(curr) + v->ttbl->width;
+                v_swap_addr(v, curr, next);
+                curr = (char *)(curr) + v->ttbl->width;
+            }
         }
 
-        curr = NULL;
-        sentinel = v->impl.finish;
-
-        /**
-         *  v->impl.finish and it_finish(pos) should refer to the same thing.
-         *  Undefined behavior if pos does not refer to container v!
-         */
-
-        while ((curr = it_curr(pos)) != sentinel) {
-            /**
-             *  Swapping it_curr(pos) and it_curr(it_next(pos))
-             *  will shift it_curr(it_next(pos)) one element
-             *  to the left. this process continues until
-             *  it_curr(pos) equals v->impl.finish.
-             */
-            v_swap_addr(v, curr, it_curr(it_next(pos)));
-            it_incr(&pos);
-        }
-
-        /* decrementing the finish pointer 1 block to the left */
-        v->impl.finish = (char *)(v->impl.finish) - (v->ttbl->width);
+        v_popb(v);
     }
 
     /**
@@ -1576,6 +1563,7 @@ iterator v_erase(vector *v, iterator pos) {
      *  so an iterator is returned referring to an element
      *  at the erased element's former index
      */
+
     return it_next_n(v_begin(v), ipos);
 }
 
@@ -2917,7 +2905,7 @@ static iterator vi_next_n(iterator it, int n) {
 
     pos = ptr_distance(v->impl.start, iter.curr, v->ttbl->width);
 
-    if ((v_size(v) - pos) <= 0) {
+    if ((v_size(v) - pos) < 0) {
         char str[256];
         sprintf(str, "Cannot advance %d times from position %d.", n, pos);
         ERROR(__FILE__, str);
@@ -2976,7 +2964,7 @@ static iterator vi_prev_n(iterator it, int n) {
 
     pos = ptr_distance(v->impl.start, iter.curr, v->ttbl->width);
 
-    if ((v_size(v) - pos) <= 0) {
+    if ((v_size(v) - pos) < 0) {
         char str[256];
         sprintf(str, "Cannot retract %d times from position %d.", n, pos);
         ERROR(__FILE__, str);

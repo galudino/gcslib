@@ -322,82 +322,41 @@ int char_ptr_compare(const void *c1, const void *c2) {
 }
 
 int str_compare(const void *c1, const void *c2) {
-    int result = -1;
+    char **first = (char **)(c1);
+    char **second = (char **)(c2);
 
-    char *first = *((char **)(c1));
-    char *second = *((char **)(c2));
-
-#if __STD_VERSION__ >= 199901L
-    char cfirst[strlen(first) + 1];
-    char csecond[strlen(second) + 1];
-#else
-    char *cfirst = malloc(strlen(first) + 1);
-    char *csecond = malloc(strlen(second) + 1);
-    massert_malloc(cfirst);
-    massert_malloc(second);
-#endif /* __STDC_VERSION__ >= 199901L */
-
-    strcpy(cfirst, first);
-    strcpy(csecond, second);
-
-    str_trim(cfirst, NULL);
-    str_trim(csecond, NULL);
-
-    result = strcmp(cfirst, csecond);
-
-#if __STD_VERSION__ >= 199901L
-    free(cfirst);
-    cfirst = NULL;
-
-    free(csecond);
-    csecond = NULL;
-#endif /* __STDC_VERSION__ >= 199901L */
-
-    return result;
+    return strcmp((*first), (*second));
 }
 
 int str_compare_ignore_case(const void *c1, const void *c2) {
-    char *first = *((char **)(c1));
-    char *second = *((char **)(c2));
+    char **first = (char **)(c1);
+    char **second = (char **)(c2);
 
     int i = 0;
+    int len_f = strlen((*first));
+    int len_s = strlen((*second));
+    int result = -1;
 
-#if __STD_VERSION__ >= 199901L
-    char cfirst[strlen(first) + 1];
-    char csecond[strlen(second) + 1];
-#else
-    char *cfirst = malloc(strlen(first) + 1);
-    char *csecond = malloc(strlen(second) + 1);
-    massert_malloc(cfirst);
-    massert_malloc(csecond);
-#endif /* __STDC_VERSION__ >= 199901L */
+    char *f = strcpy(malloc(len_f + 1), (*first));
+    char *s = strcpy(malloc(len_s + 1), (*second));
 
-    strcpy(cfirst, first);
-    strcpy(csecond, second);
-
-    str_trim(cfirst, NULL);
-    str_trim(csecond, NULL);
-
-    while (true) {
-        i = toupper(*first) - toupper(*second);
-
-        if (i != 0 || !*first) {
-            break;
-        } else {
-            ++first;
-            ++second;
-        }
+    for (i = 0; i < len_f; i++) {
+        toupper(f[i]);
     }
 
-#if __STD_VERSION__ >= 199901L
-    free(cfirst);
-    cfirst = NULL;
+    for (i = 0; i < len_s; i++) {
+        toupper(s[i]);
+    }
 
-    free(csecond);
-    csecond = NULL;
-#endif /* __STDC_VERSION__ >= 199901L */
+    result = strcmp(f, s);
 
-    return i;
+    free(f);
+    f = NULL;
+
+    free(s);
+    s = NULL;
+
+    return result;
 }
 
 int cstr_compare(const void *c1, const void *c2) {
