@@ -336,16 +336,17 @@ int str_compare_ignore_case(const void *c1, const void *c2) {
     int len_f = strlen((*first));
     int len_s = strlen((*second));
     int result = -1;
+    int t = 0;
 
     char *f = strcpy(malloc(len_f + 1), (*first));
     char *s = strcpy(malloc(len_s + 1), (*second));
 
     for (i = 0; i < len_f; i++) {
-        toupper(f[i]);
+        t = toupper(f[i]);
     }
 
     for (i = 0; i < len_s; i++) {
-        toupper(s[i]);
+        t = toupper(s[i]);
     }
 
     result = strcmp(f, s);
@@ -1366,7 +1367,7 @@ void *allocate_and_copy(struct typetable *ttbl, size_t n, void *first,
     void *curr = NULL;
 
     massert_ttbl(ttbl);
-    massert(n > 0, "[n must be greater than 0]");
+    massert((n > 0), "[n must be greater than 0]");
     massert_ptr(first);
 
     result = calloc(n, ttbl->width);

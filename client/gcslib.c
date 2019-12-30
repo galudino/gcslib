@@ -44,6 +44,7 @@
 #include <string.h>
 #include <unistd.h>
 
+
 /**
  *  @brief  Program execution begins here
  *
@@ -53,7 +54,9 @@
  *  @return     exit status
  */
 int main(int argc, char *argv[]) {
-    
+
+
+    /*
     rbtree *t = rbt_new(_int_);
     int i = 0;
     int temp = 0;
@@ -64,7 +67,7 @@ int main(int argc, char *argv[]) {
     }
 
     rbt_puts(t);
-    
+
     rbt_delete(&t);
 
     {
@@ -91,7 +94,7 @@ int main(int argc, char *argv[]) {
         v_delete(&v);
 
     }
-    
+    */
 
     return EXIT_SUCCESS;
 }
