@@ -54,7 +54,30 @@
  *  @return     exit status
  */
 int main(int argc, char *argv[]) {
+    vector *v = v_new(_str_);
+    iterator it = v_begin(v);
+    char *str = NULL;
 
+    str = "string1";
+    v_insert(v, it, &str);
+    it_incr(&it);
+
+    str = "string2";
+    v_insert(v, it, &str);
+    it_incr(&it);
+
+    str = "string3";
+    v_insert(v, it, &str);
+    it_incr(&it);
+
+    it_advance(&it, -2);
+
+    str = "string4";
+    v_insert(v, it, &str);
+
+    v_puts(v);
+
+    v_delete(&v);
 
     /*
     rbtree *t = rbt_new(_int_);
